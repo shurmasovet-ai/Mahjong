@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Мобильный Маджонг</title>
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -17,26 +18,35 @@
             height: 100%; width: 100%; background: radial-gradient(circle, #2c3e50, #1a2a3a);
             position: absolute; top: 0; left: 0; z-index: 50;
         }
+        
+        /* Обновленный стиль заголовка с новым шрифтом и 3D-тенью */
         #main-menu h1 {
-            font-size: 14vw; margin-bottom: 20px; text-shadow: 0 4px 6px rgba(0,0,0,0.5);
-            color: #f1c40f; text-align: center;
+            font-family: 'Russo One', sans-serif;
+            font-size: 15vw; 
+            margin-bottom: 15px; 
+            color: #f1c40f; 
+            text-align: center;
+            letter-spacing: 2px;
+            text-shadow: 0 6px 0 #d35400, 0 10px 15px rgba(0,0,0,0.6);
         }
+        
         #menu-level-text { font-size: 6vw; font-weight: bold; color: #2ecc71; margin-bottom: 40px; }
 
         .btn {
             background-color: #e67e22; color: white; border: none; padding: 15px 40px;
+            font-family: 'Russo One', sans-serif; /* Кнопкам тоже зададим этот шрифт для стиля */
             font-size: 6vw; border-radius: 30px; box-shadow: 0 6px 0 #d35400;
             cursor: pointer; transition: transform 0.1s, box-shadow 0.1s;
-            touch-action: manipulation; user-select: none; font-weight: bold;
+            touch-action: manipulation; user-select: none;
             margin-bottom: 20px; width: 70vw; max-width: 300px;
-            display: flex; justify-content: center; align-items: center;
+            display: flex; justify-content: center; align-items: center; letter-spacing: 1px;
         }
         .btn:active { transform: translateY(6px); box-shadow: 0 0 0 #d35400; }
         .btn-secondary { background-color: #3498db; box-shadow: 0 6px 0 #2980b9; }
         .btn-secondary:active { box-shadow: 0 0 0 #2980b9; }
         .btn-small {
-            font-size: 4vw; padding: 10px 15px; border-radius: 15px;
-            box-shadow: 0 4px 0 #d35400; width: auto; margin-bottom: 0;
+            font-family: sans-serif; font-size: 4vw; padding: 10px 15px; border-radius: 15px;
+            box-shadow: 0 4px 0 #d35400; width: auto; margin-bottom: 0; font-weight: bold;
         }
         .btn-small:active { transform: translateY(4px); box-shadow: 0 0 0 #d35400; }
 
@@ -46,7 +56,7 @@
             flex-direction: column; align-items: center; justify-content: center;
             color: white; text-align: center; padding: 20px;
         }
-        #rules-modal h2 { font-size: 8vw; color: #f1c40f; margin-bottom: 20px; }
+        #rules-modal h2 { font-family: 'Russo One', sans-serif; font-size: 8vw; color: #f1c40f; margin-bottom: 20px; }
         #rules-modal p { font-size: 5vw; line-height: 1.5; margin-bottom: 30px; max-width: 400px; }
 
         #game-screen {
@@ -57,7 +67,7 @@
             width: 90vw; max-width: 400px; display: flex;
             justify-content: space-between; align-items: center; margin-bottom: 10px;
         }
-        #hud-level { font-size: 5vw; font-weight: bold; color: #f1c40f; }
+        #hud-level { font-family: 'Russo One', sans-serif; font-size: 5vw; color: #f1c40f; }
 
         #game-board {
             width: 90vw; 
@@ -80,21 +90,21 @@
             transition: transform 0.2s, filter 0.2s, background-color 0.2s; cursor: pointer;
         }
         @media (min-width: 400px) {
-            .tile { font-size: 32px; } #main-menu h1 { font-size: 48px; }
+            .tile { font-size: 32px; } #main-menu h1 { font-size: 52px; }
             .btn { font-size: 24px; } .btn-small { font-size: 16px; }
         }
         .tile.blocked { filter: brightness(0.6); cursor: not-allowed; }
         .tile.selected { background-color: #f1c40f; border-right-color: #e67e22; border-bottom-color: #e67e22; transform: translateY(-5px); }
         .tile.matched { opacity: 0; pointer-events: none; transform: scale(1.2); }
 
-        #message { font-size: 5vw; max-font-size: 20px; height: 60px; color: #2ecc71; font-weight: bold; text-align: center; }
+        #message { font-family: 'Russo One', sans-serif; font-size: 6vw; max-font-size: 24px; height: 60px; color: #2ecc71; text-align: center; }
 
         #ad-screen {
             display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: rgba(0, 0, 0, 0.95); z-index: 100;
             flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center;
         }
-        #ad-screen h2 { font-size: 8vw; color: #f1c40f; margin-bottom: 20px; }
+        #ad-screen h2 { font-family: 'Russo One', sans-serif; font-size: 8vw; color: #f1c40f; margin-bottom: 20px; }
         #ad-screen p { font-size: 5vw; }
         .loader {
             border: 6px solid #f3f3f3; border-top: 6px solid #e67e22;
@@ -155,7 +165,6 @@
         document.getElementById('btn-menu').addEventListener('click', showMainMenu);
         document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
 
-        // --- ВОЗВРАЩАЕМ МНОГОСЛОЙНОСТЬ ---
         function generateProceduralLayout(level) {
             let layout = [];
             let grid = {}; 
@@ -168,7 +177,7 @@
 
             let maxCols = 8;
             let maxRows = 10;
-            let maxLayers = Math.min(3 + Math.floor(level / 5), 5); // СЛОИ ТУТ!
+            let maxLayers = Math.min(3 + Math.floor(level / 5), 5); 
             let layoutType = Math.floor(rnd() * 4); 
             let density = 0.6 + (rnd() * 0.4); 
 
@@ -178,7 +187,6 @@
                     for (let x = shrink; x <= (maxCols / 2) - 1; x += 2) {
                         let mirrorX = maxCols - 2 - x;
                         
-                        // Позволяем строить по центру, чтобы были слои
                         if (layoutType === 1 && x === 2 && (y === 4 || y === 6)) continue; 
                         if (layoutType === 2 && rnd() > 0.8) continue; 
                         if (layoutType === 3 && (x === 0 || y === 0 || y === 8)) continue; 
@@ -188,7 +196,6 @@
                             layout.push({x: x, y: y, z: z});
                             grid[`${x},${y},${z}`] = true;
                             
-                            // Зеркалим, ЕСЛИ ЭТО НЕ ЦЕНТР
                             if (mirrorX !== x) {
                                 layout.push({x: mirrorX, y: y, z: z});
                                 grid[`${mirrorX},${y},${z}`] = true;
@@ -198,9 +205,7 @@
                 }
             }
 
-            // ПРОВЕРКА НА ЧЕТНОСТЬ
             if (layout.length % 2 !== 0) {
-                // Если фишек нечетное количество, удаляем последнюю (самую верхнюю)
                 layout.pop();
             }
 
