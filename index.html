@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Мобильный Маджонг</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: sans-serif;
+            background-color: #1a2a3a;
+            color: white;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        h1 { font-size: 6vw; margin-bottom: 20px; text-align: center; }
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2vw;
+            padding: 2vw;
+            width: 95vw;
+            max-width: 400px;
+        }
+        .tile {
+            height: 25vw;
+            max-height: 120px;
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            font-size: 10vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            box-shadow: 0px 4px 0px #bdc3c7;
+            transition: transform 0.1s, box-shadow 0.1s;
+            cursor: pointer;
+        }
+        .tile:active {
+            transform: translateY(4px);
+            box-shadow: 0px 0px 0px #bdc3c7;
+        }
+        .tile.selected {
+            background-color: #f1c40f;
+            border: 3px solid #e67e22;
+        }
+        .tile.matched { visibility: hidden; }
+        #message {
+            margin-top: 20px;
+            font-size: 5vw;
+            height: 30px;
+            color: #2ecc71;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Мобильный Маджонг</h1>
+    <div id="game-board"></div>
+    <p id="message"></p>
+    <script>
+        const symbols = ['🀄', '🀄', '🐉', '🐉', '🎋', '🎋', '🌸', '🌸', '☯️', '☯️', '🪙', '🪙', '🐼', '🐼', '🐯', '🐯'];
+        let firstTile = null;
+        let secondTile = null;
+        let matchedPairs = 0;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function initGame() {
+            shuffle(symbols);
+            const board = document.getElementById('game-board');
+            symbols.forEach((symbol) => {
+                const tile = document.createElement('div');
+                tile.classList.add('tile');
+                tile.innerText = symbol;
+                tile.dataset.symbol = symbol;
+                tile.addEventListener('click', handleTileClick);
+                board.appendChild(tile);
+            });
+        }
+
+        function handleTileClick(e) {
+            const clickedTile = e.target;
+            if (clickedTile.classList.contains('matched') || clickedTile === firstTile) return;
+            
+            clickedTile.classList.add('selected');
+            
+            if (!firstTile) {
+                firstTile = clickedTile;
+            } else {
+                secondTile = clickedTile;
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            if (firstTile.dataset.symbol === secondTile.dataset.symbol) {
+                setTimeout(() => {
+                    firstTile.classList.add('matched');
+                    secondTile.classList.add('matched');
+                    resetSelection();
+                    matchedPairs++;
+                    if (matchedPairs === symbols.length / 2) {
+                        document.getElementById('message').innerText = 'Победа! 🎉';
+                    }
+                }, 300);
+            } else {
+                setTimeout(() => {
+                    firstTile.classList.remove('selected');
+                    secondTile.classList.remove('selected');
+                    resetSelection();
+                }, 600);
+            }
+        }
+
+        function resetSelection() {
+            if(firstTile) firstTile.classList.remove('selected');
+            if(secondTile) secondTile.classList.remove('selected');
+            firstTile = null;
+            secondTile = null;
+        }
+
+        initGame();
+    </script>
+</body>
+</html>
