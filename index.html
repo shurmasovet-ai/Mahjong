@@ -7,19 +7,11 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: sans-serif;
-            background-color: #1a2a3a;
-            color: white;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            font-family: sans-serif; background-color: #1a2a3a; color: white;
+            width: 100vw; height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* --- Главное Меню --- */
         #main-menu {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             height: 100%; width: 100%; background: radial-gradient(circle, #2c3e50, #1a2a3a);
@@ -31,7 +23,6 @@
         }
         #menu-level-text { font-size: 6vw; font-weight: bold; color: #2ecc71; margin-bottom: 40px; }
 
-        /* --- Кнопки --- */
         .btn {
             background-color: #e67e22; color: white; border: none; padding: 15px 40px;
             font-size: 6vw; border-radius: 30px; box-shadow: 0 6px 0 #d35400;
@@ -49,7 +40,6 @@
         }
         .btn-small:active { transform: translateY(4px); box-shadow: 0 0 0 #d35400; }
 
-        /* --- Правила --- */
         #rules-modal {
             display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: rgba(0, 0, 0, 0.95); z-index: 100;
@@ -59,7 +49,6 @@
         #rules-modal h2 { font-size: 8vw; color: #f1c40f; margin-bottom: 20px; }
         #rules-modal p { font-size: 5vw; line-height: 1.5; margin-bottom: 30px; max-width: 400px; }
 
-        /* --- Игровой Экран --- */
         #game-screen {
             display: none; flex-direction: column; align-items: center;
             width: 100%; height: 100%; padding-top: 20px; z-index: 10;
@@ -70,12 +59,15 @@
         }
         #hud-level { font-size: 5vw; font-weight: bold; color: #f1c40f; }
 
+        /* ИСПРАВЛЕНИЕ ВЫСОТЫ ПОЛЯ ДЛЯ МОБИЛОК */
         #game-board {
-            width: 90vw; max-width: 400px; aspect-ratio: 4 / 5;
+            width: 90vw; 
+            height: 112.5vw; /* 90vw * (5/4) = 112.5vw - точная замена aspect-ratio */
+            max-width: 400px; 
+            max-height: 500px; 
             position: relative; margin-bottom: 20px;
         }
         
-        /* --- Костяшки --- */
         .tile {
             position: absolute; width: 25%; height: 20%;
             left: calc(var(--x) * 12.5%); top: calc(var(--y) * 10%); z-index: var(--z);
@@ -98,7 +90,6 @@
 
         #message { font-size: 5vw; max-font-size: 20px; height: 60px; color: #2ecc71; font-weight: bold; text-align: center; }
 
-        /* --- Экран Рекламы --- */
         #ad-screen {
             display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: rgba(0, 0, 0, 0.95); z-index: 100;
@@ -147,32 +138,25 @@
     </div>
 
     <script>
-        // --- 1. Безопасная работа с памятью ---
         let currentLevel = 1;
         try {
             let savedLevel = localStorage.getItem('mahjong_level');
             if (savedLevel) currentLevel = parseInt(savedLevel);
-        } catch (e) {
-            console.warn("Память недоступна, игра начнется с 1 уровня.");
-        }
+        } catch (e) {}
 
         const baseSymbols = ['🀄', '🐉', '🎋', '🌸', '☯️', '🪙', '🐼', '🐯', '🏮', '🎎', '⛩️', '🍣', '🍡', '🍵', '👺', '🦊', '🎏', '🎐', '🧧', '⛩️'];
         let activeTiles = [];
         let firstTile = null;
         let secondTile = null;
 
-        // --- 2. Привязка кнопок (Надежный метод) ---
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('menu-level-text').innerText = 'Уровень ' + currentLevel;
+        // Прямая привязка кнопок (без ожидания DOMContentLoaded)
+        document.getElementById('menu-level-text').innerText = 'Уровень ' + currentLevel;
+        document.getElementById('btn-play').addEventListener('click', startGame);
+        document.getElementById('btn-rules').addEventListener('click', () => { document.getElementById('rules-modal').style.display = 'flex'; });
+        document.getElementById('btn-close-rules').addEventListener('click', () => { document.getElementById('rules-modal').style.display = 'none'; });
+        document.getElementById('btn-menu').addEventListener('click', showMainMenu);
+        document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
 
-            document.getElementById('btn-play').addEventListener('click', startGame);
-            document.getElementById('btn-rules').addEventListener('click', () => { document.getElementById('rules-modal').style.display = 'flex'; });
-            document.getElementById('btn-close-rules').addEventListener('click', () => { document.getElementById('rules-modal').style.display = 'none'; });
-            document.getElementById('btn-menu').addEventListener('click', showMainMenu);
-            document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
-        });
-
-        // --- 3. Генерация уровня ---
         function generateProceduralLayout(level) {
             let layout = [];
             let grid = {}; 
@@ -194,6 +178,10 @@
                 for (let y = shrink; y <= maxRows - shrink - 2; y += 2) {
                     for (let x = shrink; x <= (maxCols / 2) - 1; x += 2) {
                         let mirrorX = maxCols - 2 - x;
+                        
+                        // ИСПРАВЛЕНИЕ: Игнорируем центральную ось, чтобы число фишек всегда было четным!
+                        if (mirrorX === x) continue; 
+
                         if (layoutType === 1 && x === 2 && (y === 4 || y === 6)) continue; 
                         if (layoutType === 2 && rnd() > 0.8) continue; 
                         if (layoutType === 3 && (x === 0 || y === 0 || y === 8)) continue; 
@@ -202,19 +190,17 @@
                         if (isSupported && rnd() < density) {
                             layout.push({x: x, y: y, z: z});
                             grid[`${x},${y},${z}`] = true;
-                            if (mirrorX !== x) {
-                                layout.push({x: mirrorX, y: y, z: z});
-                                grid[`${mirrorX},${y},${z}`] = true;
-                            }
+                            layout.push({x: mirrorX, y: y, z: z});
+                            grid[`${mirrorX},${y},${z}`] = true;
                         }
                     }
                 }
             }
-            if (layout.length === 0) layout.push({x: 2, y: 4, z: 0}, {x: 4, y: 4, z: 0});
+            // Страховка на случай, если генератор ничего не построил
+            if (layout.length === 0) layout.push({x: 0, y: 4, z: 0}, {x: 6, y: 4, z: 0}, {x: 2, y: 4, z: 0}, {x: 4, y: 4, z: 0});
             return layout;
         }
 
-        // --- 4. Логика экранов ---
         function startGame() {
             document.getElementById('main-menu').style.display = 'none';
             document.getElementById('game-screen').style.display = 'flex';
@@ -235,7 +221,6 @@
             }
         }
 
-        // --- 5. Логика Игры ---
         function initGame() {
             const board = document.getElementById('game-board');
             board.innerHTML = ''; 
