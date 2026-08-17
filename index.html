@@ -33,10 +33,16 @@
             z-index: 50;
         }
         #main-menu h1 {
-            font-size: 12vw;
-            margin-bottom: 40px;
+            font-size: 14vw;
+            margin-bottom: 10px;
             text-shadow: 0 4px 6px rgba(0,0,0,0.5);
             color: #f1c40f;
+            text-align: center;
+        }
+        #main-menu p.subtitle {
+            font-size: 4vw;
+            color: #bdc3c7;
+            margin-bottom: 40px;
         }
         
         .btn {
@@ -52,21 +58,53 @@
             touch-action: manipulation;
             user-select: none;
             font-weight: bold;
+            margin-bottom: 20px;
+            width: 70vw;
+            max-width: 300px;
         }
         .btn:active {
             transform: translateY(6px);
             box-shadow: 0 0 0 #d35400;
         }
+        
+        .btn-secondary {
+            background-color: #3498db;
+            box-shadow: 0 6px 0 #2980b9;
+        }
+        .btn-secondary:active {
+            box-shadow: 0 0 0 #2980b9;
+        }
+
         .btn-small {
             font-size: 4vw;
             padding: 10px 15px;
             border-radius: 15px;
             box-shadow: 0 4px 0 #d35400;
+            width: auto;
+            margin-bottom: 0;
         }
         .btn-small:active {
             transform: translateY(4px);
             box-shadow: 0 0 0 #d35400;
         }
+
+        /* --- Модальное окно Правил --- */
+        #rules-modal {
+            display: none;
+            position: absolute;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 100;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        #rules-modal h2 { font-size: 8vw; color: #f1c40f; margin-bottom: 20px; }
+        #rules-modal p { font-size: 5vw; line-height: 1.5; margin-bottom: 30px; max-width: 400px; }
 
         /* --- Игровой Экран --- */
         #game-screen {
@@ -101,11 +139,8 @@
             left: calc(var(--x) * 12.5%);
             top: calc(var(--y) * 10%);
             z-index: var(--z);
-            
-            /* Делаем отступ больше, чтобы этажи читались лучше */
             margin-top: calc(var(--z) * -10px);
             margin-left: calc(var(--z) * -8px);
-            
             background-color: #fdf6e3;
             color: #2c3e50;
             font-size: 8vw;
@@ -113,10 +148,7 @@
             border-radius: 8px;
             border-top: 1px solid #fff; border-left: 1px solid #fff;
             border-right: 4px solid #d3c6a6; border-bottom: 4px solid #d3c6a6;
-            
-            /* Чем выше слой, тем сильнее тень */
             box-shadow: calc(3px + var(--z) * 1px) calc(3px + var(--z) * 1px) calc(4px + var(--z) * 2px) rgba(0,0,0,0.6);
-            
             touch-action: manipulation; user-select: none;
             -webkit-tap-highlight-color: transparent;
             transition: transform 0.2s, filter 0.2s, background-color 0.2s;
@@ -152,32 +184,43 @@
         #ad-screen h2 { font-size: 8vw; color: #f1c40f; margin-bottom: 20px; }
         #ad-screen p { font-size: 5vw; }
         .loader {
-            border: 6px solid #f3f3f3;
-            border-top: 6px solid #e67e22;
-            border-radius: 50%;
-            width: 50px; height: 50px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+            border: 6px solid #f3f3f3; border-top: 6px solid #e67e22;
+            border-radius: 50%; width: 50px; height: 50px;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
+    <!-- ПОЛНОЦЕННОЕ ГЛАВНОЕ МЕНЮ -->
     <div id="main-menu">
         <h1>МАДЖОНГ</h1>
-        <button class="btn" onclick="startGame()">ИГРАТЬ</button>
+        <p class="subtitle">Пасьянс 3D Пирамида</p>
+        
+        <button class="btn" onclick="startGame()">▶ ИГРАТЬ</button>
+        <button class="btn btn-secondary" onclick="showRules()">📖 ПРАВИЛА</button>
     </div>
 
+    <!-- ОКНО ПРАВИЛ ИГРЫ -->
+    <div id="rules-modal">
+        <h2>Как играть?</h2>
+        <p>Ваша цель — разобрать пирамиду, находя пары одинаковых костяшек.</p>
+        <p>Костяшку можно взять, только если на ней <b>не лежит</b> другая костяшка, и она <b>свободна хотя бы с одной стороны</b> (слева или справа).</p>
+        <button class="btn" onclick="hideRules()">ПОНЯТНО</button>
+    </div>
+
+    <!-- ИГРОВОЙ ЭКРАН -->
     <div id="game-screen">
         <div id="top-bar">
-            <button class="btn btn-small" onclick="showMainMenu()">🏠 Меню</button>
+            <button class="btn btn-small btn-secondary" onclick="showMainMenu()">🏠 Меню</button>
             <button class="btn btn-small" id="shuffle-btn" onclick="watchAdToShuffle()">🎥 Перемешать</button>
         </div>
         <div id="game-board"></div>
         <p id="message"></p>
     </div>
 
+    <!-- ЭКРАН РЕКЛАМЫ -->
     <div id="ad-screen">
         <div class="loader"></div>
         <h2>Рекламная пауза</h2>
@@ -185,30 +228,26 @@
     </div>
 
     <script>
-        // Теперь у нас 10 символов, чтобы покрыть 40 костяшек (4 слоя)
         const baseSymbols = ['🀄', '🐉', '🎋', '🌸', '☯️', '🪙', '🐼', '🐯', '🏮', '🎎'];
         
-        // Многоэтажная архитектура (4 СЛОЯ!)
+        // Многоэтажная архитектура (4 СЛОЯ)
         const layout = [
-            // Этаж 1 (Самый нижний, z=0) - 20 костяшек
+            // Этаж 1
             {x:0, y:0, z:0}, {x:2, y:0, z:0}, {x:4, y:0, z:0}, {x:6, y:0, z:0},
             {x:0, y:2, z:0}, {x:2, y:2, z:0}, {x:4, y:2, z:0}, {x:6, y:2, z:0},
             {x:0, y:4, z:0}, {x:2, y:4, z:0}, {x:4, y:4, z:0}, {x:6, y:4, z:0},
             {x:0, y:6, z:0}, {x:2, y:6, z:0}, {x:4, y:6, z:0}, {x:6, y:6, z:0},
             {x:0, y:8, z:0}, {x:2, y:8, z:0}, {x:4, y:8, z:0}, {x:6, y:8, z:0},
-            
-            // Этаж 2 (z=1) - 12 костяшек
+            // Этаж 2
             {x:1, y:1, z:1}, {x:3, y:1, z:1}, {x:5, y:1, z:1},
             {x:1, y:3, z:1}, {x:3, y:3, z:1}, {x:5, y:3, z:1},
             {x:1, y:5, z:1}, {x:3, y:5, z:1}, {x:5, y:5, z:1},
             {x:1, y:7, z:1}, {x:3, y:7, z:1}, {x:5, y:7, z:1},
-            
-            // Этаж 3 (z=2) - 6 костяшек
+            // Этаж 3
             {x:2, y:2, z:2}, {x:4, y:2, z:2},
             {x:2, y:4, z:2}, {x:4, y:4, z:2},
             {x:2, y:6, z:2}, {x:4, y:6, z:2},
-
-            // Этаж 4 (Верхушка, z=3) - 2 костяшки
+            // Этаж 4
             {x:3, y:3, z:3},
             {x:3, y:5, z:3}
         ];
@@ -217,6 +256,7 @@
         let firstTile = null;
         let secondTile = null;
 
+        // --- Управление экранами ---
         function startGame() {
             document.getElementById('main-menu').style.display = 'none';
             document.getElementById('game-screen').style.display = 'flex';
@@ -228,6 +268,15 @@
             document.getElementById('main-menu').style.display = 'flex';
         }
 
+        function showRules() {
+            document.getElementById('rules-modal').style.display = 'flex';
+        }
+
+        function hideRules() {
+            document.getElementById('rules-modal').style.display = 'none';
+        }
+
+        // --- Логика Игры ---
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -363,6 +412,7 @@
             }
         }
 
+        // --- Система Рекламы ---
         function watchAdToShuffle() {
             if (activeTiles.length === 0) return; 
             const adScreen = document.getElementById('ad-screen');
