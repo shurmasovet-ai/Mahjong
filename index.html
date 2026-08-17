@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Мобильный Маджонг</title>
+    <title>Мобильный Маджонг: Пирамида</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -18,59 +18,116 @@
             align-items: center;
             justify-content: center;
         }
-        h1 { font-size: 6vw; margin-bottom: 20px; text-align: center; }
+        h1 { font-size: 6vw; margin-bottom: 10px; text-align: center; }
+        
         #game-board {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 2vw;
-            padding: 2vw;
-            width: 95vw;
+            width: 90vw;
             max-width: 400px;
+            aspect-ratio: 4 / 5; /* Пропорции 8 колонок на 10 строк */
+            position: relative;
+            margin-bottom: 20px;
         }
+        
         .tile {
-            height: 25vw;
-            max-height: 120px;
-            background-color: #ecf0f1;
+            position: absolute;
+            width: 25%; /* 2 логические единицы из 8 = 25% */
+            height: 20%; /* 2 логические единицы из 10 = 20% */
+            left: calc(var(--x) * 12.5%);
+            top: calc(var(--y) * 10%);
+            z-index: var(--z);
+            
+            /* 3D эффект многослойности */
+            margin-top: calc(var(--z) * -6px);
+            margin-left: calc(var(--z) * -4px);
+            
+            background-color: #fdf6e3;
             color: #2c3e50;
-            font-size: 10vw;
+            font-size: 8vw; /* Размер эмодзи */
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 12px;
+            border-radius: 8px;
+            
+            /* Стилизация костяшки под настоящую */
+            border-top: 1px solid #fff;
+            border-left: 1px solid #fff;
+            border-right: 4px solid #d3c6a6;
+            border-bottom: 4px solid #d3c6a6;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            
             touch-action: manipulation;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            box-shadow: 0px 4px 0px #bdc3c7;
-            transition: transform 0.1s, box-shadow 0.1s;
+            transition: all 0.2s;
             cursor: pointer;
         }
-        .tile:active {
-            transform: translateY(4px);
-            box-shadow: 0px 0px 0px #bdc3c7;
+
+        /* Ограничение размера шрифта на больших экранах */
+        @media (min-width: 400px) {
+            .tile { font-size: 32px; }
+            h1 { font-size: 24px; }
         }
+
+        .tile.blocked {
+            filter: brightness(0.65); /* Затемняем заблокированные */
+            cursor: not-allowed;
+        }
+
         .tile.selected {
             background-color: #f1c40f;
-            border: 3px solid #e67e22;
+            border-right-color: #e67e22;
+            border-bottom-color: #e67e22;
         }
-        .tile.matched { visibility: hidden; }
+
+        .tile.matched {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1.2);
+        }
+
         #message {
-            margin-top: 20px;
             font-size: 5vw;
+            max-font-size: 20px;
             height: 30px;
             color: #2ecc71;
             font-weight: bold;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <h1>Мобильный Маджонг</h1>
+    <h1>Маджонг: Пирамида</h1>
     <div id="game-board"></div>
     <p id="message"></p>
+
     <script>
-        const symbols = ['🀄', '🀄', '🐉', '🐉', '🎋', '🎋', '🌸', '🌸', '☯️', '☯️', '🪙', '🪙', '🐼', '🐼', '🐯', '🐯'];
+        // Базовые эмодзи (9 штук). Для 36 тайлов нам нужно по 4 штуки каждого.
+        const baseSymbols = ['🀄', '🐉', '🎋', '🌸', '☯️', '🪙', '🐼', '🐯', '🏮'];
+        const symbols = [...baseSymbols, ...baseSymbols, ...baseSymbols, ...baseSymbols];
+        
+        // Карта уровней (x, y, z). Ширина костяшки = 2x, высота = 2y.
+        const layout = [
+            // Нижний слой (z=0) - 20 костяшек
+            {x:0, y:0, z:0}, {x:2, y:0, z:0}, {x:4, y:0, z:0}, {x:6, y:0, z:0},
+            {x:0, y:2, z:0}, {x:2, y:2, z:0}, {x:4, y:2, z:0}, {x:6, y:2, z:0},
+            {x:0, y:4, z:0}, {x:2, y:4, z:0}, {x:4, y:4, z:0}, {x:6, y:4, z:0},
+            {x:0, y:6, z:0}, {x:2, y:6, z:0}, {x:4, y:6, z:0}, {x:6, y:6, z:0},
+            {x:0, y:8, z:0}, {x:2, y:8, z:0}, {x:4, y:8, z:0}, {x:6, y:8, z:0},
+            
+            // Средний слой (z=1) - 12 костяшек (лежат со сдвигом, поверх швов нижнего слоя)
+            {x:1, y:1, z:1}, {x:3, y:1, z:1}, {x:5, y:1, z:1},
+            {x:1, y:3, z:1}, {x:3, y:3, z:1}, {x:5, y:3, z:1},
+            {x:1, y:5, z:1}, {x:3, y:5, z:1}, {x:5, y:5, z:1},
+            {x:1, y:7, z:1}, {x:3, y:7, z:1}, {x:5, y:7, z:1},
+            
+            // Верхний слой (z=2) - 4 костяшки (верхушка пирамиды)
+            {x:2, y:3, z:2}, {x:4, y:3, z:2},
+            {x:2, y:5, z:2}, {x:4, y:5, z:2}
+        ];
+
+        let activeTiles = [];
         let firstTile = null;
         let secondTile = null;
-        let matchedPairs = 0;
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -82,55 +139,148 @@
         function initGame() {
             shuffle(symbols);
             const board = document.getElementById('game-board');
-            symbols.forEach((symbol) => {
-                const tile = document.createElement('div');
-                tile.classList.add('tile');
-                tile.innerText = symbol;
-                tile.dataset.symbol = symbol;
-                tile.addEventListener('click', handleTileClick);
-                board.appendChild(tile);
+            activeTiles = [];
+            
+            layout.forEach((pos, index) => {
+                const tileEl = document.createElement('div');
+                tileEl.classList.add('tile');
+                tileEl.innerText = symbols[index];
+                
+                // Передаем координаты в CSS переменные
+                tileEl.style.setProperty('--x', pos.x);
+                tileEl.style.setProperty('--y', pos.y);
+                tileEl.style.setProperty('--z', pos.z);
+                
+                const tileObj = {
+                    element: tileEl,
+                    symbol: symbols[index],
+                    x: pos.x,
+                    y: pos.y,
+                    z: pos.z,
+                    isFree: false
+                };
+                
+                tileEl.addEventListener('click', () => handleTileClick(tileObj));
+                board.appendChild(tileEl);
+                activeTiles.push(tileObj);
             });
+
+            updateFreeState();
         }
 
-        function handleTileClick(e) {
-            const clickedTile = e.target;
-            if (clickedTile.classList.contains('matched') || clickedTile === firstTile) return;
+        // Логика Маджонг Пасьянса: Костяшка свободна, если на ней ничего не лежит, 
+        // и она свободна хотя бы с одной стороны (слева или справа).
+        function updateFreeState() {
+            activeTiles.forEach(tile => {
+                let blockedTop = false;
+                let blockedLeft = false;
+                let blockedRight = false;
+
+                for (let other of activeTiles) {
+                    if (other === tile) continue;
+
+                    // Проверяем, пересекаются ли они по осям
+                    let overlapX = Math.abs(tile.x - other.x) < 2;
+                    let overlapY = Math.abs(tile.y - other.y) < 2;
+
+                    // Блокировка сверху (лежит на уровень выше и пересекается)
+                    if (other.z > tile.z && overlapX && overlapY) {
+                        blockedTop = true;
+                    }
+
+                    // Блокировка по бокам (на том же уровне, пересекается по высоте)
+                    if (other.z === tile.z && overlapY) {
+                        if (other.x === tile.x - 2) blockedLeft = true;
+                        if (other.x === tile.x + 2) blockedRight = true;
+                    }
+                }
+
+                // Свободна, если нет никого сверху И (свободна слева ИЛИ свободна справа)
+                tile.isFree = !blockedTop && (!blockedLeft || !blockedRight);
+                
+                if (tile.isFree) {
+                    tile.element.classList.remove('blocked');
+                } else {
+                    tile.element.classList.add('blocked');
+                    tile.element.classList.remove('selected'); // Сбрасываем выделение, если заблокировалась
+                }
+            });
+
+            checkGameOver();
+        }
+
+        function handleTileClick(tileObj) {
+            if (!tileObj.isFree) return; // Игнорируем клики по заблокированным
             
-            clickedTile.classList.add('selected');
+            if (tileObj === firstTile) {
+                // Отмена выделения
+                tileObj.element.classList.remove('selected');
+                firstTile = null;
+                return;
+            }
+            
+            tileObj.element.classList.add('selected');
             
             if (!firstTile) {
-                firstTile = clickedTile;
+                firstTile = tileObj;
             } else {
-                secondTile = clickedTile;
-                checkMatch();
+                secondTile = tileObj;
+                processMatch();
             }
         }
 
-        function checkMatch() {
-            if (firstTile.dataset.symbol === secondTile.dataset.symbol) {
+        function processMatch() {
+            if (firstTile.symbol === secondTile.symbol) {
+                const t1 = firstTile;
+                const t2 = secondTile;
+                
+                // Убираем из массива активных
+                activeTiles = activeTiles.filter(t => t !== t1 && t !== t2);
+                
                 setTimeout(() => {
-                    firstTile.classList.add('matched');
-                    secondTile.classList.add('matched');
-                    resetSelection();
-                    matchedPairs++;
-                    if (matchedPairs === symbols.length / 2) {
-                        document.getElementById('message').innerText = 'Победа! 🎉';
-                    }
-                }, 300);
+                    t1.element.classList.add('matched');
+                    t2.element.classList.add('matched');
+                    
+                    firstTile = null;
+                    secondTile = null;
+                    
+                    updateFreeState(); // Пересчитываем, какие костяшки освободились
+                }, 200);
             } else {
+                const t1 = firstTile;
+                const t2 = secondTile;
+                firstTile = null;
+                secondTile = null;
+                
                 setTimeout(() => {
-                    firstTile.classList.remove('selected');
-                    secondTile.classList.remove('selected');
-                    resetSelection();
-                }, 600);
+                    t1.element.classList.remove('selected');
+                    t2.element.classList.remove('selected');
+                }, 500);
             }
         }
 
-        function resetSelection() {
-            if(firstTile) firstTile.classList.remove('selected');
-            if(secondTile) secondTile.classList.remove('selected');
-            firstTile = null;
-            secondTile = null;
+        function checkGameOver() {
+            if (activeTiles.length === 0) {
+                document.getElementById('message').innerText = '🎉 Победа! Пирамида разобрана!';
+                return;
+            }
+
+            // Проверка, есть ли доступные ходы
+            let freeTiles = activeTiles.filter(t => t.isFree);
+            let symbolsSet = new Set();
+            let hasMoves = false;
+            
+            for (let t of freeTiles) {
+                if (symbolsSet.has(t.symbol)) {
+                    hasMoves = true;
+                    break;
+                }
+                symbolsSet.add(t.symbol);
+            }
+
+            if (!hasMoves) {
+                document.getElementById('message').innerText = 'Нет ходов! 😢 Обновите страницу.';
+            }
         }
 
         initGame();
