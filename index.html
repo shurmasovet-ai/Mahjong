@@ -59,10 +59,9 @@
         }
         #hud-level { font-size: 5vw; font-weight: bold; color: #f1c40f; }
 
-        /* ИСПРАВЛЕНИЕ ВЫСОТЫ ПОЛЯ ДЛЯ МОБИЛОК */
         #game-board {
             width: 90vw; 
-            height: 112.5vw; /* 90vw * (5/4) = 112.5vw - точная замена aspect-ratio */
+            height: 112.5vw; 
             max-width: 400px; 
             max-height: 500px; 
             position: relative; margin-bottom: 20px;
@@ -149,7 +148,6 @@
         let firstTile = null;
         let secondTile = null;
 
-        // Прямая привязка кнопок (без ожидания DOMContentLoaded)
         document.getElementById('menu-level-text').innerText = 'Уровень ' + currentLevel;
         document.getElementById('btn-play').addEventListener('click', startGame);
         document.getElementById('btn-rules').addEventListener('click', () => { document.getElementById('rules-modal').style.display = 'flex'; });
@@ -157,6 +155,7 @@
         document.getElementById('btn-menu').addEventListener('click', showMainMenu);
         document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
 
+        // --- ВОЗВРАЩАЕМ МНОГОСЛОЙНОСТЬ ---
         function generateProceduralLayout(level) {
             let layout = [];
             let grid = {}; 
@@ -169,7 +168,7 @@
 
             let maxCols = 8;
             let maxRows = 10;
-            let maxLayers = Math.min(3 + Math.floor(level / 5), 5);
+            let maxLayers = Math.min(3 + Math.floor(level / 5), 5); // СЛОИ ТУТ!
             let layoutType = Math.floor(rnd() * 4); 
             let density = 0.6 + (rnd() * 0.4); 
 
@@ -179,9 +178,7 @@
                     for (let x = shrink; x <= (maxCols / 2) - 1; x += 2) {
                         let mirrorX = maxCols - 2 - x;
                         
-                        // ИСПРАВЛЕНИЕ: Игнорируем центральную ось, чтобы число фишек всегда было четным!
-                        if (mirrorX === x) continue; 
-
+                        // Позволяем строить по центру, чтобы были слои
                         if (layoutType === 1 && x === 2 && (y === 4 || y === 6)) continue; 
                         if (layoutType === 2 && rnd() > 0.8) continue; 
                         if (layoutType === 3 && (x === 0 || y === 0 || y === 8)) continue; 
@@ -190,13 +187,23 @@
                         if (isSupported && rnd() < density) {
                             layout.push({x: x, y: y, z: z});
                             grid[`${x},${y},${z}`] = true;
-                            layout.push({x: mirrorX, y: y, z: z});
-                            grid[`${mirrorX},${y},${z}`] = true;
+                            
+                            // Зеркалим, ЕСЛИ ЭТО НЕ ЦЕНТР
+                            if (mirrorX !== x) {
+                                layout.push({x: mirrorX, y: y, z: z});
+                                grid[`${mirrorX},${y},${z}`] = true;
+                            }
                         }
                     }
                 }
             }
-            // Страховка на случай, если генератор ничего не построил
+
+            // ПРОВЕРКА НА ЧЕТНОСТЬ
+            if (layout.length % 2 !== 0) {
+                // Если фишек нечетное количество, удаляем последнюю (самую верхнюю)
+                layout.pop();
+            }
+
             if (layout.length === 0) layout.push({x: 0, y: 4, z: 0}, {x: 6, y: 4, z: 0}, {x: 2, y: 4, z: 0}, {x: 4, y: 4, z: 0});
             return layout;
         }
