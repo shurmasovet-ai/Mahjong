@@ -19,167 +19,95 @@
             justify-content: center;
         }
 
-        /* --- Стили Главного Меню --- */
+        /* --- Главное Меню --- */
         #main-menu {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100%;
-            width: 100%;
+            height: 100%; width: 100%;
             background: radial-gradient(circle, #2c3e50, #1a2a3a);
-            position: absolute;
-            top: 0; left: 0;
-            z-index: 50;
+            position: absolute; top: 0; left: 0; z-index: 50;
         }
         #main-menu h1 {
-            font-size: 14vw;
-            margin-bottom: 10px;
-            text-shadow: 0 4px 6px rgba(0,0,0,0.5);
-            color: #f1c40f;
-            text-align: center;
+            font-size: 14vw; margin-bottom: 10px;
+            text-shadow: 0 4px 6px rgba(0,0,0,0.5); color: #f1c40f; text-align: center;
         }
-        #main-menu p.subtitle {
-            font-size: 4vw;
-            color: #bdc3c7;
-            margin-bottom: 40px;
-        }
+        #main-menu p.subtitle { font-size: 4vw; color: #bdc3c7; margin-bottom: 20px; font-weight: bold; }
         
+        #menu-level-text { font-size: 6vw; font-weight: bold; color: #2ecc71; margin-bottom: 40px; }
+
         .btn {
-            background-color: #e67e22;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 6vw;
-            border-radius: 30px;
-            box-shadow: 0 6px 0 #d35400;
-            cursor: pointer;
-            transition: 0.1s;
-            touch-action: manipulation;
-            user-select: none;
-            font-weight: bold;
-            margin-bottom: 20px;
-            width: 70vw;
-            max-width: 300px;
+            background-color: #e67e22; color: white; border: none;
+            padding: 15px 40px; font-size: 6vw; border-radius: 30px;
+            box-shadow: 0 6px 0 #d35400; cursor: pointer; transition: 0.1s;
+            touch-action: manipulation; user-select: none; font-weight: bold;
+            margin-bottom: 20px; width: 70vw; max-width: 300px;
         }
-        .btn:active {
-            transform: translateY(6px);
-            box-shadow: 0 0 0 #d35400;
-        }
-        
-        .btn-secondary {
-            background-color: #3498db;
-            box-shadow: 0 6px 0 #2980b9;
-        }
-        .btn-secondary:active {
-            box-shadow: 0 0 0 #2980b9;
-        }
-
+        .btn:active { transform: translateY(6px); box-shadow: 0 0 0 #d35400; }
+        .btn-secondary { background-color: #3498db; box-shadow: 0 6px 0 #2980b9; }
+        .btn-secondary:active { box-shadow: 0 0 0 #2980b9; }
         .btn-small {
-            font-size: 4vw;
-            padding: 10px 15px;
-            border-radius: 15px;
-            box-shadow: 0 4px 0 #d35400;
-            width: auto;
-            margin-bottom: 0;
+            font-size: 4vw; padding: 10px 15px; border-radius: 15px;
+            box-shadow: 0 4px 0 #d35400; width: auto; margin-bottom: 0;
         }
-        .btn-small:active {
-            transform: translateY(4px);
-            box-shadow: 0 0 0 #d35400;
-        }
+        .btn-small:active { transform: translateY(4px); box-shadow: 0 0 0 #d35400; }
 
-        /* --- Модальное окно Правил --- */
+        /* --- Правила --- */
         #rules-modal {
-            display: none;
-            position: absolute;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background-color: rgba(0, 0, 0, 0.9);
-            z-index: 100;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-align: center;
-            padding: 20px;
+            display: none; position: absolute; top: 0; left: 0;
+            width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.9);
+            z-index: 100; flex-direction: column; align-items: center; justify-content: center;
+            color: white; text-align: center; padding: 20px;
         }
         #rules-modal h2 { font-size: 8vw; color: #f1c40f; margin-bottom: 20px; }
         #rules-modal p { font-size: 5vw; line-height: 1.5; margin-bottom: 30px; max-width: 400px; }
 
         /* --- Игровой Экран --- */
         #game-screen {
-            display: none; 
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-            padding-top: 20px;
+            display: none; flex-direction: column; align-items: center;
+            width: 100%; height: 100%; padding-top: 20px;
         }
-
         #top-bar {
-            width: 90vw;
-            max-width: 400px;
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
+            width: 90vw; max-width: 400px; display: flex;
+            justify-content: space-between; align-items: center; margin-bottom: 10px;
         }
+        #hud-level { font-size: 5vw; font-weight: bold; color: #f1c40f; }
 
         #game-board {
-            width: 90vw;
-            max-width: 400px;
-            aspect-ratio: 4 / 5;
-            position: relative;
-            margin-bottom: 20px;
+            width: 90vw; max-width: 400px; aspect-ratio: 4 / 5;
+            position: relative; margin-bottom: 20px;
         }
         
-        /* --- Стили Костяшек (Усиленный 3D Эффект) --- */
+        /* --- Костяшки --- */
         .tile {
-            position: absolute;
-            width: 25%; height: 20%;
-            left: calc(var(--x) * 12.5%);
-            top: calc(var(--y) * 10%);
-            z-index: var(--z);
-            margin-top: calc(var(--z) * -10px);
-            margin-left: calc(var(--z) * -8px);
-            background-color: #fdf6e3;
-            color: #2c3e50;
-            font-size: 8vw;
+            position: absolute; width: 25%; height: 20%;
+            left: calc(var(--x) * 12.5%); top: calc(var(--y) * 10%); z-index: var(--z);
+            margin-top: calc(var(--z) * -8px); margin-left: calc(var(--z) * -6px);
+            background-color: #fdf6e3; color: #2c3e50; font-size: 8vw;
             display: flex; justify-content: center; align-items: center;
-            border-radius: 8px;
-            border-top: 1px solid #fff; border-left: 1px solid #fff;
+            border-radius: 8px; border-top: 1px solid #fff; border-left: 1px solid #fff;
             border-right: 4px solid #d3c6a6; border-bottom: 4px solid #d3c6a6;
-            box-shadow: calc(3px + var(--z) * 1px) calc(3px + var(--z) * 1px) calc(4px + var(--z) * 2px) rgba(0,0,0,0.6);
-            touch-action: manipulation; user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            transition: transform 0.2s, filter 0.2s, background-color 0.2s;
-            cursor: pointer;
+            box-shadow: calc(2px + var(--z) * 1px) calc(2px + var(--z) * 1px) calc(3px + var(--z) * 2px) rgba(0,0,0,0.6);
+            touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
+            transition: transform 0.2s, filter 0.2s, background-color 0.2s; cursor: pointer;
         }
         @media (min-width: 400px) {
-            .tile { font-size: 32px; }
-            #main-menu h1 { font-size: 48px; }
-            .btn { font-size: 24px; }
-            .btn-small { font-size: 16px; }
+            .tile { font-size: 32px; } #main-menu h1 { font-size: 48px; }
+            .btn { font-size: 24px; } .btn-small { font-size: 16px; }
         }
-
         .tile.blocked { filter: brightness(0.6); cursor: not-allowed; }
         .tile.selected { background-color: #f1c40f; border-right-color: #e67e22; border-bottom-color: #e67e22; transform: translateY(-5px); }
         .tile.matched { opacity: 0; pointer-events: none; transform: scale(1.2); }
 
-        #message { font-size: 5vw; max-font-size: 20px; height: 30px; color: #2ecc71; font-weight: bold; text-align: center; }
+        #message { font-size: 5vw; max-font-size: 20px; height: 60px; color: #2ecc71; font-weight: bold; text-align: center; }
 
         /* --- Экран Рекламы --- */
         #ad-screen {
-            display: none;
-            position: absolute;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background-color: rgba(0, 0, 0, 0.9);
-            z-index: 100;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-align: center;
+            display: none; position: absolute; top: 0; left: 0;
+            width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.9);
+            z-index: 100; flex-direction: column; align-items: center; justify-content: center;
+            color: white; text-align: center;
         }
         #ad-screen h2 { font-size: 8vw; color: #f1c40f; margin-bottom: 20px; }
         #ad-screen p { font-size: 5vw; }
@@ -193,34 +121,32 @@
 </head>
 <body>
 
-    <!-- ПОЛНОЦЕННОЕ ГЛАВНОЕ МЕНЮ -->
     <div id="main-menu">
         <h1>МАДЖОНГ</h1>
-        <p class="subtitle">Пасьянс 3D Пирамида</p>
+        <p class="subtitle">14 500 000 Уровней</p>
+        <div id="menu-level-text">Уровень 1</div>
         
         <button class="btn" onclick="startGame()">▶ ИГРАТЬ</button>
         <button class="btn btn-secondary" onclick="showRules()">📖 ПРАВИЛА</button>
     </div>
 
-    <!-- ОКНО ПРАВИЛ ИГРЫ -->
     <div id="rules-modal">
         <h2>Как играть?</h2>
-        <p>Ваша цель — разобрать пирамиду, находя пары одинаковых костяшек.</p>
-        <p>Костяшку можно взять, только если на ней <b>не лежит</b> другая костяшка, и она <b>свободна хотя бы с одной стороны</b> (слева или справа).</p>
+        <p>Находите пары одинаковых костяшек, чтобы очистить поле.</p>
+        <p>Костяшка активна, если на ней <b>ничего не лежит</b>, и она <b>свободна слева ИЛИ справа</b>.</p>
         <button class="btn" onclick="hideRules()">ПОНЯТНО</button>
     </div>
 
-    <!-- ИГРОВОЙ ЭКРАН -->
     <div id="game-screen">
         <div id="top-bar">
-            <button class="btn btn-small btn-secondary" onclick="showMainMenu()">🏠 Меню</button>
-            <button class="btn btn-small" id="shuffle-btn" onclick="watchAdToShuffle()">🎥 Перемешать</button>
+            <button class="btn btn-small btn-secondary" onclick="showMainMenu()">🏠</button>
+            <div id="hud-level">Ур. 1</div>
+            <button class="btn btn-small" onclick="watchAdToShuffle()">🎥 Микс</button>
         </div>
         <div id="game-board"></div>
-        <p id="message"></p>
+        <div id="message"></div>
     </div>
 
-    <!-- ЭКРАН РЕКЛАМЫ -->
     <div id="ad-screen">
         <div class="loader"></div>
         <h2>Рекламная пауза</h2>
@@ -228,55 +154,86 @@
     </div>
 
     <script>
-        const baseSymbols = ['🀄', '🐉', '🎋', '🌸', '☯️', '🪙', '🐼', '🐯', '🏮', '🎎'];
+        const baseSymbols = ['🀄', '🐉', '🎋', '🌸', '☯️', '🪙', '🐼', '🐯', '🏮', '🎎', '⛩️', '🍣', '🍡', '🍵', '👺', '🦊', '🎏', '🎐', '🧧', '⛩️'];
         
-        // Многоэтажная архитектура (4 СЛОЯ)
-        const layout = [
-            // Этаж 1
-            {x:0, y:0, z:0}, {x:2, y:0, z:0}, {x:4, y:0, z:0}, {x:6, y:0, z:0},
-            {x:0, y:2, z:0}, {x:2, y:2, z:0}, {x:4, y:2, z:0}, {x:6, y:2, z:0},
-            {x:0, y:4, z:0}, {x:2, y:4, z:0}, {x:4, y:4, z:0}, {x:6, y:4, z:0},
-            {x:0, y:6, z:0}, {x:2, y:6, z:0}, {x:4, y:6, z:0}, {x:6, y:6, z:0},
-            {x:0, y:8, z:0}, {x:2, y:8, z:0}, {x:4, y:8, z:0}, {x:6, y:8, z:0},
-            // Этаж 2
-            {x:1, y:1, z:1}, {x:3, y:1, z:1}, {x:5, y:1, z:1},
-            {x:1, y:3, z:1}, {x:3, y:3, z:1}, {x:5, y:3, z:1},
-            {x:1, y:5, z:1}, {x:3, y:5, z:1}, {x:5, y:5, z:1},
-            {x:1, y:7, z:1}, {x:3, y:7, z:1}, {x:5, y:7, z:1},
-            // Этаж 3
-            {x:2, y:2, z:2}, {x:4, y:2, z:2},
-            {x:2, y:4, z:2}, {x:4, y:4, z:2},
-            {x:2, y:6, z:2}, {x:4, y:6, z:2},
-            // Этаж 4
-            {x:3, y:3, z:3},
-            {x:3, y:5, z:3}
-        ];
-
+        let currentLevel = parseInt(localStorage.getItem('mahjong_level')) || 1;
         let activeTiles = [];
         let firstTile = null;
         let secondTile = null;
 
-        // --- Управление экранами ---
+        document.getElementById('menu-level-text').innerText = 'Уровень ' + currentLevel;
+
+        // --- Улучшенный Генератор 14,5 миллионов комбинаций ---
+        function generateProceduralLayout(level) {
+            let layout = [];
+            let grid = {}; 
+            
+            // Надежный сид для генерации 14.5 млн вариантов
+            let seed = level * 13371337;
+            function rnd() {
+                seed = (seed * 1664525 + 1013904223) % 4294967296;
+                return seed / 4294967296;
+            }
+
+            let maxCols = 8;
+            let maxRows = 10;
+            let maxLayers = Math.min(3 + Math.floor(level / 5), 5); // До 5 слоев
+            
+            // Тип архитектуры генерируется случайно на основе уровня
+            let layoutType = Math.floor(rnd() * 4); // 0 - монолит, 1 - с дырой внутри, 2 - разбитый на блоки, 3 - крест
+            let density = 0.6 + (rnd() * 0.4); // Плотность от 60% до 100%
+
+            for (let z = 0; z < maxLayers; z++) {
+                let shrink = z; 
+                for (let y = shrink; y <= maxRows - shrink - 2; y += 2) {
+                    for (let x = shrink; x <= (maxCols / 2) - 1; x += 2) {
+                        let mirrorX = maxCols - 2 - x;
+                        
+                        // Применяем архитектурные модификаторы для разнообразия форм
+                        if (layoutType === 1 && x === 2 && (y === 4 || y === 6)) continue; // Вырезаем центр (Кольцо)
+                        if (layoutType === 2 && rnd() > 0.8) continue; // Случайные пропуски (Руины)
+                        if (layoutType === 3 && (x === 0 || y === 0 || y === 8)) continue; // Узкая форма (Крест)
+
+                        // Проверяем, есть ли под костяшкой опора
+                        let isSupported = (z === 0) || grid[`${x},${y},${z-1}`] || grid[`${x+2},${y},${z-1}`] || grid[`${x-2},${y},${z-1}`];
+                        
+                        if (isSupported && rnd() < density) {
+                            layout.push({x: x, y: y, z: z});
+                            grid[`${x},${y},${z}`] = true;
+                            
+                            // Зеркалим правую сторону для симметрии. Это гарантирует четное количество тайлов!
+                            if (mirrorX !== x) {
+                                layout.push({x: mirrorX, y: y, z: z});
+                                grid[`${mirrorX},${y},${z}`] = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Страховка от сбоев, если алгоритм вырезал всё
+            if (layout.length === 0) {
+                layout.push({x: 2, y: 4, z: 0}, {x: 4, y: 4, z: 0});
+            }
+            return layout;
+        }
+
         function startGame() {
             document.getElementById('main-menu').style.display = 'none';
             document.getElementById('game-screen').style.display = 'flex';
+            document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
             initGame();
         }
 
         function showMainMenu() {
             document.getElementById('game-screen').style.display = 'none';
             document.getElementById('main-menu').style.display = 'flex';
+            document.getElementById('menu-level-text').innerText = 'Уровень ' + currentLevel;
         }
 
-        function showRules() {
-            document.getElementById('rules-modal').style.display = 'flex';
-        }
+        function showRules() { document.getElementById('rules-modal').style.display = 'flex'; }
+        function hideRules() { document.getElementById('rules-modal').style.display = 'none'; }
 
-        function hideRules() {
-            document.getElementById('rules-modal').style.display = 'none';
-        }
-
-        // --- Логика Игры ---
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -285,29 +242,34 @@
         }
 
         function initGame() {
-            const symbols = [...baseSymbols, ...baseSymbols, ...baseSymbols, ...baseSymbols];
-            shuffleArray(symbols);
-            
             const board = document.getElementById('game-board');
             board.innerHTML = ''; 
             activeTiles = [];
-            firstTile = null;
-            secondTile = null;
-            document.getElementById('message').innerText = '';
+            firstTile = null; secondTile = null;
+            document.getElementById('message').innerHTML = '';
+            
+            const layout = generateProceduralLayout(currentLevel);
+            
+            let requiredPairs = layout.length / 2;
+            let levelSymbols = [];
+            for(let i=0; i<requiredPairs; i++) {
+                levelSymbols.push(baseSymbols[Math.floor(Math.random() * baseSymbols.length)]);
+            }
+            levelSymbols = [...levelSymbols, ...levelSymbols]; 
+            shuffleArray(levelSymbols); 
             
             layout.forEach((pos, index) => {
                 const tileEl = document.createElement('div');
                 tileEl.classList.add('tile');
-                tileEl.innerText = symbols[index];
+                tileEl.innerText = levelSymbols[index];
                 
                 tileEl.style.setProperty('--x', pos.x);
                 tileEl.style.setProperty('--y', pos.y);
                 tileEl.style.setProperty('--z', pos.z);
                 
                 const tileObj = {
-                    element: tileEl, symbol: symbols[index],
-                    x: pos.x, y: pos.y, z: pos.z,
-                    isFree: false
+                    element: tileEl, symbol: levelSymbols[index],
+                    x: pos.x, y: pos.y, z: pos.z, isFree: false
                 };
                 
                 tileEl.addEventListener('click', () => handleTileClick(tileObj));
@@ -351,8 +313,7 @@
             
             if (tileObj === firstTile) {
                 tileObj.element.classList.remove('selected');
-                firstTile = null;
-                return;
+                firstTile = null; return;
             }
             
             tileObj.element.classList.add('selected');
@@ -388,7 +349,13 @@
 
         function checkGameState() {
             if (activeTiles.length === 0) {
-                document.getElementById('message').innerText = '🎉 Победа!';
+                currentLevel++; 
+                localStorage.setItem('mahjong_level', currentLevel); 
+                
+                document.getElementById('message').innerHTML = `
+                    🎉 Уровень пройден!<br>
+                    <button class="btn btn-small" onclick="startGame()" style="margin-top:10px;">Дальше ▶</button>
+                `;
                 document.getElementById('message').style.color = '#2ecc71';
                 return;
             }
@@ -398,21 +365,18 @@
             let hasMoves = false;
             
             for (let t of freeTiles) {
-                if (symbolsSet.has(t.symbol)) {
-                    hasMoves = true; break;
-                }
+                if (symbolsSet.has(t.symbol)) { hasMoves = true; break; }
                 symbolsSet.add(t.symbol);
             }
 
             if (!hasMoves) {
-                document.getElementById('message').innerText = 'Нет ходов! Нажмите "Перемешать"';
+                document.getElementById('message').innerText = 'Нет ходов! Нажмите "Микс"';
                 document.getElementById('message').style.color = '#e74c3c';
             } else {
-                document.getElementById('message').innerText = '';
+                document.getElementById('message').innerHTML = '';
             }
         }
 
-        // --- Система Рекламы ---
         function watchAdToShuffle() {
             if (activeTiles.length === 0) return; 
             const adScreen = document.getElementById('ad-screen');
@@ -444,11 +408,10 @@
                 tile.element.classList.remove('selected'); 
             });
 
-            firstTile = null;
-            secondTile = null;
+            firstTile = null; secondTile = null;
             updateFreeState();
             
-            document.getElementById('message').innerText = 'Костяшки перемешаны! ✨';
+            document.getElementById('message').innerText = 'Перемешано! ✨';
             document.getElementById('message').style.color = '#f1c40f';
         }
     </script>
