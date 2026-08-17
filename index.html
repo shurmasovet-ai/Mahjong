@@ -30,10 +30,9 @@
             position: absolute; top: 0; left: 0; z-index: 50;
         }
         #main-menu h1 {
-            font-size: 14vw; margin-bottom: 10px;
+            font-size: 14vw; margin-bottom: 20px;
             text-shadow: 0 4px 6px rgba(0,0,0,0.5); color: #f1c40f; text-align: center;
         }
-        #main-menu p.subtitle { font-size: 4vw; color: #bdc3c7; margin-bottom: 20px; font-weight: bold; }
         
         #menu-level-text { font-size: 6vw; font-weight: bold; color: #2ecc71; margin-bottom: 40px; }
 
@@ -123,7 +122,6 @@
 
     <div id="main-menu">
         <h1>МАДЖОНГ</h1>
-        <p class="subtitle">14 500 000 Уровней</p>
         <div id="menu-level-text">Уровень 1</div>
         
         <button class="btn" onclick="startGame()">▶ ИГРАТЬ</button>
@@ -163,12 +161,10 @@
 
         document.getElementById('menu-level-text').innerText = 'Уровень ' + currentLevel;
 
-        // --- Улучшенный Генератор 14,5 миллионов комбинаций ---
         function generateProceduralLayout(level) {
             let layout = [];
             let grid = {}; 
             
-            // Надежный сид для генерации 14.5 млн вариантов
             let seed = level * 13371337;
             function rnd() {
                 seed = (seed * 1664525 + 1013904223) % 4294967296;
@@ -177,11 +173,10 @@
 
             let maxCols = 8;
             let maxRows = 10;
-            let maxLayers = Math.min(3 + Math.floor(level / 5), 5); // До 5 слоев
+            let maxLayers = Math.min(3 + Math.floor(level / 5), 5);
             
-            // Тип архитектуры генерируется случайно на основе уровня
-            let layoutType = Math.floor(rnd() * 4); // 0 - монолит, 1 - с дырой внутри, 2 - разбитый на блоки, 3 - крест
-            let density = 0.6 + (rnd() * 0.4); // Плотность от 60% до 100%
+            let layoutType = Math.floor(rnd() * 4); 
+            let density = 0.6 + (rnd() * 0.4); 
 
             for (let z = 0; z < maxLayers; z++) {
                 let shrink = z; 
@@ -189,231 +184,14 @@
                     for (let x = shrink; x <= (maxCols / 2) - 1; x += 2) {
                         let mirrorX = maxCols - 2 - x;
                         
-                        // Применяем архитектурные модификаторы для разнообразия форм
-                        if (layoutType === 1 && x === 2 && (y === 4 || y === 6)) continue; // Вырезаем центр (Кольцо)
-                        if (layoutType === 2 && rnd() > 0.8) continue; // Случайные пропуски (Руины)
-                        if (layoutType === 3 && (x === 0 || y === 0 || y === 8)) continue; // Узкая форма (Крест)
+                        if (layoutType === 1 && x === 2 && (y === 4 || y === 6)) continue; 
+                        if (layoutType === 2 && rnd() > 0.8) continue; 
+                        if (layoutType === 3 && (x === 0 || y === 0 || y === 8)) continue; 
 
-                        // Проверяем, есть ли под костяшкой опора
                         let isSupported = (z === 0) || grid[`${x},${y},${z-1}`] || grid[`${x+2},${y},${z-1}`] || grid[`${x-2},${y},${z-1}`];
                         
                         if (isSupported && rnd() < density) {
                             layout.push({x: x, y: y, z: z});
                             grid[`${x},${y},${z}`] = true;
                             
-                            // Зеркалим правую сторону для симметрии. Это гарантирует четное количество тайлов!
                             if (mirrorX !== x) {
-                                layout.push({x: mirrorX, y: y, z: z});
-                                grid[`${mirrorX},${y},${z}`] = true;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Страховка от сбоев, если алгоритм вырезал всё
-            if (layout.length === 0) {
-                layout.push({x: 2, y: 4, z: 0}, {x: 4, y: 4, z: 0});
-            }
-            return layout;
-        }
-
-        function startGame() {
-            document.getElementById('main-menu').style.display = 'none';
-            document.getElementById('game-screen').style.display = 'flex';
-            document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
-            initGame();
-        }
-
-        function showMainMenu() {
-            document.getElementById('game-screen').style.display = 'none';
-            document.getElementById('main-menu').style.display = 'flex';
-            document.getElementById('menu-level-text').innerText = 'Уровень ' + currentLevel;
-        }
-
-        function showRules() { document.getElementById('rules-modal').style.display = 'flex'; }
-        function hideRules() { document.getElementById('rules-modal').style.display = 'none'; }
-
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
-
-        function initGame() {
-            const board = document.getElementById('game-board');
-            board.innerHTML = ''; 
-            activeTiles = [];
-            firstTile = null; secondTile = null;
-            document.getElementById('message').innerHTML = '';
-            
-            const layout = generateProceduralLayout(currentLevel);
-            
-            let requiredPairs = layout.length / 2;
-            let levelSymbols = [];
-            for(let i=0; i<requiredPairs; i++) {
-                levelSymbols.push(baseSymbols[Math.floor(Math.random() * baseSymbols.length)]);
-            }
-            levelSymbols = [...levelSymbols, ...levelSymbols]; 
-            shuffleArray(levelSymbols); 
-            
-            layout.forEach((pos, index) => {
-                const tileEl = document.createElement('div');
-                tileEl.classList.add('tile');
-                tileEl.innerText = levelSymbols[index];
-                
-                tileEl.style.setProperty('--x', pos.x);
-                tileEl.style.setProperty('--y', pos.y);
-                tileEl.style.setProperty('--z', pos.z);
-                
-                const tileObj = {
-                    element: tileEl, symbol: levelSymbols[index],
-                    x: pos.x, y: pos.y, z: pos.z, isFree: false
-                };
-                
-                tileEl.addEventListener('click', () => handleTileClick(tileObj));
-                board.appendChild(tileEl);
-                activeTiles.push(tileObj);
-            });
-
-            updateFreeState();
-        }
-
-        function updateFreeState() {
-            activeTiles.forEach(tile => {
-                let blockedTop = false, blockedLeft = false, blockedRight = false;
-
-                for (let other of activeTiles) {
-                    if (other === tile) continue;
-                    let overlapX = Math.abs(tile.x - other.x) < 2;
-                    let overlapY = Math.abs(tile.y - other.y) < 2;
-
-                    if (other.z > tile.z && overlapX && overlapY) blockedTop = true;
-                    if (other.z === tile.z && overlapY) {
-                        if (other.x === tile.x - 2) blockedLeft = true;
-                        if (other.x === tile.x + 2) blockedRight = true;
-                    }
-                }
-
-                tile.isFree = !blockedTop && (!blockedLeft || !blockedRight);
-                
-                if (tile.isFree) {
-                    tile.element.classList.remove('blocked');
-                } else {
-                    tile.element.classList.add('blocked');
-                    tile.element.classList.remove('selected');
-                }
-            });
-            checkGameState();
-        }
-
-        function handleTileClick(tileObj) {
-            if (!tileObj.isFree) return;
-            
-            if (tileObj === firstTile) {
-                tileObj.element.classList.remove('selected');
-                firstTile = null; return;
-            }
-            
-            tileObj.element.classList.add('selected');
-            
-            if (!firstTile) {
-                firstTile = tileObj;
-            } else {
-                secondTile = tileObj;
-                processMatch();
-            }
-        }
-
-        function processMatch() {
-            if (firstTile.symbol === secondTile.symbol) {
-                const t1 = firstTile, t2 = secondTile;
-                activeTiles = activeTiles.filter(t => t !== t1 && t !== t2);
-                
-                setTimeout(() => {
-                    t1.element.classList.add('matched');
-                    t2.element.classList.add('matched');
-                    firstTile = null; secondTile = null;
-                    updateFreeState();
-                }, 200);
-            } else {
-                const t1 = firstTile, t2 = secondTile;
-                firstTile = null; secondTile = null;
-                setTimeout(() => {
-                    t1.element.classList.remove('selected');
-                    t2.element.classList.remove('selected');
-                }, 500);
-            }
-        }
-
-        function checkGameState() {
-            if (activeTiles.length === 0) {
-                currentLevel++; 
-                localStorage.setItem('mahjong_level', currentLevel); 
-                
-                document.getElementById('message').innerHTML = `
-                    🎉 Уровень пройден!<br>
-                    <button class="btn btn-small" onclick="startGame()" style="margin-top:10px;">Дальше ▶</button>
-                `;
-                document.getElementById('message').style.color = '#2ecc71';
-                return;
-            }
-
-            let freeTiles = activeTiles.filter(t => t.isFree);
-            let symbolsSet = new Set();
-            let hasMoves = false;
-            
-            for (let t of freeTiles) {
-                if (symbolsSet.has(t.symbol)) { hasMoves = true; break; }
-                symbolsSet.add(t.symbol);
-            }
-
-            if (!hasMoves) {
-                document.getElementById('message').innerText = 'Нет ходов! Нажмите "Микс"';
-                document.getElementById('message').style.color = '#e74c3c';
-            } else {
-                document.getElementById('message').innerHTML = '';
-            }
-        }
-
-        function watchAdToShuffle() {
-            if (activeTiles.length === 0) return; 
-            const adScreen = document.getElementById('ad-screen');
-            const timerEl = document.getElementById('ad-timer');
-            adScreen.style.display = 'flex';
-            
-            let timeLeft = 3; 
-            timerEl.innerText = timeLeft;
-
-            const countdown = setInterval(() => {
-                timeLeft--;
-                timerEl.innerText = timeLeft;
-                
-                if (timeLeft <= 0) {
-                    clearInterval(countdown);
-                    adScreen.style.display = 'none';
-                    executeShuffle(); 
-                }
-            }, 1000);
-        }
-
-        function executeShuffle() {
-            let currentSymbols = activeTiles.map(t => t.symbol);
-            shuffleArray(currentSymbols);
-            
-            activeTiles.forEach((tile, index) => {
-                tile.symbol = currentSymbols[index];
-                tile.element.innerText = tile.symbol;
-                tile.element.classList.remove('selected'); 
-            });
-
-            firstTile = null; secondTile = null;
-            updateFreeState();
-            
-            document.getElementById('message').innerText = 'Перемешано! ✨';
-            document.getElementById('message').style.color = '#f1c40f';
-        }
-    </script>
-</body>
-</html>
