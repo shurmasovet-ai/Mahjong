@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="color-scheme" content="light only">
-    <title>Маджонг - Вариант 1</title>
+    <title>Мобильный Маджонг</title>
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
     <style>
         :root { color-scheme: light; }
@@ -71,37 +71,33 @@
             position: relative; margin-top: 8vw; 
         }
         
-        /* --- ВАРИАНТ 1: Классический брусок с фаской и разделителем --- */
+        /* --- ВЕРТИКАЛЬНЫЕ ПЛИТКИ (ПРОПОРЦИИ МАДЖОНГА) --- */
         .tile {
-            position: absolute; width: 25%; height: 20%;
-            left: calc(var(--x) * 12.5%); top: calc(var(--y) * 10%);
-            margin-top: calc(var(--z) * -3.5vw); 
-            margin-left: calc(var(--z) * -2.5vw);
+            position: absolute; width: 20%; height: 25%;
+            left: calc(var(--x) * 10%); top: calc(var(--y) * 12.5%);
+            margin-top: calc(var(--z) * -4vw); 
+            margin-left: calc(var(--z) * -2vw);
             
             background-color: #d2b48c; 
-            color: #1a2a3a; font-size: 8vw;
+            color: #1a2a3a; font-size: 7.5vw;
             display: flex; justify-content: center; align-items: center;
             
-            /* Сложная рамка, создающая скошенную фаску (3D-эффект скоса) */
-            border-radius: 1.5vw;
-            border-top: 2px solid #fff5e6; 
-            border-left: 2px solid #fff5e6;
-            border-right: 2vw solid #65350f; 
-            border-bottom: 3vw solid #4a2508;
+            border-radius: 1vw; 
+            border-top: 1px solid #f5deb3; border-left: 1px solid #f5deb3;
+            border-right: 1.5vw solid #8b4513; 
+            border-bottom: 2.5vw solid #5c2e0b;
             
-            /* Имитация центрального шва классической костяшки */
-            background-image: linear-gradient(to right, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0) 10%, rgba(0,0,0,0) 90%, rgba(0,0,0,0.08) 100%);
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.4), inset -2px -2px 5px rgba(255,255,255,0.4), calc(1vw + var(--z) * 0.5vw) calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 1vw) rgba(0,0,0,0.7);
             
-            box-shadow: calc(1vw + var(--z) * 0.5vw) calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 1vw) rgba(0,0,0,0.7);
             touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
             transition: transform 0.2s, filter 0.2s, background-color 0.2s; cursor: pointer;
         }
         
         @media (min-width: 400px) {
-            .tile { font-size: 32px; border-radius: 6px; border-right-width: 8px; border-bottom-width: 12px; } 
+            .tile { font-size: 28px; } 
             #main-menu h1 { font-size: 52px; }
             .btn { font-size: 24px; } .btn-small { font-size: 16px; }
-            .tile { margin-top: calc(var(--z) * -14px); margin-left: calc(var(--z) * -10px); }
+            .tile { margin-top: calc(var(--z) * -16px); margin-left: calc(var(--z) * -8px); }
         }
 
         .tile.blocked { filter: brightness(0.6); cursor: not-allowed; }
@@ -188,15 +184,12 @@
                     {x:0, y:2, z:0}, {x:2, y:2, z:0}, {x:4, y:2, z:0}, {x:6, y:2, z:0},
                     {x:0, y:4, z:0}, {x:2, y:4, z:0}, {x:4, y:4, z:0}, {x:6, y:4, z:0},
                     {x:0, y:6, z:0}, {x:2, y:6, z:0}, {x:4, y:6, z:0}, {x:6, y:6, z:0},
-                    {x:0, y:8, z:0}, {x:2, y:8, z:0}, {x:4, y:8, z:0}, {x:6, y:8, z:0},
                     {x:1, y:1, z:1}, {x:3, y:1, z:1}, {x:5, y:1, z:1},
                     {x:1, y:3, z:1}, {x:3, y:3, z:1}, {x:5, y:3, z:1},
                     {x:1, y:5, z:1}, {x:3, y:5, z:1}, {x:5, y:5, z:1},
-                    {x:1, y:7, z:1}, {x:3, y:7, z:1}, {x:5, y:7, z:1},
                     {x:2, y:2, z:2}, {x:4, y:2, z:2},
                     {x:2, y:4, z:2}, {x:4, y:4, z:2},
-                    {x:2, y:6, z:2}, {x:4, y:6, z:2},
-                    {x:3, y:3, z:3}, {x:3, y:5, z:3}
+                    {x:3, y:3, z:3}
                 ];
             }
 
@@ -205,36 +198,31 @@
             let seed = level * 13371337;
             function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
 
-            let maxCols = 8; let maxRows = 10;
-            let maxLayers = Math.max(3, Math.min(3 + Math.floor(level / 3), 5)); 
+            let maxCols = 8; let maxRows = 8;
+            let maxLayers = Math.max(2, Math.min(2 + Math.floor(level / 5), 5)); 
             let layoutType = Math.floor(rnd() * 4); 
-            let density = 0.8 + (rnd() * 0.2); 
+            let density = 0.75 + (rnd() * 0.2); 
 
             for (let z = 0; z < maxLayers; z++) {
                 let shrink = z; 
                 for (let y = shrink; y <= maxRows - shrink - 2; y += 2) {
-                    for (let x = shrink; x <= (maxCols / 2) - 1; x += 2) {
-                        let mirrorX = maxCols - 2 - x;
-                        if (layoutType === 1 && x === 2 && (y === 4 || y === 6)) continue; 
-                        if (layoutType === 2 && rnd() > 0.9) continue; 
-                        
+                    for (let x = shrink; x <= maxCols - shrink - 2; x += 2) {
                         let isSupported = false;
                         if (z === 0) isSupported = true;
                         else {
-                            isSupported = grid[`${x-1},${y-1},${z-1}`] || grid[`${x+1},${y-1},${z-1}`] || 
-                                          grid[`${x-1},${y+1},${z-1}`] || grid[`${x+1},${y+1},${z-1}`];
+                            isSupported = grid[`${x},${y},${z-1}`] || grid[`${x-1},${y},${z-1}`];
                         }
 
                         if (isSupported && rnd() < density) {
-                            layout.push({x: x, y: y, z: z}); grid[`${x},${y},${z}`] = true;
-                            if (mirrorX !== x) { layout.push({x: mirrorX, y: y, z: z}); grid[`${mirrorX},${y},${z}`] = true; }
+                            layout.push({x: x, y: y, z: z}); 
+                            grid[`${x},${y},${z}`] = true;
                         }
                     }
                 }
             }
 
             if (layout.length % 2 !== 0) layout.pop(); 
-            if (layout.length < 4) return [{x: 2, y: 4, z: 0}, {x: 4, y: 4, z: 0}, {x: 2, y: 6, z: 0}, {x: 4, y: 6, z: 0}];
+            if (layout.length < 4) return [{x: 2, y: 2, z: 0}, {x: 4, y: 2, z: 0}, {x: 2, y: 4, z: 0}, {x: 4, y: 4, z: 0}];
             return layout;
         }
 
@@ -392,8 +380,8 @@
 
             const countdown = setInterval(() => {
                 timeLeft--;
-                timer_el = document.getElementById('ad-timer'); // safe fallback
-                if (timerEl) timerEl.innerText = timeLeft;
+                let timerElem = document.getElementById('ad-timer');
+                if (timerElem) timerElem.innerText = timeLeft;
                 if (timeLeft <= 0) {
                     clearInterval(countdown);
                     adScreen.style.display = 'none';
