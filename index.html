@@ -1,204 +1,57 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="color-scheme" content="light only">
-    <title>Mahjong Deluxe</title>
-    <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
-    <style>
-        :root { color-scheme: light; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: sans-serif; 
-            background: radial-gradient(circle at center, #1b5e20, #0a2e0c);
-            color: white; width: 100vw; height: 100vh; overflow: hidden;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-
-        #main-menu {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 100%; width: 100%; position: absolute; top: 0; left: 0; z-index: 50;
-        }
-        
-        #main-menu h1 {
-            font-family: 'Russo One', sans-serif;
-            font-size: 14vw; margin-bottom: 15px; color: #f1c40f; 
-            text-align: center; letter-spacing: 2px;
-            text-shadow: 0 6px 0 #b7950b, 0 10px 20px rgba(0,0,0,0.8);
-        }
-        
-        #menu-level-text { font-size: 6vw; font-weight: bold; color: #2ecc71; margin-bottom: 40px; }
-
-        .btn {
-            background-color: #f1c40f; color: #7d6608; border: none; padding: 15px 40px;
-            font-family: 'Russo One', sans-serif; font-size: 6vw; border-radius: 30px; 
-            box-shadow: 0 6px 0 #b7950b, 0 10px 15px rgba(0,0,0,0.5); cursor: pointer; 
-            transition: transform 0.1s, box-shadow 0.1s;
-            touch-action: manipulation; user-select: none; margin-bottom: 20px; width: 70vw; max-width: 300px;
-            display: flex; justify-content: center; align-items: center; letter-spacing: 1px;
-        }
-        .btn:active { transform: translateY(6px); box-shadow: 0 0 0 #b7950b; }
-        .btn-secondary { background-color: #3498db; color: white; box-shadow: 0 6px 0 #2980b9; }
-        .btn-secondary:active { box-shadow: 0 0 0 #2980b9; }
-        .btn-small {
-            font-family: sans-serif; font-size: 4vw; padding: 10px 15px; border-radius: 15px;
-            box-shadow: 0 4px 0 #b7950b; width: auto; margin-bottom: 0; font-weight: bold;
-        }
-        .btn-small:active { transform: translateY(4px); box-shadow: 0 0 0 #b7950b; }
-
-        #rules-modal {
-            display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: rgba(0, 0, 0, 0.95); z-index: 100;
-            flex-direction: column; align-items: center; justify-content: center;
-            color: white; text-align: center; padding: 20px;
-        }
-        #rules-modal h2 { font-family: 'Russo One', sans-serif; font-size: 8vw; color: #f1c40f; margin-bottom: 20px; }
-        #rules-modal p { font-size: 5vw; line-height: 1.5; margin-bottom: 30px; max-width: 400px; }
-
-        #game-screen {
-            display: none; flex-direction: column; align-items: center;
-            width: 100%; height: 100%; padding-top: 20px; z-index: 10;
-        }
-        #top-bar {
-            width: 90vw; max-width: 400px; display: flex;
-            justify-content: space-between; align-items: center; margin-bottom: 5vw;
-        }
-        #hud-level { font-family: 'Russo One', sans-serif; font-size: 5vw; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-
-        #game-board {
-            width: 90vw; height: 112.5vw; max-width: 400px; max-height: 500px; 
-            position: relative; margin-top: 5vw; 
-        }
-        
-        /* --- УВЕЛИЧЕННЫЕ ВЫТЯНУТЫЕ ПЛИТКИ --- */
-        .tile {
-            position: absolute; 
-            /* УВЕЛИЧИЛИ РАЗМЕР */
-            width: 20%; 
-            height: 35%;
-            left: calc(var(--x) * 9.5%); 
-            top: calc(var(--y) * 10%);
-            margin-top: calc(var(--z) * -5vw); 
-            margin-left: calc(var(--z) * -2.5vw);
-            
-            background-color: #fffaf0; 
-            background-image: radial-gradient(#e6d5b8 15%, transparent 16%), radial-gradient(#e6d5b8 15%, transparent 16%);
-            background-size: 14px 14px;
-            background-position: 0 0, 7px 7px;
-
-            color: #1a2a3a; 
-            font-size: 9vw; /* Увеличили размер иконки */
-            display: flex; justify-content: center; align-items: center;
-            
-            border-radius: 12px;
-            border: 2px solid #fdf5e6;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.6), 
-                        inset 0 0 12px rgba(180, 140, 100, 0.5),
-                        calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(2.5vw + var(--z) * 1vw) rgba(0,0,0,0.9);
-            
-            touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
-            transition: transform 0.2s, filter 0.2s, box-shadow 0.2s; cursor: pointer;
-        }
-        
-        @media (min-width: 400px) {
-            .tile { font-size: 36px; border-radius: 14px; } 
-            #main-menu h1 { font-size: 52px; }
-            .btn { font-size: 24px; } .btn-small { font-size: 16px; }
-            .tile { margin-top: calc(var(--z) * -22px); margin-left: calc(var(--z) * -10px); }
-        }
-
-        .tile.blocked { filter: brightness(0.5); cursor: not-allowed; }
-        .tile.selected { 
-            background-color: #fff2cc; 
-            border: 2px solid #f1c40f;
-            box-shadow: 0 0 20px #f1c40f, 0 10px 20px rgba(0,0,0,0.9);
-            transform: translateY(-4vw) scale(1.1);
-            z-index: 999 !important;
-        }
-        .tile.matched { opacity: 0; pointer-events: none; transform: scale(1.4); }
-        
-        /* ... Остальной код (сообщение, ад-экран и т.д.) ... */
-        #message { font-family: 'Russo One', sans-serif; font-size: 6vw; max-font-size: 24px; height: 65px; color: #2ecc71; text-align: center; margin-top: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-        #ad-screen { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.95); z-index: 100; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; }
-        #ad-screen h2 { font-family: 'Russo One', sans-serif; font-size: 8vw; color: #f1c40f; margin-bottom: 20px; }
-        .loader { border: 6px solid #f3f3f3; border-top: 6px solid #e67e22; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
-</head>
-<body>
-    <div id="main-menu">
-        <h1>МАДЖОНГ</h1>
-        <div id="menu-level-text">Уровень 1</div>
-        <button id="btn-play" class="btn">▶ ИГРАТЬ</button>
-        <button id="btn-rules" class="btn btn-secondary">📖 ПРАВИЛА</button>
-    </div>
-    <div id="rules-modal">
-        <h2>Как играть?</h2>
-        <p>Находите пары одинаковых фишек-печений, чтобы очистить поле.</p>
-        <button id="btn-close-rules" class="btn">ПОНЯТНО</button>
-    </div>
-    <div id="game-screen">
-        <div id="top-bar">
-            <button id="btn-menu" class="btn btn-small btn-secondary">🏠 Меню</button>
-            <div id="hud-level">Ур. 1</div>
-            <button id="btn-shuffle" class="btn btn-small">🎥 Микс</button>
-        </div>
-        <div id="game-board"></div>
-        <div id="message"></div>
-    </div>
-    <div id="ad-screen">
-        <div class="loader"></div>
-        <h2>Рекламная пауза</h2>
-        <p>Награда через: <span id="ad-timer">3</span> сек.</p>
-    </div>
-    <script>
-        let currentLevel = 1; try { let saved = localStorage.getItem('mahjong_level'); if (saved) currentLevel = parseInt(saved); } catch(e){}
-        const baseSymbols = ['🍹', '🍸', '🥤', '🧊', '🍊', '🍓', '🍩', '🍪', '🍫', '🍬', '🧁', '🍰', '🍏', '🍉', '🍍', '🍒', '🍯', '🍧', '🍨', '🧋'];
-        let activeTiles = [], firstTile = null, secondTile = null;
-
-        document.getElementById('btn-play').addEventListener('click', () => { document.getElementById('main-menu').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; initGame(); });
-        document.getElementById('btn-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'flex');
-        document.getElementById('btn-close-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'none');
-        document.getElementById('btn-menu').addEventListener('click', () => { document.getElementById('game-screen').style.display = 'none'; document.getElementById('main-menu').style.display = 'flex'; });
-        document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
+// ... (весь предыдущий код, только замените функции generateLayout и проверку в handleTileClick)
 
         function generateLayout(level) {
             let layout = [], grid = {};
-            for (let z = 0; z < 2; z++) {
-                for (let y = z; y < 6; y+=2) for (let x = z; x < 6; x+=2) {
-                    if (Math.random() > 0.3) { layout.push({x, y, z}); grid[`${x},${y},${z}`] = true; }
+            // Чем выше уровень, тем больше слоев (maxLayers) и плотность
+            let maxLayers = Math.min(2 + Math.floor(level / 10), 5);
+            let size = 6 + Math.min(Math.floor(level / 20), 4); // Поле растет до уровня 80
+
+            for (let z = 0; z < maxLayers; z++) {
+                for (let y = z; y < size; y += 2) {
+                    for (let x = z; x < size; x += 2) {
+                        if (Math.random() > (0.3 - (level * 0.001))) { 
+                            layout.push({x, y, z}); 
+                            grid[`${x},${y},${z}`] = true; 
+                        }
+                    }
                 }
             }
-            if(layout.length % 2 !== 0) layout.pop();
-            return layout;
+            if (layout.length % 2 !== 0) layout.pop();
+            return layout.length < 4 ? [{x: 2, y: 2, z: 0}, {x: 4, y: 2, z: 0}, {x: 2, y: 4, z: 0}, {x: 4, y: 4, z: 0}] : layout;
         }
 
+        function handleTileClick(t) { 
+            if (t.isFree) { 
+                t.el.classList.add('selected'); 
+                if (!firstTile) { firstTile = t; } 
+                else if (firstTile !== t) { 
+                    if (firstTile.symbol === t.symbol) { 
+                        activeTiles = activeTiles.filter(x => x !== firstTile && x !== t); 
+                        t.el.classList.add('matched'); 
+                        firstTile.el.classList.add('matched'); 
+                        firstTile = null; 
+                        updateFreeState();
+                        
+                        // ПРОВЕРКА ПОБЕДЫ И ПЕРЕХОД
+                        if (activeTiles.length === 0) {
+                            currentLevel++;
+                            localStorage.setItem('mahjong_level', currentLevel);
+                            document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
+                            setTimeout(initGame, 500);
+                        }
+                    } else { 
+                        setTimeout(() => { 
+                            if(firstTile) firstTile.el.classList.remove('selected'); 
+                            t.el.classList.remove('selected'); 
+                            firstTile = null; 
+                        }, 300); 
+                    } 
+                } 
+            } 
+        }
+
+        // В функции initGame обязательно вызовите generateLayout(currentLevel)
         function initGame() {
             const board = document.getElementById('game-board'); board.innerHTML = ''; activeTiles = [];
-            let layout = generateLayout(currentLevel);
-            let symbols = []; for(let i=0; i<layout.length/2; i++) symbols.push(baseSymbols[Math.floor(Math.random()*baseSymbols.length)]);
-            symbols = [...symbols, ...symbols].sort(() => Math.random() - 0.5);
-            layout.forEach((pos, i) => {
-                const el = document.createElement('div'); el.classList.add('tile'); el.innerText = symbols[i];
-                el.style.setProperty('--x', pos.x); el.style.setProperty('--y', pos.y); el.style.setProperty('--z', pos.z); el.style.zIndex = (pos.z * 100) + pos.y;
-                let obj = { el, symbol: symbols[i], x: pos.x, y: pos.y, z: pos.z, isFree: false };
-                el.addEventListener('click', () => handleTileClick(obj));
-                board.appendChild(el); activeTiles.push(obj);
-            });
-            updateFreeState();
-        }
-
-        function updateFreeState() {
-            activeTiles.forEach(t => {
-                let blocked = activeTiles.some(o => o.z > t.z && Math.abs(t.x-o.x) < 2 && Math.abs(t.y-o.y) < 2);
-                t.isFree = !blocked; t.el.classList.toggle('blocked', !t.isFree);
-            });
-        }
-
-        function handleTileClick(t) { if (t.isFree) { t.el.classList.add('selected'); if (!firstTile) firstTile = t; else { if (firstTile !== t && firstTile.symbol === t.symbol) { activeTiles = activeTiles.filter(x => x !== firstTile && x !== t); t.el.classList.add('matched'); firstTile.el.classList.add('matched'); firstTile = null; updateFreeState(); } else { setTimeout(() => { if(firstTile) firstTile.el.classList.remove('selected'); t.el.classList.remove('selected'); firstTile = null; }, 300); } } } }
-        function watchAdToShuffle() { const ad = document.getElementById('ad-screen'); ad.style.display = 'flex'; setTimeout(() => { ad.style.display = 'none'; initGame(); }, 2000); }
-    </script>
-</body>
-</html>
+            let layout = generateLayout(currentLevel); // ПЕРЕДАЕМ ТЕКУЩИЙ УРОВЕНЬ!
+            // ... остальной код initGame без изменений
