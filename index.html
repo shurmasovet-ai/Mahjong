@@ -19,14 +19,10 @@
             position: absolute; top: 0; left: 0; z-index: 50;
         }
         
-        /* Обновленный стиль заголовка с новым шрифтом и 3D-тенью */
         #main-menu h1 {
             font-family: 'Russo One', sans-serif;
-            font-size: 15vw; 
-            margin-bottom: 15px; 
-            color: #f1c40f; 
-            text-align: center;
-            letter-spacing: 2px;
+            font-size: 15vw; margin-bottom: 15px; color: #f1c40f; 
+            text-align: center; letter-spacing: 2px;
             text-shadow: 0 6px 0 #d35400, 0 10px 15px rgba(0,0,0,0.6);
         }
         
@@ -34,9 +30,8 @@
 
         .btn {
             background-color: #e67e22; color: white; border: none; padding: 15px 40px;
-            font-family: 'Russo One', sans-serif; /* Кнопкам тоже зададим этот шрифт для стиля */
-            font-size: 6vw; border-radius: 30px; box-shadow: 0 6px 0 #d35400;
-            cursor: pointer; transition: transform 0.1s, box-shadow 0.1s;
+            font-family: 'Russo One', sans-serif; font-size: 6vw; border-radius: 30px; 
+            box-shadow: 0 6px 0 #d35400; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s;
             touch-action: manipulation; user-select: none;
             margin-bottom: 20px; width: 70vw; max-width: 300px;
             display: flex; justify-content: center; align-items: center; letter-spacing: 1px;
@@ -70,22 +65,21 @@
         #hud-level { font-family: 'Russo One', sans-serif; font-size: 5vw; color: #f1c40f; }
 
         #game-board {
-            width: 90vw; 
-            height: 112.5vw; 
-            max-width: 400px; 
-            max-height: 500px; 
+            width: 90vw; height: 112.5vw; max-width: 400px; max-height: 500px; 
             position: relative; margin-bottom: 20px;
         }
         
         .tile {
             position: absolute; width: 25%; height: 20%;
             left: calc(var(--x) * 12.5%); top: calc(var(--y) * 10%); z-index: var(--z);
+            /* Смещения создают 3D эффект многослойности */
             margin-top: calc(var(--z) * -8px); margin-left: calc(var(--z) * -6px);
             background-color: #fdf6e3; color: #2c3e50; font-size: 8vw;
             display: flex; justify-content: center; align-items: center;
             border-radius: 8px; border-top: 1px solid #fff; border-left: 1px solid #fff;
             border-right: 4px solid #d3c6a6; border-bottom: 4px solid #d3c6a6;
-            box-shadow: calc(2px + var(--z) * 1px) calc(2px + var(--z) * 1px) calc(3px + var(--z) * 2px) rgba(0,0,0,0.6);
+            /* Тень усиливается с высотой этажа */
+            box-shadow: calc(2px + var(--z) * 1.5px) calc(2px + var(--z) * 1.5px) calc(3px + var(--z) * 3px) rgba(0,0,0,0.7);
             touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
             transition: transform 0.2s, filter 0.2s, background-color 0.2s; cursor: pointer;
         }
@@ -165,6 +159,7 @@
         document.getElementById('btn-menu').addEventListener('click', showMainMenu);
         document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
 
+        // --- ИСПРАВЛЕННАЯ ЛОГИКА ГЕНЕРАЦИИ СЛОЕВ ---
         function generateProceduralLayout(level) {
             let layout = [];
             let grid = {}; 
@@ -177,21 +172,33 @@
 
             let maxCols = 8;
             let maxRows = 10;
-            let maxLayers = Math.min(3 + Math.floor(level / 5), 5); 
+            // Чем выше уровень, тем больше этажей (от 3 до 5)
+            let maxLayers = Math.min(3 + Math.floor(level / 3), 5); 
             let layoutType = Math.floor(rnd() * 4); 
-            let density = 0.6 + (rnd() * 0.4); 
+            let density = 0.7 + (rnd() * 0.3); // Плотность генерации от 70 до 100%
 
             for (let z = 0; z < maxLayers; z++) {
-                let shrink = z; 
+                let shrink = z; // Каждый этаж сужается
                 for (let y = shrink; y <= maxRows - shrink - 2; y += 2) {
                     for (let x = shrink; x <= (maxCols / 2) - 1; x += 2) {
                         let mirrorX = maxCols - 2 - x;
                         
-                        if (layoutType === 1 && x === 2 && (y === 4 || y === 6)) continue; 
-                        if (layoutType === 2 && rnd() > 0.8) continue; 
-                        if (layoutType === 3 && (x === 0 || y === 0 || y === 8)) continue; 
+                        // Разные типы архитектуры для разнообразия
+                        if (layoutType === 1 && x === 2 && (y === 4 || y === 6)) continue; // Дырка
+                        if (layoutType === 2 && rnd() > 0.85) continue; // Руины
+                        
+                        // ПРАВИЛЬНАЯ проверка опоры под смещенным этажом
+                        let isSupported = false;
+                        if (z === 0) {
+                            isSupported = true; // Нижний этаж висит в воздухе
+                        } else {
+                            // Фишка лежит на 4 фишках снизу
+                            isSupported = grid[`${x-1},${y-1},${z-1}`] || 
+                                          grid[`${x+1},${y-1},${z-1}`] || 
+                                          grid[`${x-1},${y+1},${z-1}`] || 
+                                          grid[`${x+1},${y+1},${z-1}`];
+                        }
 
-                        let isSupported = (z === 0) || grid[`${x},${y},${z-1}`] || grid[`${x+2},${y},${z-1}`] || grid[`${x-2},${y},${z-1}`];
                         if (isSupported && rnd() < density) {
                             layout.push({x: x, y: y, z: z});
                             grid[`${x},${y},${z}`] = true;
@@ -205,11 +212,19 @@
                 }
             }
 
+            // ГАРАНТИЯ ЧЕТНОГО КОЛИЧЕСТВА: если нечетное, удаляем самую верхнюю
             if (layout.length % 2 !== 0) {
-                layout.pop();
+                layout.pop(); 
             }
 
-            if (layout.length === 0) layout.push({x: 0, y: 4, z: 0}, {x: 6, y: 4, z: 0}, {x: 2, y: 4, z: 0}, {x: 4, y: 4, z: 0});
+            // Защита, если уровень сгенерировался пустым
+            if (layout.length < 4) {
+                return [
+                    {x: 2, y: 4, z: 0}, {x: 4, y: 4, z: 0},
+                    {x: 2, y: 6, z: 0}, {x: 4, y: 6, z: 0}
+                ];
+            }
+
             return layout;
         }
 
