@@ -60,38 +60,55 @@
         }
         #top-bar {
             width: 90vw; max-width: 400px; display: flex;
-            justify-content: space-between; align-items: center; margin-bottom: 10px;
+            justify-content: space-between; align-items: center; margin-bottom: 5vw;
         }
         #hud-level { font-family: 'Russo One', sans-serif; font-size: 5vw; color: #f1c40f; }
 
         #game-board {
             width: 90vw; height: 112.5vw; max-width: 400px; max-height: 500px; 
-            position: relative; margin-bottom: 20px;
+            position: relative; margin-top: 8vw; /* Даем место верхним слоям */
         }
         
+        /* --- ЖЕЛЕЗОБЕТОННЫЙ 3D-ЭФФЕКТ --- */
         .tile {
             position: absolute; width: 25%; height: 20%;
-            left: calc(var(--x) * 12.5%); top: calc(var(--y) * 10%); z-index: var(--z);
-            /* Смещения создают 3D эффект многослойности */
-            margin-top: calc(var(--z) * -8px); margin-left: calc(var(--z) * -6px);
+            left: calc(var(--x) * 12.5%); top: calc(var(--y) * 10%);
+            
+            /* Смещения слоев теперь в vw (зависят от экрана), они будут ОГРОМНЫМИ */
+            margin-top: calc(var(--z) * -3.5vw); 
+            margin-left: calc(var(--z) * -2.5vw);
+            
             background-color: #fdf6e3; color: #2c3e50; font-size: 8vw;
             display: flex; justify-content: center; align-items: center;
-            border-radius: 8px; border-top: 1px solid #fff; border-left: 1px solid #fff;
-            border-right: 4px solid #d3c6a6; border-bottom: 4px solid #d3c6a6;
-            /* Тень усиливается с высотой этажа */
-            box-shadow: calc(2px + var(--z) * 1.5px) calc(2px + var(--z) * 1.5px) calc(3px + var(--z) * 3px) rgba(0,0,0,0.7);
+            border-radius: 1vw; 
+            border-top: 1px solid #fff; border-left: 1px solid #fff;
+            
+            /* Очень толстые рамки снизу и сбоку создают физическое тело костяшки */
+            border-right: 1.5vw solid #c2b59b; 
+            border-bottom: 2.5vw solid #a89a7c;
+            
+            box-shadow: calc(1vw + var(--z) * 0.5vw) calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 1vw) rgba(0,0,0,0.7);
             touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
             transition: transform 0.2s, filter 0.2s, background-color 0.2s; cursor: pointer;
         }
+        
         @media (min-width: 400px) {
-            .tile { font-size: 32px; } #main-menu h1 { font-size: 52px; }
+            .tile { font-size: 32px; border-radius: 4px; border-right-width: 6px; border-bottom-width: 10px; } 
+            #main-menu h1 { font-size: 52px; }
             .btn { font-size: 24px; } .btn-small { font-size: 16px; }
+            .tile { margin-top: calc(var(--z) * -14px); margin-left: calc(var(--z) * -10px); }
         }
+
         .tile.blocked { filter: brightness(0.6); cursor: not-allowed; }
-        .tile.selected { background-color: #f1c40f; border-right-color: #e67e22; border-bottom-color: #e67e22; transform: translateY(-5px); }
+        .tile.selected { 
+            background-color: #f1c40f; 
+            border-right-color: #d68910; 
+            border-bottom-color: #b9770e; 
+            transform: translateY(-2vw); /* Прыжок при клике */
+        }
         .tile.matched { opacity: 0; pointer-events: none; transform: scale(1.2); }
 
-        #message { font-family: 'Russo One', sans-serif; font-size: 6vw; max-font-size: 24px; height: 60px; color: #2ecc71; text-align: center; }
+        #message { font-family: 'Russo One', sans-serif; font-size: 6vw; max-font-size: 24px; height: 60px; color: #2ecc71; text-align: center; margin-top: 10px;}
 
         #ad-screen {
             display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -159,72 +176,66 @@
         document.getElementById('btn-menu').addEventListener('click', showMainMenu);
         document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
 
-        // --- ИСПРАВЛЕННАЯ ЛОГИКА ГЕНЕРАЦИИ СЛОЕВ ---
         function generateProceduralLayout(level) {
+            // ФИКСИРОВАННАЯ 4-ЭТАЖНАЯ ПИРАМИДА ДЛЯ 1 УРОВНЯ (100% гарантия объема)
+            if (level === 1) {
+                return [
+                    // Слой 0 (20 фишек)
+                    {x:0, y:0, z:0}, {x:2, y:0, z:0}, {x:4, y:0, z:0}, {x:6, y:0, z:0},
+                    {x:0, y:2, z:0}, {x:2, y:2, z:0}, {x:4, y:2, z:0}, {x:6, y:2, z:0},
+                    {x:0, y:4, z:0}, {x:2, y:4, z:0}, {x:4, y:4, z:0}, {x:6, y:4, z:0},
+                    {x:0, y:6, z:0}, {x:2, y:6, z:0}, {x:4, y:6, z:0}, {x:6, y:6, z:0},
+                    {x:0, y:8, z:0}, {x:2, y:8, z:0}, {x:4, y:8, z:0}, {x:6, y:8, z:0},
+                    // Слой 1 (12 фишек - лежат сверху)
+                    {x:1, y:1, z:1}, {x:3, y:1, z:1}, {x:5, y:1, z:1},
+                    {x:1, y:3, z:1}, {x:3, y:3, z:1}, {x:5, y:3, z:1},
+                    {x:1, y:5, z:1}, {x:3, y:5, z:1}, {x:5, y:5, z:1},
+                    {x:1, y:7, z:1}, {x:3, y:7, z:1}, {x:5, y:7, z:1},
+                    // Слой 2 (6 фишек)
+                    {x:2, y:2, z:2}, {x:4, y:2, z:2},
+                    {x:2, y:4, z:2}, {x:4, y:4, z:2},
+                    {x:2, y:6, z:2}, {x:4, y:6, z:2},
+                    // Слой 3 (Верхушка - 2 фишки)
+                    {x:3, y:3, z:3}, {x:3, y:5, z:3}
+                ];
+            }
+
+            // Для уровней 2+ работает алгоритм
             let layout = [];
             let grid = {}; 
             let seed = level * 13371337;
-            
-            function rnd() {
-                seed = (seed * 1664525 + 1013904223) % 4294967296;
-                return seed / 4294967296;
-            }
+            function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
 
-            let maxCols = 8;
-            let maxRows = 10;
-            // Чем выше уровень, тем больше этажей (от 3 до 5)
-            let maxLayers = Math.min(3 + Math.floor(level / 3), 5); 
+            let maxCols = 8; let maxRows = 10;
+            let maxLayers = Math.max(3, Math.min(3 + Math.floor(level / 3), 5)); 
             let layoutType = Math.floor(rnd() * 4); 
-            let density = 0.7 + (rnd() * 0.3); // Плотность генерации от 70 до 100%
+            let density = 0.8 + (rnd() * 0.2); 
 
             for (let z = 0; z < maxLayers; z++) {
-                let shrink = z; // Каждый этаж сужается
+                let shrink = z; 
                 for (let y = shrink; y <= maxRows - shrink - 2; y += 2) {
                     for (let x = shrink; x <= (maxCols / 2) - 1; x += 2) {
                         let mirrorX = maxCols - 2 - x;
+                        if (layoutType === 1 && x === 2 && (y === 4 || y === 6)) continue; 
+                        if (layoutType === 2 && rnd() > 0.9) continue; 
                         
-                        // Разные типы архитектуры для разнообразия
-                        if (layoutType === 1 && x === 2 && (y === 4 || y === 6)) continue; // Дырка
-                        if (layoutType === 2 && rnd() > 0.85) continue; // Руины
-                        
-                        // ПРАВИЛЬНАЯ проверка опоры под смещенным этажом
                         let isSupported = false;
-                        if (z === 0) {
-                            isSupported = true; // Нижний этаж висит в воздухе
-                        } else {
-                            // Фишка лежит на 4 фишках снизу
-                            isSupported = grid[`${x-1},${y-1},${z-1}`] || 
-                                          grid[`${x+1},${y-1},${z-1}`] || 
-                                          grid[`${x-1},${y+1},${z-1}`] || 
-                                          grid[`${x+1},${y+1},${z-1}`];
+                        if (z === 0) isSupported = true;
+                        else {
+                            isSupported = grid[`${x-1},${y-1},${z-1}`] || grid[`${x+1},${y-1},${z-1}`] || 
+                                          grid[`${x-1},${y+1},${z-1}`] || grid[`${x+1},${y+1},${z-1}`];
                         }
 
                         if (isSupported && rnd() < density) {
-                            layout.push({x: x, y: y, z: z});
-                            grid[`${x},${y},${z}`] = true;
-                            
-                            if (mirrorX !== x) {
-                                layout.push({x: mirrorX, y: y, z: z});
-                                grid[`${mirrorX},${y},${z}`] = true;
-                            }
+                            layout.push({x: x, y: y, z: z}); grid[`${x},${y},${z}`] = true;
+                            if (mirrorX !== x) { layout.push({x: mirrorX, y: y, z: z}); grid[`${mirrorX},${y},${z}`] = true; }
                         }
                     }
                 }
             }
 
-            // ГАРАНТИЯ ЧЕТНОГО КОЛИЧЕСТВА: если нечетное, удаляем самую верхнюю
-            if (layout.length % 2 !== 0) {
-                layout.pop(); 
-            }
-
-            // Защита, если уровень сгенерировался пустым
-            if (layout.length < 4) {
-                return [
-                    {x: 2, y: 4, z: 0}, {x: 4, y: 4, z: 0},
-                    {x: 2, y: 6, z: 0}, {x: 4, y: 6, z: 0}
-                ];
-            }
-
+            if (layout.length % 2 !== 0) layout.pop(); 
+            if (layout.length < 4) return [{x: 2, y: 4, z: 0}, {x: 4, y: 4, z: 0}, {x: 2, y: 6, z: 0}, {x: 4, y: 6, z: 0}];
             return layout;
         }
 
@@ -267,9 +278,13 @@
                 const tileEl = document.createElement('div');
                 tileEl.classList.add('tile');
                 tileEl.innerText = levelSymbols[index];
+                
                 tileEl.style.setProperty('--x', pos.x);
                 tileEl.style.setProperty('--y', pos.y);
                 tileEl.style.setProperty('--z', pos.z);
+                
+                // ЖЕСТКАЯ ЗАЩИТА СЛОЕВ: Считаем z-index математически, чтобы нижние слои никогда не перекрывали верхние
+                tileEl.style.zIndex = (pos.z * 100) + pos.y;
                 
                 const tileObj = { element: tileEl, symbol: levelSymbols[index], x: pos.x, y: pos.y, z: pos.z, isFree: false };
                 tileEl.addEventListener('click', () => handleTileClick(tileObj));
