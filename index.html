@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- Блокируем искажение цветов темной темой браузера -->
+    <!-- Жесткая блокировка темной темы, чтобы фишки оставались светлыми -->
     <meta name="color-scheme" content="light only">
     <title>Мобильный Маджонг</title>
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
@@ -13,10 +13,10 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        /* --- ВАРИАНТ 2: БОРДОВЫЙ ФОН --- */
+        /* --- ВЫБРАННЫЙ ЦВЕТ: СУМЕРЕЧНО-СИНИЙ ФОН --- */
         body {
             font-family: sans-serif; 
-            background: radial-gradient(circle at center, #5b1626, #24050d);
+            background: radial-gradient(circle at center, #1e3c72, #0a1931);
             color: white;
             width: 100vw; height: 100vh; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -78,17 +78,24 @@
             position: relative; margin-top: 8vw; 
         }
         
+        /* --- ФИШКИ ИЗ ВАШЕЙ ПАЛИТРЫ --- */
         .tile {
             position: absolute; width: 25%; height: 20%;
             left: calc(var(--x) * 12.5%); top: calc(var(--y) * 10%);
             margin-top: calc(var(--z) * -3.5vw); 
             margin-left: calc(var(--z) * -2.5vw);
-            background-color: #fdf6e3; color: #2c3e50; font-size: 8vw;
+            
+            /* Цвет лица фишки: "Побег папайи" (теплый кремовый) */
+            background-color: #ffefd5; 
+            color: #1a2a3a; font-size: 8vw;
             display: flex; justify-content: center; align-items: center;
             border-radius: 1vw; 
-            border-top: 1px solid #fff; border-left: 1px solid #fff;
-            border-right: 1.5vw solid #c2b59b; 
-            border-bottom: 2.5vw solid #a89a7c;
+            border-top: 1px solid #ffffff; border-left: 1px solid #ffffff;
+            
+            /* Цвета объема (боковины): "Кожа буйвола" */
+            border-right: 1.5vw solid #dcb26b; 
+            border-bottom: 2.5vw solid #c29b4f;
+            
             box-shadow: calc(1vw + var(--z) * 0.5vw) calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 1vw) rgba(0,0,0,0.7);
             touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
             transition: transform 0.2s, filter 0.2s, background-color 0.2s; cursor: pointer;
@@ -103,9 +110,9 @@
 
         .tile.blocked { filter: brightness(0.6); cursor: not-allowed; }
         .tile.selected { 
-            background-color: #f1c40f; 
-            border-right-color: #d68910; 
-            border-bottom-color: #b9770e; 
+            background-color: #ffe066; 
+            border-right-color: #e67e22; 
+            border-bottom-color: #d35400; 
             transform: translateY(-2vw);
         }
         .tile.matched { opacity: 0; pointer-events: none; transform: scale(1.2); }
