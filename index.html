@@ -12,7 +12,6 @@
         
         body {
             font-family: sans-serif; 
-            /* Роскошный насыщенный зеленый фон стола, как у лучших конкурентов */
             background: radial-gradient(circle at center, #1b5e20, #0a2e0c);
             color: white; width: 100vw; height: 100vh; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -73,29 +72,28 @@
             position: relative; margin-top: 8vw; 
         }
         
-        /* --- ПРЕМИАЛЬНЫЕ ПЛИТКИ-ПЕЧЕНЬЯ КАК У КОНКУРЕНТОВ --- */
+        /* --- СТРОГО НАСТОЯЩИЕ ВЕРТИКАЛЬНЫЕ ПРЯМОУГОЛЬНИКИ --- */
         .tile {
             position: absolute; 
-            width: 22%; 
-            height: 27%;
-            left: calc(var(--x) * 10.5%); 
-            top: calc(var(--y) * 12%);
+            /* Ширина меньше, высота больше — правильный вытянутый прямоугольник */
+            width: 16%; 
+            height: 28%;
+            left: calc(var(--x) * 9.5%); 
+            top: calc(var(--y) * 11.5%);
             margin-top: calc(var(--z) * -4.5vw); 
-            margin-left: calc(var(--z) * -2.5vw);
+            margin-left: calc(var(--z) * -2vw);
             
-            /* Текстура аппетитного светлого печенья/крекера */
             background-color: #fffaf0; 
             background-image: radial-gradient(#e6d5b8 15%, transparent 16%), radial-gradient(#e6d5b8 15%, transparent 16%);
             background-size: 12px 12px;
             background-position: 0 0, 6px 6px;
 
             color: #1a2a3a; 
-            font-size: 7.5vw;
+            font-size: 7vw;
             display: flex; justify-content: center; align-items: center;
             
-            /* Волнистые фигурные края печенья и объемные тени */
-            border-radius: 14px;
-            border: 3px solid #fdf5e6;
+            border-radius: 10px;
+            border: 2px solid #fdf5e6;
             box-shadow: 0 4px 8px rgba(0,0,0,0.5), 
                         inset 0 0 10px rgba(180, 140, 100, 0.4),
                         calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(2vw + var(--z) * 1vw) rgba(0,0,0,0.8);
@@ -105,16 +103,16 @@
         }
         
         @media (min-width: 400px) {
-            .tile { font-size: 32px; border-radius: 16px; } 
+            .tile { font-size: 28px; border-radius: 12px; } 
             #main-menu h1 { font-size: 52px; }
             .btn { font-size: 24px; } .btn-small { font-size: 16px; }
-            .tile { margin-top: calc(var(--z) * -18px); margin-left: calc(var(--z) * -10px); }
+            .tile { margin-top: calc(var(--z) * -18px); margin-left: calc(var(--z) * -8px); }
         }
 
         .tile.blocked { filter: brightness(0.5); cursor: not-allowed; }
         .tile.selected { 
             background-color: #fff2cc; 
-            border: 3px solid #f1c40f;
+            border: 2px solid #f1c40f;
             box-shadow: 0 0 15px #f1c40f, 0 8px 15px rgba(0,0,0,0.8);
             transform: translateY(-3vw) scale(1.05);
             z-index: 999 !important;
@@ -177,7 +175,6 @@
             if (savedLevel) currentLevel = parseInt(savedLevel);
         } catch (e) {}
 
-        /* Супер-сочные иконки напитков, сладостей и фруктов высокого качества */
         const baseSymbols = ['🍹', '🍸', '🥤', '🧊', '🍊', '🍓', '🍩', '🍪', '🍫', '🍬', '🧁', '🍰', '🍏', '🍉', '🍍', '🍒', '🍯', '🍧', '🍨', '🧋'];
         let activeTiles = [];
         let firstTile = null;
