@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="color-scheme" content="light only">
     <title>Mahjong Deluxe - Infinity 8888</title>
-    <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+    <!-- Подключаем шрифты, в том числе универсальный шрифт для Эмодзи от Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
     <style>
         :root { 
             color-scheme: light; 
@@ -53,8 +54,19 @@
         .btn-small {
             font-family: sans-serif; font-size: 4vw; padding: 10px 15px; border-radius: 15px;
             box-shadow: 0 4px 0 #b7950b; width: auto; margin-bottom: 0; font-weight: bold;
+            transition: all 0.3s;
         }
         .btn-small:active { transform: translateY(4px); box-shadow: 0 0 0 #b7950b; }
+
+        /* Пульсирующая кнопка Микса при тупике */
+        @keyframes pulseBtn {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); background-color: #e74c3c; color: white; }
+            50% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); background-color: #c0392b; color: white; }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); background-color: #e74c3c; color: white; }
+        }
+        .btn-pulse {
+            animation: pulseBtn 1.5s infinite !important;
+        }
 
         #btn-reset {
             margin-top: 25px; color: #e74c3c; text-decoration: underline; 
@@ -82,15 +94,12 @@
             flex-wrap: nowrap;
         }
 
-        .hud-center {
-            display: flex; flex-direction: column; align-items: center;
-        }
+        .hud-center { display: flex; flex-direction: column; align-items: center; }
         
         #hud-level { 
             font-family: 'Russo One', sans-serif; font-size: 5vw; color: #f1c40f; 
             text-shadow: 0 2px 4px rgba(0,0,0,0.5); cursor: pointer; padding: 2px 10px;
             white-space: nowrap; line-height: 1.2; text-align: center;
-            transition: transform 0.1s;
         }
         #hud-level:active { transform: scale(0.9); }
         
@@ -102,9 +111,7 @@
         #hud-difficulty {
             font-size: 3vw; font-weight: bold; padding: 3px 8px; 
             border-radius: 10px; margin-top: 4px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            white-space: nowrap;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8); box-shadow: 0 2px 4px rgba(0,0,0,0.5); white-space: nowrap;
         }
 
         #game-board {
@@ -122,18 +129,17 @@
             background-color: var(--tileBg); 
             background-image: var(--bgImg);
             background-size: 14px 14px; background-position: 0 0, 7px 7px;
-
             color: var(--tileColor); font-size: 7.5vw; 
-            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
-            display: flex; justify-content: center; align-items: center;
+
+            /* Строго заставляем использовать гугловский шрифт эмодзи */
+            font-family: 'Noto Color Emoji', sans-serif;
             
+            display: flex; justify-content: center; align-items: center;
             border-radius: 12px; border: 2px solid var(--tileBorder);
             box-shadow: var(--shadow), calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(2vw + var(--z) * 0.8vw) rgba(0,0,0,0.85);
             backdrop-filter: blur(4px); 
             
             touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
-            
-            /* Я добавил сюда top и left в transition, чтобы фишки красиво перелетали при перемешивании! */
             transition: transform 0.2s, filter 0.2s, box-shadow 0.2s, top 0.6s ease-in-out, left 0.6s ease-in-out, margin-top 0.6s, margin-left 0.6s; cursor: pointer;
         }
         
@@ -158,15 +164,11 @@
         #message { font-family: 'Russo One', sans-serif; font-size: 6vw; max-font-size: 24px; height: 65px; color: #2ecc71; text-align: center; margin-top: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
 
         .floating-text {
-            position: absolute;
-            font-family: 'Russo One', sans-serif; font-size: 6vw; color: #2ecc71;
+            position: absolute; font-family: 'Russo One', sans-serif; font-size: 6vw; color: #2ecc71;
             text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 10px rgba(46, 204, 113, 0.8);
-            pointer-events: none; z-index: 1000;
-            animation: floatUp 1s ease-out forwards;
+            pointer-events: none; z-index: 1000; animation: floatUp 1s ease-out forwards;
         }
-        .floating-text.combo {
-            color: #f1c40f; font-size: 8vw; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 15px rgba(241, 196, 15, 0.8);
-        }
+        .floating-text.combo { color: #f1c40f; font-size: 8vw; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 15px rgba(241, 196, 15, 0.8); }
 
         @keyframes floatUp {
             0% { transform: translateY(0) scale(0.5); opacity: 0; }
@@ -218,13 +220,11 @@
     <div id="game-screen">
         <div id="top-bar">
             <button id="btn-menu" class="btn btn-small btn-secondary">🏠 Меню</button>
-            
             <div class="hud-center">
                 <div id="hud-level" title="Нажмите для пропуска уровня">Ур. 1</div>
                 <div id="hud-score">🏆 0</div>
                 <div id="hud-difficulty">🟢 Легко</div>
             </div>
-
             <button id="btn-shuffle" class="btn btn-small">🎥 Микс</button>
         </div>
         <div id="game-board"></div>
@@ -247,7 +247,6 @@
         try { 
             let savedLvl = localStorage.getItem('mahjong_level'); 
             if (savedLvl) currentLevel = parseInt(savedLvl); 
-            
             let savedScore = localStorage.getItem('mahjong_score');
             if (savedScore) totalScore = parseInt(savedScore);
         } catch(e){}
@@ -320,10 +319,8 @@
 
         document.getElementById('btn-reset').addEventListener('click', () => {
             if (confirm('Вы уверены, что хотите начать с 1 уровня? Весь прогресс и очки будут удалены.')) {
-                currentLevel = 1;
-                totalScore = 0;
-                localStorage.setItem('mahjong_level', 1);
-                localStorage.setItem('mahjong_score', 0);
+                currentLevel = 1; totalScore = 0;
+                localStorage.setItem('mahjong_level', 1); localStorage.setItem('mahjong_score', 0);
                 document.getElementById('menu-level-text').innerText = 'Уровень 1';
                 updateScoreDisplay();
             }
@@ -339,100 +336,107 @@
         document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
 
         document.getElementById('hud-level').addEventListener('click', () => {
-            currentLevel++;
-            localStorage.setItem('mahjong_level', currentLevel);
-            initGame();
+            currentLevel++; localStorage.setItem('mahjong_level', currentLevel); initGame();
         });
 
-        function updateScoreDisplay() {
-            document.getElementById('hud-score').innerText = '🏆 ' + totalScore;
-        }
+        function updateScoreDisplay() { document.getElementById('hud-score').innerText = '🏆 ' + totalScore; }
 
         function applyMaterial(level) {
             let root = document.documentElement;
             let matIndex = Math.floor((level - 1) / 3) % materials.length; 
             let mat = materials[matIndex];
-            root.style.setProperty('--bg1', mat.bg1);
-            root.style.setProperty('--bg2', mat.bg2);
-            root.style.setProperty('--tileBg', mat.tileBg);
-            root.style.setProperty('--tileBorder', mat.tileBorder);
-            root.style.setProperty('--tileColor', mat.tileColor);
-            root.style.setProperty('--bgImg', mat.bgImg);
+            root.style.setProperty('--bg1', mat.bg1); root.style.setProperty('--bg2', mat.bg2);
+            root.style.setProperty('--tileBg', mat.tileBg); root.style.setProperty('--tileBorder', mat.tileBorder);
+            root.style.setProperty('--tileColor', mat.tileColor); root.style.setProperty('--bgImg', mat.bgImg);
             root.style.setProperty('--shadow', mat.shadow);
         }
 
         function getDifficultyParams(level) {
             let cyclePos = (level - 1) % 10;
-            if (cyclePos >= 0 && cyclePos <= 2) {
-                return { text: "🟢 Легко", color: "#2ecc71", maxLayers: 2, density: 0.4 };
-            } else if (cyclePos >= 3 && cyclePos <= 5) {
-                return { text: "🟡 Средне", color: "#f1c40f", maxLayers: 3, density: 0.6 };
-            } else if (cyclePos >= 6 && cyclePos <= 8) {
-                return { text: "🟠 Сложно", color: "#e67e22", maxLayers: 4, density: 0.8 };
-            } else {
-                return { text: "🔴 ЭКСПЕРТ", color: "#e74c3c", maxLayers: 5, density: 0.95 };
-            }
+            if (cyclePos >= 0 && cyclePos <= 2) return { text: "🟢 Легко", color: "#2ecc71", maxLayers: 2, density: 0.4 };
+            else if (cyclePos >= 3 && cyclePos <= 5) return { text: "🟡 Средне", color: "#f1c40f", maxLayers: 3, density: 0.6 };
+            else if (cyclePos >= 6 && cyclePos <= 8) return { text: "🟠 Сложно", color: "#e67e22", maxLayers: 4, density: 0.8 };
+            else return { text: "🔴 ЭКСПЕРТ", color: "#e74c3c", maxLayers: 5, density: 0.95 };
         }
 
         function generateLayout(level) {
             let diff = getDifficultyParams(level);
             let layout = [], grid = {};
-            
             let seed = level * 13371337;
             function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
 
             let maxCols = 8, maxRows = 8;
-            let maxLayers = diff.maxLayers; 
-            let density = diff.density; 
-            
-            for (let z = 0; z < maxLayers; z++) {
+            for (let z = 0; z < diff.maxLayers; z++) {
                 let offset = (z % 2 === 0) ? 0 : 1; 
                 let shrink = Math.floor(z / 2) * 2 + offset; 
-                
                 for (let y = shrink; y <= maxRows - shrink; y += 2) {
                     for (let x = shrink; x <= maxCols - shrink; x += 2) {
-                        let isSupported = false;
-                        if (z === 0) {
-                            isSupported = true;
-                        } else {
-                            isSupported = grid[`${x-1},${y-1},${z-1}`] || 
-                                          grid[`${x+1},${y-1},${z-1}`] || 
-                                          grid[`${x-1},${y+1},${z-1}`] || 
-                                          grid[`${x+1},${y+1},${z-1}`] ||
-                                          grid[`${x},${y},${z-1}`];
-                        }
-                        
-                        if (isSupported && rnd() < density) {
-                            layout.push({x: x, y: y, z: z}); 
-                            grid[`${x},${y},${z}`] = true;
-                        }
+                        let isSupported = (z === 0) || grid[`${x-1},${y-1},${z-1}`] || grid[`${x+1},${y-1},${z-1}`] || grid[`${x-1},${y+1},${z-1}`] || grid[`${x+1},${y+1},${z-1}`] || grid[`${x},${y},${z-1}`];
+                        if (isSupported && rnd() < diff.density) { layout.push({x, y, z}); grid[`${x},${y},${z}`] = true; }
                     }
                 }
             }
-            
             if (layout.length % 2 !== 0) layout.pop(); 
             if (layout.length < 4) return [{x: 2, y: 2, z: 0}, {x: 4, y: 2, z: 0}, {x: 2, y: 4, z: 0}, {x: 4, y: 4, z: 0}];
             return layout;
         }
 
         function getSymbolsForLevel(level) {
-            if (level <= 50) {
-                let themeIndex = (level - 1) % themeSets.length;
-                return themeSets[themeIndex];
-            } else {
-                let mixedSymbols = [];
-                let t1 = Math.floor(Math.random() * themeSets.length);
-                let t2 = Math.floor(Math.random() * themeSets.length);
-                let t3 = Math.floor(Math.random() * themeSets.length);
-                mixedSymbols = [...themeSets[t1].slice(0, 7), ...themeSets[t2].slice(7, 14), ...themeSets[t3].slice(14, 20)];
-                return mixedSymbols;
+            if (level <= 50) return themeSets[(level - 1) % themeSets.length];
+            let t1 = Math.floor(Math.random() * themeSets.length), t2 = Math.floor(Math.random() * themeSets.length), t3 = Math.floor(Math.random() * themeSets.length);
+            return [...themeSets[t1].slice(0, 7), ...themeSets[t2].slice(7, 14), ...themeSets[t3].slice(14, 20)];
+        }
+
+        function shuffleArray(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } }
+
+        // --- УМНАЯ РАЗДАЧА (Защита от тупиков на старте) ---
+        function assignSymbolsSmart(layout, baseSymbols) {
+            let unassigned = layout.map(pos => ({x: pos.x, y: pos.y, z: pos.z, isFree: false, symbol: null, el: null}));
+            let symbolPool = [];
+            for(let i = 0; i < layout.length / 2; i++) {
+                symbolPool.push(baseSymbols[Math.floor(Math.random() * baseSymbols.length)]);
             }
+            
+            let remaining = [...unassigned];
+            let fallbackTriggered = false;
+
+            while(remaining.length > 1) {
+                let freeTiles = remaining.filter(tile => {
+                    let blockedTop = false, blockedLeft = false, blockedRight = false;
+                    for (let other of remaining) {
+                        if (other === tile) continue;
+                        let overlapX = Math.abs(tile.x - other.x) < 2;
+                        let overlapY = Math.abs(tile.y - other.y) < 2;
+                        if (other.z > tile.z && overlapX && overlapY) blockedTop = true;
+                        if (other.z === tile.z && overlapY) {
+                            if (other.x === tile.x - 2) blockedLeft = true;
+                            if (other.x === tile.x + 2) blockedRight = true;
+                        }
+                    }
+                    return !blockedTop && (!blockedLeft || !blockedRight);
+                });
+
+                if (freeTiles.length < 2) { fallbackTriggered = true; break; }
+
+                shuffleArray(freeTiles);
+                let t1 = freeTiles[0], t2 = freeTiles[1];
+                let sym = symbolPool.pop();
+                t1.symbol = sym; t2.symbol = sym;
+                remaining = remaining.filter(t => t !== t1 && t !== t2);
+            }
+
+            if (fallbackTriggered && remaining.length > 0) {
+                shuffleArray(symbolPool);
+                remaining.forEach((t, i) => { t.symbol = symbolPool[i]; });
+            }
+            return unassigned;
         }
 
         function initGame() {
             const board = document.getElementById('game-board'); 
             board.innerHTML = ''; activeTiles = []; firstTile = null; secondTile = null;
             document.getElementById('message').innerHTML = '';
+            document.getElementById('btn-shuffle').classList.remove('btn-pulse');
             comboCount = 0; 
             
             document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
@@ -448,29 +452,19 @@
             
             let baseSymbols = getSymbolsForLevel(currentLevel);
             let layout = generateLayout(currentLevel);
-            let symbols = []; 
             
-            for(let i = 0; i < layout.length / 2; i++) {
-                symbols.push(baseSymbols[Math.floor(Math.random() * baseSymbols.length)]);
-            }
-            symbols = [...symbols, ...symbols]; shuffleArray(symbols);
+            // Используем УМНУЮ раздачу вместо глупой
+            let preparedTiles = assignSymbolsSmart(layout, baseSymbols);
             
-            layout.forEach((pos, i) => {
-                const el = document.createElement('div'); el.classList.add('tile'); el.innerText = symbols[i];
-                el.style.setProperty('--x', pos.x); el.style.setProperty('--y', pos.y); el.style.setProperty('--z', pos.z); 
-                el.style.zIndex = (pos.z * 100) + pos.y;
-                let obj = { el, symbol: symbols[i], x: pos.x, y: pos.y, z: pos.z, isFree: false };
+            preparedTiles.forEach((obj) => {
+                const el = document.createElement('div'); el.classList.add('tile'); el.innerText = obj.symbol;
+                el.style.setProperty('--x', obj.x); el.style.setProperty('--y', obj.y); el.style.setProperty('--z', obj.z); 
+                el.style.zIndex = (obj.z * 100) + obj.y;
+                obj.el = el;
                 el.addEventListener('click', (e) => handleTileClick(obj, e));
                 board.appendChild(el); activeTiles.push(obj);
             });
             updateFreeState();
-        }
-
-        function shuffleArray(a) { 
-            for (let i = a.length - 1; i > 0; i--) { 
-                const j = Math.floor(Math.random() * (i + 1)); 
-                [a[i], a[j]] = [a[j], a[i]]; 
-            } 
         }
 
         function updateFreeState() {
@@ -502,27 +496,26 @@
                 if (symbolsSet.has(t.symbol)) { hasMoves = true; break; }
                 symbolsSet.add(t.symbol);
             }
+            let btnShuffle = document.getElementById('btn-shuffle');
             if (!hasMoves) {
-                document.getElementById('message').innerText = 'Нет ходов! Нажмите "Микс"';
+                document.getElementById('message').innerText = 'НЕТ ХОДОВ! Нажмите Микс ➔';
                 document.getElementById('message').style.color = '#e74c3c';
+                btnShuffle.classList.add('btn-pulse');
             } else {
                 document.getElementById('message').innerHTML = '';
+                btnShuffle.classList.remove('btn-pulse');
             }
         }
 
         function showFloatingText(element, points, isCombo) {
             let rect = element.getBoundingClientRect();
             let boardRect = document.getElementById('game-board').getBoundingClientRect();
-            
             let floatEl = document.createElement('div');
             floatEl.classList.add('floating-text');
             if(isCombo) floatEl.classList.add('combo');
-            
             floatEl.innerText = isCombo ? `+${points} КОМБО!` : `+${points}`;
-            
             floatEl.style.left = (rect.left - boardRect.left + rect.width / 4) + 'px';
             floatEl.style.top = (rect.top - boardRect.top) + 'px';
-            
             document.getElementById('game-board').appendChild(floatEl);
             setTimeout(() => floatEl.remove(), 1000);
         }
@@ -552,18 +545,14 @@
                 if (firstTile.symbol === t.symbol) { 
                     
                     let now = Date.now();
-                    if (now - lastMatchTime < COMBO_TIME_LIMIT) {
-                        comboCount++;
-                    } else {
-                        comboCount = 1;
-                    }
+                    if (now - lastMatchTime < COMBO_TIME_LIMIT) comboCount++;
+                    else comboCount = 1;
                     lastMatchTime = now;
                     
                     let earnedPoints = 10 * comboCount;
                     totalScore += earnedPoints;
                     localStorage.setItem('mahjong_score', totalScore);
                     updateScoreDisplay();
-
                     showFloatingText(t.el, earnedPoints, comboCount > 1);
 
                     activeTiles = activeTiles.filter(x => x !== firstTile && x !== t); 
@@ -573,28 +562,18 @@
                     updateFreeState();
                     
                     if (activeTiles.length === 0) {
-                        currentLevel++;
-                        localStorage.setItem('mahjong_level', currentLevel);
+                        currentLevel++; localStorage.setItem('mahjong_level', currentLevel);
                         document.getElementById('message').innerHTML = '🎉 УРОВЕНЬ ПРОЙДЕН!';
                         document.getElementById('message').style.color = '#f1c40f';
-                        
                         shootConfetti(); 
-                        
-                        setTimeout(() => {
-                            initGame();
-                        }, 2500); 
+                        setTimeout(() => { initGame(); }, 2500); 
                     }
                 } else { 
-                    let t1 = firstTile, t2 = t;
-                    firstTile = null;
-                    setTimeout(() => { 
-                        t1.el.classList.remove('selected'); 
-                        t2.el.classList.remove('selected'); 
-                    }, 300); 
+                    let t1 = firstTile, t2 = t; firstTile = null;
+                    setTimeout(() => { t1.el.classList.remove('selected'); t2.el.classList.remove('selected'); }, 300); 
                 } 
             } else {
-                t.el.classList.remove('selected');
-                firstTile = null;
+                t.el.classList.remove('selected'); firstTile = null;
             }
         }
 
@@ -609,30 +588,19 @@
                 let currentSymbols = activeTiles.map(t => t.symbol);
                 shuffleArray(currentSymbols);
 
-                // --- ФИЗИЧЕСКАЯ ПЕРЕСТРОЙКА (Спасение от тупиков) ---
                 let fX = 0, fY = 0, fZ = 0;
                 activeTiles.forEach((tile, index) => {
                     tile.symbol = currentSymbols[index];
                     tile.el.innerText = tile.symbol;
                     tile.el.classList.remove('selected');
-
-                    // Раскладываем оставшиеся фишки ровными рядами
-                    tile.x = fX;
-                    tile.y = fY;
-                    tile.z = fZ;
-                    tile.el.style.setProperty('--x', tile.x);
-                    tile.el.style.setProperty('--y', tile.y);
-                    tile.el.style.setProperty('--z', tile.z);
+                    tile.x = fX; tile.y = fY; tile.z = fZ;
+                    tile.el.style.setProperty('--x', tile.x); tile.el.style.setProperty('--y', tile.y); tile.el.style.setProperty('--z', tile.z);
 
                     fX += 2; 
                     if (fX > 8) { 
-                        fX = 0;
-                        fY += 2;
+                        fX = 0; fY += 2;
                         if (fY > 8) { 
-                            // Если слой заполнился, кладем следующий слой со сдвигом, чтобы не было блоков
-                            fY = (fZ % 2 === 0) ? 1 : 0;
-                            fX = (fZ % 2 === 0) ? 1 : 0;
-                            fZ += 1;
+                            fY = (fZ % 2 === 0) ? 1 : 0; fX = (fZ % 2 === 0) ? 1 : 0; fZ += 1;
                         }
                     }
                 });
@@ -642,6 +610,7 @@
                 comboCount = 0; 
                 document.getElementById('message').innerText = 'Поле перестроено! ✨';
                 document.getElementById('message').style.color = '#f1c40f';
+                document.getElementById('btn-shuffle').classList.remove('btn-pulse');
             }, 2000); 
         }
     </script>
