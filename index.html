@@ -67,27 +67,38 @@
 
         #game-screen {
             display: none; flex-direction: column; align-items: center;
-            width: 100%; height: 100%; padding-top: 20px; z-index: 10;
+            width: 100%; height: 100%; padding-top: 15px; z-index: 10;
         }
         
         #top-bar {
             width: 90vw; max-width: 400px; display: flex;
-            justify-content: space-between; align-items: center; margin-bottom: 5vw;
-            flex-wrap: nowrap; /* Исправление: жестко запрещаем перенос элементов */
+            justify-content: space-between; align-items: flex-start; margin-bottom: 2vw;
+            flex-wrap: nowrap;
+        }
+
+        .hud-center {
+            display: flex; flex-direction: column; align-items: center;
         }
         
         #hud-level { 
             font-family: 'Russo One', sans-serif; font-size: 5vw; color: #f1c40f; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5); cursor: pointer; padding: 5px 10px;
-            white-space: nowrap; /* Исправление: запрещаем тексту прыгать на вторую строку */
-            line-height: 1; /* Исправление: выравниваем высоту */
-            text-align: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5); cursor: pointer; padding: 2px 10px;
+            white-space: nowrap; line-height: 1.2; text-align: center;
         }
         #hud-level:active { transform: scale(0.9); }
 
+        /* ТАБЛИЧКА СЛОЖНОСТИ */
+        #hud-difficulty {
+            font-size: 3.5vw; font-weight: bold; padding: 3px 10px; 
+            border-radius: 10px; margin-top: 2px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            white-space: nowrap;
+        }
+
         #game-board {
             width: 90vw; height: 112.5vw; max-width: 400px; max-height: 500px; 
-            position: relative; margin-top: 5vw; 
+            position: relative; margin-top: 2vw; 
         }
         
         .tile {
@@ -101,14 +112,10 @@
             background-size: 14px 14px; background-position: 0 0, 7px 7px;
 
             color: var(--tileColor); font-size: 8.5vw; 
-            
-            /* Исправление: Системные шрифты эмодзи, чтобы не было пустых квадратов */
             font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
-            
             display: flex; justify-content: center; align-items: center;
             
             border-radius: 12px; border: 2px solid var(--tileBorder);
-            
             box-shadow: var(--shadow), calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(2vw + var(--z) * 0.8vw) rgba(0,0,0,0.85);
             backdrop-filter: blur(4px); 
             
@@ -121,6 +128,7 @@
             #main-menu h1 { font-size: 52px; }
             .btn { font-size: 24px; } .btn-small { font-size: 16px; }
             .tile { margin-top: calc(var(--z) * -14px); margin-left: calc(var(--z) * -8px); }
+            #hud-difficulty { font-size: 14px; }
         }
 
         .tile.blocked { filter: brightness(0.5); cursor: not-allowed; }
@@ -167,7 +175,12 @@
     <div id="game-screen">
         <div id="top-bar">
             <button id="btn-menu" class="btn btn-small btn-secondary">🏠 Меню</button>
-            <div id="hud-level" title="Нажмите для пропуска уровня">Ур. 1</div>
+            
+            <div class="hud-center">
+                <div id="hud-level" title="Нажмите для пропуска уровня">Ур. 1</div>
+                <div id="hud-difficulty">🟢 Легко</div>
+            </div>
+
             <button id="btn-shuffle" class="btn btn-small">🎥 Микс</button>
         </div>
         <div id="game-board"></div>
@@ -225,73 +238,24 @@
         ];
 
         const materials = [
-            { // 1. Классика
-                bg1: '#1b5e20', bg2: '#0a2e0c', tileBg: '#fffaf0', tileBorder: '#fdf5e6', tileColor: '#1a2a3a',
-                bgImg: 'radial-gradient(#e6d5b8 15%, transparent 16%), radial-gradient(#e6d5b8 15%, transparent 16%)',
-                shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 12px rgba(180, 140, 100, 0.4)'
-            },
-            { // 2. Резное дерево
-                bg1: '#1a3c20', bg2: '#051808', tileBg: '#8b5a2b', tileBorder: '#a0522d', tileColor: '#ffe4c4',
-                bgImg: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px)',
-                shadow: '0 5px 10px rgba(0,0,0,0.8), inset 0 0 15px rgba(60, 30, 10, 0.8)'
-            },
-            { // 3. Золотые слитки
-                bg1: '#4a0000', bg2: '#1a0000', tileBg: '#ffd700', tileBorder: '#ffec8b', tileColor: '#8b6508',
-                bgImg: 'linear-gradient(45deg, rgba(255,255,255,0.2) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.2) 75%, transparent 75%, transparent)',
-                shadow: '0 5px 15px rgba(0,0,0,0.7), inset 0 0 20px #b8860b, 0 0 10px rgba(255,215,0,0.5)'
-            },
-            { // 4. Лёд
-                bg1: '#001f3f', bg2: '#000a1a', tileBg: '#e0ffff', tileBorder: '#ffffff', tileColor: '#005f87',
-                bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 100%)',
-                shadow: '0 5px 10px rgba(0,0,0,0.4), inset 0 0 15px rgba(0, 150, 255, 0.3), 0 0 10px rgba(175,238,238,0.5)'
-            },
-            { // 5. Киберпанк Неон
-                bg1: '#050505', bg2: '#000000', tileBg: '#1a1a1a', tileBorder: '#00ffcc', tileColor: '#ffffff',
-                bgImg: 'none',
-                shadow: '0 5px 15px rgba(0,0,0,0.9), inset 0 0 10px rgba(0, 255, 204, 0.2), 0 0 10px #00ffcc'
-            },
-            { // 6. Камень
-                bg1: '#2c3e50', bg2: '#1a252f', tileBg: '#7f8c8d', tileBorder: '#95a5a6', tileColor: '#2c3e50',
-                bgImg: 'radial-gradient(#bdc3c7 15%, transparent 16%), radial-gradient(#bdc3c7 15%, transparent 16%)',
-                shadow: '0 5px 10px rgba(0,0,0,0.8), inset 0 0 15px rgba(0, 0, 0, 0.4)'
-            },
-            { // 7. Шоколад
-                bg1: '#ffebcd', bg2: '#d2b48c', tileBg: '#3e2723', tileBorder: '#4e342e', tileColor: '#d7ccc8',
-                bgImg: 'radial-gradient(#4e342e 15%, transparent 16%), radial-gradient(#4e342e 15%, transparent 16%)',
-                shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 12px rgba(0, 0, 0, 0.5)'
-            },
-            { // 8. Мрамор
-                bg1: '#3e2723', bg2: '#1b100c', tileBg: '#f5f5f5', tileBorder: '#ffffff', tileColor: '#424242',
-                bgImg: 'linear-gradient(45deg, transparent, rgba(0,0,0,0.03) 30%, transparent 40%, rgba(0,0,0,0.02) 60%, transparent)',
-                shadow: '0 5px 10px rgba(0,0,0,0.5), inset 0 0 15px rgba(0, 0, 0, 0.1)'
-            },
-            { // 9. Рубин
-                bg1: '#1a0000', bg2: '#050000', tileBg: '#b71c1c', tileBorder: '#d32f2f', tileColor: '#ffebee',
-                bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(0,0,0,0.2) 100%)',
-                shadow: '0 5px 15px rgba(0,0,0,0.8), inset 0 0 15px rgba(0, 0, 0, 0.5), 0 0 10px rgba(229, 57, 53, 0.4)'
-            },
-            { // 10. Изумруд
-                bg1: '#001a00', bg2: '#000500', tileBg: '#1b5e20', tileBorder: '#2e7d32', tileColor: '#e8f5e9',
-                bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(0,0,0,0.2) 100%)',
-                shadow: '0 5px 15px rgba(0,0,0,0.8), inset 0 0 15px rgba(0, 0, 0, 0.5), 0 0 10px rgba(67, 160, 71, 0.4)'
-            },
-            { // 11. Аметист
-                bg1: '#1a0033', bg2: '#05001a', tileBg: '#4a148c', tileBorder: '#6a1b9a', tileColor: '#f3e5f5',
-                bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(0,0,0,0.2) 100%)',
-                shadow: '0 5px 15px rgba(0,0,0,0.8), inset 0 0 15px rgba(0, 0, 0, 0.5), 0 0 10px rgba(142, 36, 170, 0.4)'
-            },
-            { // 12. Стекло
-                bg1: '#e0f7fa', bg2: '#80deea', tileBg: 'rgba(255, 255, 255, 0.4)', tileBorder: 'rgba(255, 255, 255, 0.8)', tileColor: '#006064',
-                bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.6) 0%, transparent 100%)',
-                shadow: '0 5px 15px rgba(0,0,0,0.2), inset 0 0 20px rgba(255,255,255,0.5)'
-            }
+            { bg1: '#1b5e20', bg2: '#0a2e0c', tileBg: '#fffaf0', tileBorder: '#fdf5e6', tileColor: '#1a2a3a', bgImg: 'radial-gradient(#e6d5b8 15%, transparent 16%), radial-gradient(#e6d5b8 15%, transparent 16%)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 12px rgba(180, 140, 100, 0.4)' },
+            { bg1: '#1a3c20', bg2: '#051808', tileBg: '#8b5a2b', tileBorder: '#a0522d', tileColor: '#ffe4c4', bgImg: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px)', shadow: '0 5px 10px rgba(0,0,0,0.8), inset 0 0 15px rgba(60, 30, 10, 0.8)' },
+            { bg1: '#4a0000', bg2: '#1a0000', tileBg: '#ffd700', tileBorder: '#ffec8b', tileColor: '#8b6508', bgImg: 'linear-gradient(45deg, rgba(255,255,255,0.2) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.2) 75%, transparent 75%, transparent)', shadow: '0 5px 15px rgba(0,0,0,0.7), inset 0 0 20px #b8860b, 0 0 10px rgba(255,215,0,0.5)' },
+            { bg1: '#001f3f', bg2: '#000a1a', tileBg: '#e0ffff', tileBorder: '#ffffff', tileColor: '#005f87', bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 100%)', shadow: '0 5px 10px rgba(0,0,0,0.4), inset 0 0 15px rgba(0, 150, 255, 0.3), 0 0 10px rgba(175,238,238,0.5)' },
+            { bg1: '#050505', bg2: '#000000', tileBg: '#1a1a1a', tileBorder: '#00ffcc', tileColor: '#ffffff', bgImg: 'none', shadow: '0 5px 15px rgba(0,0,0,0.9), inset 0 0 10px rgba(0, 255, 204, 0.2), 0 0 10px #00ffcc' },
+            { bg1: '#2c3e50', bg2: '#1a252f', tileBg: '#7f8c8d', tileBorder: '#95a5a6', tileColor: '#2c3e50', bgImg: 'radial-gradient(#bdc3c7 15%, transparent 16%), radial-gradient(#bdc3c7 15%, transparent 16%)', shadow: '0 5px 10px rgba(0,0,0,0.8), inset 0 0 15px rgba(0, 0, 0, 0.4)' },
+            { bg1: '#ffebcd', bg2: '#d2b48c', tileBg: '#3e2723', tileBorder: '#4e342e', tileColor: '#d7ccc8', bgImg: 'radial-gradient(#4e342e 15%, transparent 16%), radial-gradient(#4e342e 15%, transparent 16%)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 12px rgba(0, 0, 0, 0.5)' },
+            { bg1: '#3e2723', bg2: '#1b100c', tileBg: '#f5f5f5', tileBorder: '#ffffff', tileColor: '#424242', bgImg: 'linear-gradient(45deg, transparent, rgba(0,0,0,0.03) 30%, transparent 40%, rgba(0,0,0,0.02) 60%, transparent)', shadow: '0 5px 10px rgba(0,0,0,0.5), inset 0 0 15px rgba(0, 0, 0, 0.1)' },
+            { bg1: '#1a0000', bg2: '#050000', tileBg: '#b71c1c', tileBorder: '#d32f2f', tileColor: '#ffebee', bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(0,0,0,0.2) 100%)', shadow: '0 5px 15px rgba(0,0,0,0.8), inset 0 0 15px rgba(0, 0, 0, 0.5), 0 0 10px rgba(229, 57, 53, 0.4)' },
+            { bg1: '#001a00', bg2: '#000500', tileBg: '#1b5e20', tileBorder: '#2e7d32', tileColor: '#e8f5e9', bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(0,0,0,0.2) 100%)', shadow: '0 5px 15px rgba(0,0,0,0.8), inset 0 0 15px rgba(0, 0, 0, 0.5), 0 0 10px rgba(67, 160, 71, 0.4)' },
+            { bg1: '#1a0033', bg2: '#05001a', tileBg: '#4a148c', tileBorder: '#6a1b9a', tileColor: '#f3e5f5', bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%, rgba(0,0,0,0.2) 100%)', shadow: '0 5px 15px rgba(0,0,0,0.8), inset 0 0 15px rgba(0, 0, 0, 0.5), 0 0 10px rgba(142, 36, 170, 0.4)' },
+            { bg1: '#e0f7fa', bg2: '#80deea', tileBg: 'rgba(255, 255, 255, 0.4)', tileBorder: 'rgba(255, 255, 255, 0.8)', tileColor: '#006064', bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.6) 0%, transparent 100%)', shadow: '0 5px 15px rgba(0,0,0,0.2), inset 0 0 20px rgba(255,255,255,0.5)' }
         ];
 
         let activeTiles = [], firstTile = null, secondTile = null;
 
         document.getElementById('menu-level-text').innerText = 'Уровень ' + currentLevel;
-        document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
-
+        
         document.getElementById('btn-play').addEventListener('click', () => { 
             document.getElementById('main-menu').style.display = 'none'; 
             document.getElementById('game-screen').style.display = 'flex'; 
@@ -308,8 +272,6 @@
         document.getElementById('hud-level').addEventListener('click', () => {
             currentLevel++;
             localStorage.setItem('mahjong_level', currentLevel);
-            document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
-            document.getElementById('menu-level-text').innerText = 'Уровень ' + currentLevel;
             initGame();
         });
 
@@ -326,37 +288,46 @@
             root.style.setProperty('--shadow', mat.shadow);
         }
 
-        function generateLayout(level) {
-            if (level === 1) return [
-                {x:0, y:0, z:0}, {x:2, y:0, z:0}, {x:4, y:0, z:0}, {x:6, y:0, z:0}, 
-                {x:0, y:2, z:0}, {x:2, y:2, z:0}, {x:4, y:2, z:0}, {x:6, y:2, z:0}, 
-                {x:0, y:4, z:0}, {x:2, y:4, z:0}, {x:4, y:4, z:0}, {x:6, y:4, z:0}, 
-                {x:0, y:6, z:0}, {x:2, y:6, z:0}, {x:4, y:6, z:0}, {x:6, y:6, z:0}, 
-                {x:1, y:1, z:1}, {x:3, y:1, z:1}, {x:5, y:1, z:1}, 
-                {x:1, y:3, z:1}, {x:3, y:3, z:1}, {x:5, y:3, z:1}, 
-                {x:1, y:5, z:1}, {x:3, y:5, z:1}, {x:5, y:5, z:1}, 
-                {x:2, y:2, z:2}, {x:4, y:2, z:2}, 
-                {x:2, y:4, z:2}, {x:4, y:4, z:2}, 
-                {x:3, y:3, z:3}
-            ];
+        // --- НОВАЯ СИСТЕМА СЛОЖНОСТИ (Цикл 10 уровней) ---
+        function getDifficultyParams(level) {
+            let cyclePos = (level - 1) % 10; // От 0 до 9
             
+            if (cyclePos >= 0 && cyclePos <= 2) {
+                return { text: "🟢 Легко", color: "#2ecc71", maxLayers: 2, density: 0.4 };
+            } else if (cyclePos >= 3 && cyclePos <= 5) {
+                return { text: "🟡 Средне", color: "#f1c40f", maxLayers: 3, density: 0.6 };
+            } else if (cyclePos >= 6 && cyclePos <= 8) {
+                return { text: "🟠 Сложно", color: "#e67e22", maxLayers: 4, density: 0.8 };
+            } else {
+                return { text: "🔴 ЭКСПЕРТ", color: "#e74c3c", maxLayers: 5, density: 0.95 };
+            }
+        }
+
+        function generateLayout(level) {
+            let diff = getDifficultyParams(level);
             let layout = [], grid = {};
+            
+            // Генератор случайных чисел, привязанный к уровню (всегда один и тот же результат для одного уровня)
             let seed = level * 13371337;
             function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
 
             let maxCols = 8, maxRows = 8;
-            let maxLayers = Math.min(2 + Math.floor(level / 10), 5); 
-            let density = 0.7 + (rnd() * 0.2); 
+            let maxLayers = diff.maxLayers; 
+            let density = diff.density; 
             
             for (let z = 0; z < maxLayers; z++) {
-                let shrink = z; 
+                let shrink = z; // С каждым слоем пирамида сужается
                 for (let y = shrink; y <= maxRows - shrink - 2; y += 2) {
                     for (let x = shrink; x <= maxCols - shrink - 2; x += 2) {
                         let isSupported = false;
-                        if (z === 0) isSupported = true;
-                        else {
-                            isSupported = grid[`${x},${y},${z-1}`] || grid[`${x-1},${y},${z-1}`];
+                        if (z === 0) {
+                            isSupported = true; // Нижний слой лежит на столе
+                        } else {
+                            // Проверяем, есть ли под фишкой опора
+                            isSupported = grid[`${x},${y},${z-1}`] || grid[`${x-1},${y},${z-1}`] || grid[`${x+1},${y},${z-1}`];
                         }
+                        
+                        // Если есть опора и рандом проходит плотность — ставим фишку
                         if (isSupported && rnd() < density) {
                             layout.push({x: x, y: y, z: z}); 
                             grid[`${x},${y},${z}`] = true;
@@ -364,7 +335,11 @@
                     }
                 }
             }
+            
+            // Фишек должно быть четное количество!
             if (layout.length % 2 !== 0) layout.pop(); 
+            
+            // Защита: если сгенерировалось слишком мало фишек, даем базовый квадрат
             if (layout.length < 4) return [{x: 2, y: 2, z: 0}, {x: 4, y: 2, z: 0}, {x: 2, y: 4, z: 0}, {x: 4, y: 4, z: 0}];
             return layout;
         }
@@ -388,6 +363,16 @@
             board.innerHTML = ''; activeTiles = []; firstTile = null; secondTile = null;
             document.getElementById('message').innerHTML = '';
             
+            // Обновляем текст и табличку сложности
+            document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
+            document.getElementById('menu-level-text').innerText = 'Уровень ' + currentLevel;
+            
+            let diffParams = getDifficultyParams(currentLevel);
+            let diffBadge = document.getElementById('hud-difficulty');
+            diffBadge.innerText = diffParams.text;
+            diffBadge.style.backgroundColor = diffParams.color;
+            diffBadge.style.color = (diffParams.color === "#f1c40f") ? "#000" : "#fff"; // Текст на желтом фоне делаем черным
+
             applyMaterial(currentLevel); 
             
             let baseSymbols = getSymbolsForLevel(currentLevel);
@@ -472,9 +457,7 @@
                     if (activeTiles.length === 0) {
                         currentLevel++;
                         localStorage.setItem('mahjong_level', currentLevel);
-                        document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
-                        document.getElementById('menu-level-text').innerText = 'Уровень ' + currentLevel;
-                        document.getElementById('message').innerHTML = '🎉 Уровень пройден!';
+                        document.getElementById('message').innerHTML = '🎉 Отлично!';
                         document.getElementById('message').style.color = '#2ecc71';
                         
                         setTimeout(() => {
