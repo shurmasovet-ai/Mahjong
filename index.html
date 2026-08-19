@@ -73,7 +73,7 @@
         #top-bar {
             width: 90vw; max-width: 400px; display: flex;
             justify-content: space-between; align-items: flex-start; margin-bottom: 2vw;
-            flex-wrap: nowrap;
+            flex-wrap: nowrap; /* Жестко запрещаем перенос элементов */
         }
 
         .hud-center {
@@ -87,7 +87,6 @@
         }
         #hud-level:active { transform: scale(0.9); }
 
-        /* ТАБЛИЧКА СЛОЖНОСТИ */
         #hud-difficulty {
             font-size: 3.5vw; font-weight: bold; padding: 3px 10px; 
             border-radius: 10px; margin-top: 2px;
@@ -112,6 +111,7 @@
             background-size: 14px 14px; background-position: 0 0, 7px 7px;
 
             color: var(--tileColor); font-size: 8.5vw; 
+            /* Универсальные шрифты эмодзи для спасения от пустых квадратов */
             font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
             display: flex; justify-content: center; align-items: center;
             
@@ -288,10 +288,8 @@
             root.style.setProperty('--shadow', mat.shadow);
         }
 
-        // --- НОВАЯ СИСТЕМА СЛОЖНОСТИ (Цикл 10 уровней) ---
         function getDifficultyParams(level) {
-            let cyclePos = (level - 1) % 10; // От 0 до 9
-            
+            let cyclePos = (level - 1) % 10;
             if (cyclePos >= 0 && cyclePos <= 2) {
                 return { text: "🟢 Легко", color: "#2ecc71", maxLayers: 2, density: 0.4 };
             } else if (cyclePos >= 3 && cyclePos <= 5) {
@@ -303,11 +301,11 @@
             }
         }
 
+        // ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ ФУНКЦИЯ 3D-ГЕНЕРАЦИИ ПОЛЯ
         function generateLayout(level) {
             let diff = getDifficultyParams(level);
             let layout = [], grid = {};
             
-            // Генератор случайных чисел, привязанный к уровню (всегда один и тот же результат для одного уровня)
             let seed = level * 13371337;
             function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
 
@@ -316,18 +314,22 @@
             let density = diff.density; 
             
             for (let z = 0; z < maxLayers; z++) {
-                let shrink = z; // С каждым слоем пирамида сужается
-                for (let y = shrink; y <= maxRows - shrink - 2; y += 2) {
-                    for (let x = shrink; x <= maxCols - shrink - 2; x += 2) {
+                let offset = (z % 2 === 0) ? 0 : 1; 
+                let shrink = Math.floor(z / 2) * 2 + offset; 
+                
+                for (let y = shrink; y <= maxRows - shrink; y += 2) {
+                    for (let x = shrink; x <= maxCols - shrink; x += 2) {
                         let isSupported = false;
                         if (z === 0) {
-                            isSupported = true; // Нижний слой лежит на столе
+                            isSupported = true;
                         } else {
-                            // Проверяем, есть ли под фишкой опора
-                            isSupported = grid[`${x},${y},${z-1}`] || grid[`${x-1},${y},${z-1}`] || grid[`${x+1},${y},${z-1}`];
+                            isSupported = grid[`${x-1},${y-1},${z-1}`] || 
+                                          grid[`${x+1},${y-1},${z-1}`] || 
+                                          grid[`${x-1},${y+1},${z-1}`] || 
+                                          grid[`${x+1},${y+1},${z-1}`] ||
+                                          grid[`${x},${y},${z-1}`];
                         }
                         
-                        // Если есть опора и рандом проходит плотность — ставим фишку
                         if (isSupported && rnd() < density) {
                             layout.push({x: x, y: y, z: z}); 
                             grid[`${x},${y},${z}`] = true;
@@ -336,10 +338,7 @@
                 }
             }
             
-            // Фишек должно быть четное количество!
             if (layout.length % 2 !== 0) layout.pop(); 
-            
-            // Защита: если сгенерировалось слишком мало фишек, даем базовый квадрат
             if (layout.length < 4) return [{x: 2, y: 2, z: 0}, {x: 4, y: 2, z: 0}, {x: 2, y: 4, z: 0}, {x: 4, y: 4, z: 0}];
             return layout;
         }
@@ -363,7 +362,6 @@
             board.innerHTML = ''; activeTiles = []; firstTile = null; secondTile = null;
             document.getElementById('message').innerHTML = '';
             
-            // Обновляем текст и табличку сложности
             document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
             document.getElementById('menu-level-text').innerText = 'Уровень ' + currentLevel;
             
@@ -371,7 +369,7 @@
             let diffBadge = document.getElementById('hud-difficulty');
             diffBadge.innerText = diffParams.text;
             diffBadge.style.backgroundColor = diffParams.color;
-            diffBadge.style.color = (diffParams.color === "#f1c40f") ? "#000" : "#fff"; // Текст на желтом фоне делаем черным
+            diffBadge.style.color = (diffParams.color === "#f1c40f") ? "#000" : "#fff"; 
 
             applyMaterial(currentLevel); 
             
