@@ -9,7 +9,6 @@
     <style>
         :root { 
             color-scheme: light; 
-            /* Дефолтные переменные (Классическое печенье) */
             --bg1: #1b5e20; --bg2: #0a2e0c;
             --tileBg: #fffaf0; --tileBorder: #fdf5e6;
             --tileColor: #1a2a3a;
@@ -70,15 +69,19 @@
             display: none; flex-direction: column; align-items: center;
             width: 100%; height: 100%; padding-top: 20px; z-index: 10;
         }
+        
         #top-bar {
             width: 90vw; max-width: 400px; display: flex;
             justify-content: space-between; align-items: center; margin-bottom: 5vw;
+            flex-wrap: nowrap; /* Исправление: жестко запрещаем перенос элементов */
         }
         
-        /* Сделали индикатор уровня кликабельным (кнопка разработчика) */
         #hud-level { 
             font-family: 'Russo One', sans-serif; font-size: 5vw; color: #f1c40f; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5); cursor: pointer; padding: 5px 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5); cursor: pointer; padding: 5px 10px;
+            white-space: nowrap; /* Исправление: запрещаем тексту прыгать на вторую строку */
+            line-height: 1; /* Исправление: выравниваем высоту */
+            text-align: center;
         }
         #hud-level:active { transform: scale(0.9); }
 
@@ -87,7 +90,6 @@
             position: relative; margin-top: 5vw; 
         }
         
-        /* Плитки 2:3 с динамическими материалами */
         .tile {
             position: absolute; 
             width: 20%; height: 24%;
@@ -99,6 +101,10 @@
             background-size: 14px 14px; background-position: 0 0, 7px 7px;
 
             color: var(--tileColor); font-size: 8.5vw; 
+            
+            /* Исправление: Системные шрифты эмодзи, чтобы не было пустых квадратов */
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+            
             display: flex; justify-content: center; align-items: center;
             
             border-radius: 12px; border: 2px solid var(--tileBorder);
@@ -161,7 +167,6 @@
     <div id="game-screen">
         <div id="top-bar">
             <button id="btn-menu" class="btn btn-small btn-secondary">🏠 Меню</button>
-            <!-- ЭТО ВАША СЕКРЕТНАЯ КНОПКА -->
             <div id="hud-level" title="Нажмите для пропуска уровня">Ур. 1</div>
             <button id="btn-shuffle" class="btn btn-small">🎥 Микс</button>
         </div>
@@ -179,7 +184,6 @@
         let currentLevel = 1;
         try { let saved = localStorage.getItem('mahjong_level'); if (saved) currentLevel = parseInt(saved); } catch(e){}
         
-        // 37 Тем * 20 = 740 уникальных значков
         const themeSets = [
             ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'], 
             ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'], 
@@ -220,9 +224,8 @@
             ['一','二','三','四','五','六','七','八','九','十','百','千','万','中','发','白','春','夏','秋','冬']  
         ];
 
-        // 12 ДИНАМИЧЕСКИХ МАТЕРИАЛОВ
         const materials = [
-            { // 1. Классика (Осталась в крапинку!)
+            { // 1. Классика
                 bg1: '#1b5e20', bg2: '#0a2e0c', tileBg: '#fffaf0', tileBorder: '#fdf5e6', tileColor: '#1a2a3a',
                 bgImg: 'radial-gradient(#e6d5b8 15%, transparent 16%), radial-gradient(#e6d5b8 15%, transparent 16%)',
                 shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 12px rgba(180, 140, 100, 0.4)'
@@ -302,7 +305,6 @@
         });
         document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
 
-        // --- СЕКРЕТНАЯ КНОПКА РАЗРАБОТЧИКА ---
         document.getElementById('hud-level').addEventListener('click', () => {
             currentLevel++;
             localStorage.setItem('mahjong_level', currentLevel);
@@ -310,7 +312,6 @@
             document.getElementById('menu-level-text').innerText = 'Уровень ' + currentLevel;
             initGame();
         });
-        // ------------------------------------
 
         function applyMaterial(level) {
             let root = document.documentElement;
