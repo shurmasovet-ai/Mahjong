@@ -73,25 +73,17 @@
             position: relative; margin-top: 5vw; 
         }
         
-        /* --- СТРОГАЯ ПРОПОРЦИЯ 2:3 --- */
+        /* --- СТРОГАЯ ПРОПОРЦИЯ 2:3 + ПЕЧЕНЬЯ --- */
         .tile {
             position: absolute; 
-            
-            /* Математически выверенная ширина и высота: 
-               20% от ширины поля (18vw) 
-               24% от высоты поля (27vw) 
-               18 к 27 = строго 2 к 3 */
             width: 20%; 
             height: 24%;
-            
-            /* Идеальное центрирование всей пирамиды на поле */
             left: calc(var(--x) * 10% + 10%); 
             top: calc(var(--y) * 12% + 2%);
             
             margin-top: calc(var(--z) * -3.5vw); 
             margin-left: calc(var(--z) * -2vw);
             
-            /* Дизайн "печенья/крекера" */
             background-color: #fffaf0; 
             background-image: radial-gradient(#e6d5b8 15%, transparent 16%), radial-gradient(#e6d5b8 15%, transparent 16%);
             background-size: 14px 14px;
@@ -104,7 +96,6 @@
             border-radius: 12px;
             border: 2px solid #fdf5e6;
             
-            /* Мягкие, глубокие тени */
             box-shadow: 0 5px 10px rgba(0,0,0,0.6), 
                         inset 0 0 12px rgba(180, 140, 100, 0.4),
                         calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(2vw + var(--z) * 0.8vw) rgba(0,0,0,0.85);
@@ -182,7 +173,16 @@
     <script>
         let currentLevel = 1;
         try { let saved = localStorage.getItem('mahjong_level'); if (saved) currentLevel = parseInt(saved); } catch(e){}
-        const baseSymbols = ['🍹', '🍸', '🥤', '🧊', '🍊', '🍓', '🍩', '🍪', '🍫', '🍬', '🧁', '🍰', '🍏', '🍉', '🍍', '🍒', '🍯', '🍧', '🍨', '🧋'];
+        
+        // ДИНАМИЧЕСКИЕ ТЕМЫ (100 уникальных иконок!)
+        const themeSets = [
+            ['🍹', '🍸', '🥤', '🧊', '🧉', '🥛', '☕', '🍵', '🧃', '🍯', '🍩', '🍪', '🍫', '🍬', '🍭', '🧁', '🍰', '🍧', '🍨', '🥞'], // 1. Напитки и сладости
+            ['🦊', '🐼', '🐯', '🐸', '🦋', '🐢', '🐞', '🐙', '🐒', '🦉', '🌸', '🌻', '🍄', '🍀', '🍁', '🌲', '🌵', '🍉', '🍓', '🥑'], // 2. Природа
+            ['🌊', '🐚', '🦀', '🐠', '🐳', '🐬', '🌴', '🥥', '🍍', '☀️', '⛵', '⚓', '⛱️', '🏄', '🦑', '🐡', '🍹', '🍧', '🏝️', '🛶'], // 3. Пляж и Океан
+            ['🔮', '🪄', '🦇', '🦉', '🌙', '✨', '🧙', '🦄', '🕸️', '🍄', '🕯️', '🗝️', '📜', '🧪', '🧿', '👑', '🐉', '🎭', '🧩', '🪐'], // 4. Магия
+            ['💎', '👑', '💍', '🪙', '💰', '🏆', '🎁', '🎀', '🔮', '✨', '🌟', '🥂', '🍾', '🏰', '🗝️', '🧸', '🪞', '🛍️', '📿', '⚜️']  // 5. Сокровища и Роскошь
+        ];
+
         let activeTiles = [], firstTile = null, secondTile = null;
 
         document.getElementById('menu-level-text').innerText = 'Уровень ' + currentLevel;
@@ -202,6 +202,7 @@
         document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
 
         function generateLayout(level) {
+            // Обучающий легкий уровень
             if (level === 1) return [
                 {x:0, y:0, z:0}, {x:2, y:0, z:0}, {x:4, y:0, z:0}, {x:6, y:0, z:0}, 
                 {x:0, y:2, z:0}, {x:2, y:2, z:0}, {x:4, y:2, z:0}, {x:6, y:2, z:0}, 
@@ -249,6 +250,10 @@
             const board = document.getElementById('game-board'); 
             board.innerHTML = ''; activeTiles = []; firstTile = null; secondTile = null;
             document.getElementById('message').innerHTML = '';
+            
+            // ВЫБОР ТЕМЫ: меняем каждые 5 уровней
+            let themeIndex = Math.floor((currentLevel - 1) / 5) % themeSets.length;
+            let baseSymbols = themeSets[themeIndex];
             
             let layout = generateLayout(currentLevel);
             let symbols = []; 
