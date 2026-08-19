@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="color-scheme" content="light only">
     <title>Mahjong Deluxe - Infinity 8888</title>
-    <!-- Подключаем шрифты, в том числе универсальный шрифт для Эмодзи от Google -->
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -58,15 +57,12 @@
         }
         .btn-small:active { transform: translateY(4px); box-shadow: 0 0 0 #b7950b; }
 
-        /* Пульсирующая кнопка Микса при тупике */
         @keyframes pulseBtn {
             0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); background-color: #e74c3c; color: white; }
             50% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); background-color: #c0392b; color: white; }
             100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); background-color: #e74c3c; color: white; }
         }
-        .btn-pulse {
-            animation: pulseBtn 1.5s infinite !important;
-        }
+        .btn-pulse { animation: pulseBtn 1.5s infinite !important; }
 
         #btn-reset {
             margin-top: 25px; color: #e74c3c; text-decoration: underline; 
@@ -130,8 +126,6 @@
             background-image: var(--bgImg);
             background-size: 14px 14px; background-position: 0 0, 7px 7px;
             color: var(--tileColor); font-size: 7.5vw; 
-
-            /* Строго заставляем использовать гугловский шрифт эмодзи */
             font-family: 'Noto Color Emoji', sans-serif;
             
             display: flex; justify-content: center; align-items: center;
@@ -389,7 +383,7 @@
 
         function shuffleArray(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } }
 
-        // --- УМНАЯ РАЗДАЧА (Защита от тупиков на старте) ---
+        // --- ИСПРАВЛЕННАЯ УМНАЯ РАЗДАЧА С ЗАЩИТОЙ ОТ UNDEFINED ---
         function assignSymbolsSmart(layout, baseSymbols) {
             let unassigned = layout.map(pos => ({x: pos.x, y: pos.y, z: pos.z, isFree: false, symbol: null, el: null}));
             let symbolPool = [];
@@ -425,10 +419,23 @@
                 remaining = remaining.filter(t => t !== t1 && t !== t2);
             }
 
+            // ИСПРАВЛЕНИЕ: Математически выверенное дублирование остатков
             if (fallbackTriggered && remaining.length > 0) {
-                shuffleArray(symbolPool);
-                remaining.forEach((t, i) => { t.symbol = symbolPool[i]; });
+                let remainingSymbols = [];
+                // Берем оставшиеся одиночные символы в пуле и дублируем их для парности
+                symbolPool.forEach(sym => {
+                    remainingSymbols.push(sym, sym);
+                });
+                
+                // Тщательно перемешиваем восстановленные пары
+                shuffleArray(remainingSymbols);
+                
+                // Раздаем ровно столько символов, сколько осталось ячеек
+                remaining.forEach((t, i) => { 
+                    t.symbol = remainingSymbols[i]; 
+                });
             }
+            
             return unassigned;
         }
 
@@ -453,7 +460,6 @@
             let baseSymbols = getSymbolsForLevel(currentLevel);
             let layout = generateLayout(currentLevel);
             
-            // Используем УМНУЮ раздачу вместо глупой
             let preparedTiles = assignSymbolsSmart(layout, baseSymbols);
             
             preparedTiles.forEach((obj) => {
