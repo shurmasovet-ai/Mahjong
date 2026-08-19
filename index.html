@@ -73,7 +73,7 @@
         #top-bar {
             width: 90vw; max-width: 400px; display: flex;
             justify-content: space-between; align-items: flex-start; margin-bottom: 2vw;
-            flex-wrap: nowrap; /* Жестко запрещаем перенос элементов */
+            flex-wrap: nowrap;
         }
 
         .hud-center {
@@ -84,8 +84,10 @@
             font-family: 'Russo One', sans-serif; font-size: 5vw; color: #f1c40f; 
             text-shadow: 0 2px 4px rgba(0,0,0,0.5); cursor: pointer; padding: 2px 10px;
             white-space: nowrap; line-height: 1.2; text-align: center;
+            transition: transform 0.1s;
         }
         #hud-level:active { transform: scale(0.9); }
+        #hud-level:hover { opacity: 0.8; }
 
         #hud-difficulty {
             font-size: 3.5vw; font-weight: bold; padding: 3px 10px; 
@@ -97,21 +99,22 @@
 
         #game-board {
             width: 90vw; height: 112.5vw; max-width: 400px; max-height: 500px; 
-            position: relative; margin-top: 2vw; 
+            position: relative; margin-top: 6vw; /* Добавил отступ сверху, чтобы башни не упирались в текст */
         }
         
         .tile {
             position: absolute; 
-            width: 20%; height: 24%;
-            left: calc(var(--x) * 10% + 10%); top: calc(var(--y) * 12% + 2%);
+            /* Новые пропорции! Теперь на экране помещается ровно 5 рядов без обрезания */
+            width: 20%; height: 20%;
+            left: calc(var(--x) * 10%); 
+            top: calc(var(--y) * 10%);
             margin-top: calc(var(--z) * -3.5vw); margin-left: calc(var(--z) * -2vw);
             
             background-color: var(--tileBg); 
             background-image: var(--bgImg);
             background-size: 14px 14px; background-position: 0 0, 7px 7px;
 
-            color: var(--tileColor); font-size: 8.5vw; 
-            /* Универсальные шрифты эмодзи для спасения от пустых квадратов */
+            color: var(--tileColor); font-size: 7.5vw; 
             font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
             display: flex; justify-content: center; align-items: center;
             
@@ -124,7 +127,7 @@
         }
         
         @media (min-width: 400px) {
-            .tile { font-size: 32px; border-radius: 14px; } 
+            .tile { font-size: 30px; border-radius: 14px; } 
             #main-menu h1 { font-size: 52px; }
             .btn { font-size: 24px; } .btn-small { font-size: 16px; }
             .tile { margin-top: calc(var(--z) * -14px); margin-left: calc(var(--z) * -8px); }
@@ -177,6 +180,7 @@
             <button id="btn-menu" class="btn btn-small btn-secondary">🏠 Меню</button>
             
             <div class="hud-center">
+                <!-- ВОТ ОНА СЕКРЕТНАЯ КНОПКА (ЖМИТЕ НА ТЕКСТ) -->
                 <div id="hud-level" title="Нажмите для пропуска уровня">Ур. 1</div>
                 <div id="hud-difficulty">🟢 Легко</div>
             </div>
@@ -269,6 +273,7 @@
         });
         document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
 
+        // ОБРАБОТКА СЕКРЕТНОЙ КНОПКИ
         document.getElementById('hud-level').addEventListener('click', () => {
             currentLevel++;
             localStorage.setItem('mahjong_level', currentLevel);
@@ -301,7 +306,6 @@
             }
         }
 
-        // ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ ФУНКЦИЯ 3D-ГЕНЕРАЦИИ ПОЛЯ
         function generateLayout(level) {
             let diff = getDifficultyParams(level);
             let layout = [], grid = {};
@@ -309,6 +313,7 @@
             let seed = level * 13371337;
             function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
 
+            // Исправленные границы поля для идеального 3D
             let maxCols = 8, maxRows = 8;
             let maxLayers = diff.maxLayers; 
             let density = diff.density; 
@@ -323,6 +328,7 @@
                         if (z === 0) {
                             isSupported = true;
                         } else {
+                            // Правильная проверка опоры для башен
                             isSupported = grid[`${x-1},${y-1},${z-1}`] || 
                                           grid[`${x+1},${y-1},${z-1}`] || 
                                           grid[`${x-1},${y+1},${z-1}`] || 
