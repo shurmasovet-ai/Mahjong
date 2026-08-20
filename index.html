@@ -18,28 +18,23 @@
         
         body {
             font-family: sans-serif; 
-            /* ГЛУБОКИЙ ФОН С ЗАТЕМНЕНИЕМ ПО КРАЯМ */
+            /* ГЛУБОКИЙ БОРДОВЫЙ ФОН С ВИЗУАЛЬНЫМ ОБЪЕМОМ */
             background: radial-gradient(circle at center, #6b1222 0%, #2a050b 100%);
             color: white; width: 100vw; height: 100vh; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* --- НОВОЕ ГЛАВНОЕ МЕНЮ --- */
+        /* --- ГЛАВНОЕ МЕНЮ --- */
         #main-menu {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             height: 100%; width: 100%; position: absolute; top: 0; left: 0; z-index: 50;
             overflow: hidden;
         }
 
-        /* ЧАСТИЦЫ ЗОЛОТОЙ ПЫЛИ НА ФОНЕ */
         .particle {
-            position: absolute;
-            background-color: #f1c40f;
-            border-radius: 50%;
-            pointer-events: none;
-            box-shadow: 0 0 10px #f1c40f, 0 0 20px #f1c40f;
-            animation: floatUp 15s infinite linear;
-            opacity: 0;
+            position: absolute; background-color: #f1c40f; border-radius: 50%;
+            pointer-events: none; box-shadow: 0 0 10px #f1c40f, 0 0 20px #f1c40f;
+            animation: floatUp 15s infinite linear; opacity: 0;
         }
         @keyframes floatUp {
             0% { transform: translateY(100vh) scale(0); opacity: 0; }
@@ -48,67 +43,41 @@
             100% { transform: translateY(-10vh) scale(1); opacity: 0; }
         }
         
-        /* ОБЪЕМНЫЙ ЗАГОЛОВОК */
         #main-menu h1 {
-            font-family: 'Russo One', sans-serif;
-            font-size: 16vw; margin-bottom: 25px; 
+            font-family: 'Russo One', sans-serif; font-size: 16vw; margin-bottom: 25px; 
             background: linear-gradient(180deg, #fff3b0 0%, #f1c40f 50%, #b7950b 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-align: center; letter-spacing: 3px;
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8));
-            z-index: 2;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-align: center; letter-spacing: 3px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8)); z-index: 2;
         }
         
-        /* ПРЕМИАЛЬНАЯ ПЛАШКА УРОВНЯ */
         #menu-level-badge {
-            background: rgba(0, 0, 0, 0.4);
-            border: 2px solid rgba(241, 196, 15, 0.5);
+            background: rgba(0, 0, 0, 0.4); border: 2px solid rgba(241, 196, 15, 0.5);
             box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.5);
-            border-radius: 30px;
-            padding: 10px 40px;
-            margin-bottom: 50px;
-            z-index: 2;
-            backdrop-filter: blur(5px);
+            border-radius: 30px; padding: 10px 40px; margin-bottom: 50px; z-index: 2; backdrop-filter: blur(5px);
         }
         #menu-level-text { 
-            font-family: 'Russo One', sans-serif;
-            font-size: 6vw; color: #2ecc71; 
-            text-shadow: 0 2px 5px rgba(0,0,0,1);
-            letter-spacing: 1px;
+            font-family: 'Russo One', sans-serif; font-size: 6vw; color: #2ecc71; 
+            text-shadow: 0 2px 5px rgba(0,0,0,1); letter-spacing: 1px;
         }
 
-        /* МАССИВНАЯ 3D-КНОПКА ИГРАТЬ */
         .btn-massive {
             background: linear-gradient(180deg, #ffdf00 0%, #f1c40f 50%, #d4ac0d 100%);
             color: #4b0d18; border: none; padding: 20px 40px;
-            font-family: 'Russo One', sans-serif; font-size: 8vw; font-weight: 900;
-            border-radius: 40px; 
-            /* Толстая подошва (тень) + свечение */
+            font-family: 'Russo One', sans-serif; font-size: 8vw; font-weight: 900; border-radius: 40px; 
             box-shadow: 0 10px 0 #9c7e07, 0 20px 25px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8);
-            cursor: pointer; 
-            transition: all 0.1s;
-            touch-action: manipulation; user-select: none; margin-bottom: 25px; 
-            width: 80vw; max-width: 350px;
-            display: flex; justify-content: center; align-items: center; letter-spacing: 2px;
-            z-index: 2;
-            animation: breathe 2s infinite ease-in-out;
+            cursor: pointer; transition: all 0.1s; touch-action: manipulation; user-select: none; margin-bottom: 25px; 
+            width: 80vw; max-width: 350px; display: flex; justify-content: center; align-items: center; letter-spacing: 2px;
+            z-index: 2; animation: breathe 2s infinite ease-in-out;
         }
-        @keyframes breathe {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-            100% { transform: scale(1); }
-        }
+        @keyframes breathe { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
         .btn-massive:active { 
             transform: translateY(10px) scale(1) !important; 
             box-shadow: 0 0 0 #9c7e07, 0 5px 10px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8); 
         }
 
         .btn-menu-small {
-            background: transparent; color: #95a5a6; border: 2px solid #95a5a6;
-            padding: 12px 30px; font-family: sans-serif; font-size: 4.5vw; font-weight: bold;
-            border-radius: 20px; z-index: 2; margin-bottom: 15px;
-            transition: all 0.2s;
+            background: transparent; color: #95a5a6; border: 2px solid #95a5a6; padding: 12px 30px; 
+            font-family: sans-serif; font-size: 4.5vw; font-weight: bold; border-radius: 20px; z-index: 2; margin-bottom: 15px; transition: all 0.2s;
         }
         .btn-menu-small:active { background: rgba(255,255,255,0.1); }
 
@@ -118,53 +87,19 @@
         }
         #btn-reset:active { opacity: 0.5; }
 
-        /* --- ОСТАЛЬНЫЕ СТИЛИ (ГЕЙМПЛЕЙ) --- */
-        .btn {
-            background-color: #f1c40f; color: #7d6608; border: none; padding: 15px 40px;
-            font-family: 'Russo One', sans-serif; font-size: 6vw; border-radius: 30px; 
-            box-shadow: 0 6px 0 #b7950b, 0 10px 15px rgba(0,0,0,0.5); cursor: pointer; 
-            transition: transform 0.1s, box-shadow 0.1s;
-            touch-action: manipulation; user-select: none; margin-bottom: 20px; width: 70vw; max-width: 300px;
-            display: flex; justify-content: center; align-items: center; letter-spacing: 1px;
-        }
-        .btn:active { transform: translateY(6px); box-shadow: 0 0 0 #b7950b; }
-        .btn-secondary { background-color: #3498db; color: white; box-shadow: 0 6px 0 #2980b9; }
-        .btn-secondary:active { box-shadow: 0 0 0 #2980b9; }
-        .btn-small {
-            font-family: sans-serif; font-size: 4vw; padding: 10px 15px; border-radius: 15px;
-            box-shadow: 0 4px 0 #b7950b; width: auto; margin-bottom: 0; font-weight: bold;
-            transition: all 0.3s;
-        }
-        .btn-small:active { transform: translateY(4px); box-shadow: 0 0 0 #b7950b; }
-
-        @keyframes pulseBtn {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); background-color: #e74c3c; color: white; }
-            50% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); background-color: #c0392b; color: white; }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); background-color: #e74c3c; color: white; }
-        }
-        .btn-pulse { animation: pulseBtn 1.5s infinite !important; }
-
-        #rules-modal {
-            display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: rgba(0, 0, 0, 0.95); z-index: 100;
-            flex-direction: column; align-items: center; justify-content: center;
-            color: white; text-align: center; padding: 20px;
-        }
-        #rules-modal h2 { font-family: 'Russo One', sans-serif; font-size: 8vw; color: #f1c40f; margin-bottom: 20px; }
-        #rules-modal p { font-size: 5vw; line-height: 1.5; margin-bottom: 30px; max-width: 400px; }
-
+        /* --- ИГРОВОЙ ЭКРАН --- */
         #game-screen {
             display: none; flex-direction: column; align-items: center;
-            width: 100%; height: 100%; padding-top: 15px; z-index: 10;
+            width: 100%; height: 100%; padding-top: 15px; z-index: 10; position: relative;
         }
         
         #top-bar {
             width: 90vw; max-width: 400px; display: flex;
-            justify-content: space-between; align-items: flex-start; margin-bottom: 2vw;
+            justify-content: space-between; align-items: center; margin-bottom: 10px;
             flex-wrap: nowrap;
         }
 
-        .hud-center { display: flex; flex-direction: column; align-items: center; }
+        .hud-center { display: flex; flex-direction: column; align-items: center; flex-grow: 1; }
         
         #hud-level { 
             font-family: 'Russo One', sans-serif; font-size: 5vw; color: #f1c40f; 
@@ -179,53 +114,50 @@
         }
 
         #hud-difficulty {
-            font-size: 3vw; font-weight: bold; padding: 3px 8px; 
-            border-radius: 10px; margin-top: 4px;
+            font-size: 3vw; font-weight: bold; padding: 3px 8px; border-radius: 10px; margin-top: 4px;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.8); box-shadow: 0 2px 4px rgba(0,0,0,0.5); white-space: nowrap;
         }
 
+        /* --- ЗОЛОТАЯ ШКАЛА ПРОГРЕССА --- */
+        #progress-container {
+            width: 90vw; max-width: 400px; height: 8px;
+            background-color: rgba(0,0,0,0.5); border-radius: 4px;
+            margin-bottom: 2vw; overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.1);
+        }
+        #progress-bar {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, #ffdf00, #f1c40f, #fff3b0);
+            box-shadow: 0 0 10px rgba(241, 196, 15, 0.8);
+            transition: width 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .btn-small-top {
+            font-family: sans-serif; font-size: 4vw; padding: 10px 15px; border-radius: 15px;
+            background-color: #3498db; color: white; border: none; font-weight: bold;
+            box-shadow: 0 4px 0 #2980b9, 0 5px 10px rgba(0,0,0,0.5); transition: all 0.2s;
+        }
+        .btn-small-top:active { transform: translateY(4px); box-shadow: 0 0 0 #2980b9; }
+
         #game-board {
             width: 90vw; height: 112.5vw; max-width: 400px; max-height: 500px; 
-            position: relative; margin-top: 4vw; 
-            perspective: 1000px;
+            position: relative; margin-top: 2vw; perspective: 1000px; 
         }
         
         .tile {
-            position: absolute; 
-            width: 20%; height: 20%;
-            left: calc(var(--x) * 10%); 
-            top: calc(var(--y) * 10%);
+            position: absolute; width: 20%; height: 20%;
+            left: calc(var(--x) * 10%); top: calc(var(--y) * 10%);
             margin-top: calc(var(--z) * -3.5vw); margin-left: calc(var(--z) * -2vw);
-            
-            background-color: var(--tileBg); 
-            background-image: var(--bgImg);
+            background-color: var(--tileBg); background-image: var(--bgImg);
             background-size: 14px 14px; background-position: 0 0, 7px 7px;
-            
-            color: var(--tileColor); 
-            font-size: 14vw; 
-            line-height: 1;
-            text-shadow: 2px 3px 4px rgba(0,0,0,0.4); 
-            font-family: 'Noto Color Emoji', sans-serif;
-            
+            color: var(--tileColor); font-size: 14vw; line-height: 1;
+            text-shadow: 2px 3px 4px rgba(0,0,0,0.4); font-family: 'Noto Color Emoji', sans-serif;
             display: flex; justify-content: center; align-items: center;
             border-radius: 12px; border: 2px solid var(--tileBorder);
             box-shadow: var(--shadow), calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(2vw + var(--z) * 0.8vw) rgba(0,0,0,0.85);
-            backdrop-filter: blur(4px); 
-            
-            touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
+            backdrop-filter: blur(4px); touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
             transition: transform 0.2s, filter 0.2s, box-shadow 0.2s, top 0.6s ease-in-out, left 0.6s ease-in-out, margin-top 0.6s, margin-left 0.6s; cursor: pointer;
             transform-style: preserve-3d;
-        }
-        
-        @media (min-width: 400px) {
-            .tile { font-size: 56px; border-radius: 14px; } 
-            #main-menu h1 { font-size: 64px; }
-            .btn { font-size: 24px; } .btn-small { font-size: 16px; }
-            .btn-massive { font-size: 32px; padding: 25px 50px; }
-            #menu-level-text { font-size: 24px; }
-            .tile { margin-top: calc(var(--z) * -14px); margin-left: calc(var(--z) * -8px); }
-            #hud-difficulty { font-size: 12px; }
-            #hud-score { font-size: 18px; }
         }
 
         .tile.blocked { filter: brightness(0.5); cursor: not-allowed; }
@@ -236,21 +168,11 @@
         }
         .tile.matched { opacity: 0; pointer-events: none; transform: scale(1.5); filter: brightness(2); }
 
-        .tile.is-hidden {
-            color: transparent !important;
-            text-shadow: none !important;
-        }
+        .tile.is-hidden { color: transparent !important; text-shadow: none !important; }
         .tile.is-hidden::after {
-            content: '❖'; 
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 8vw;
-            color: rgba(139, 69, 19, 0.35); 
+            content: '❖'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 8vw; color: rgba(139, 69, 19, 0.35); 
             text-shadow: 1px 1px 1px rgba(255,255,255,0.6), -1px -1px 1px rgba(0,0,0,0.2); 
-        }
-        @media (min-width: 400px) {
-            .tile.is-hidden::after { font-size: 32px; }
         }
 
         .flip-anim { animation: flipTileIn 0.3s ease-out forwards; }
@@ -258,6 +180,31 @@
             0% { transform: translateY(-3vw) scale(1.08) rotateY(-90deg); }
             100% { transform: translateY(-3vw) scale(1.08) rotateY(0deg); }
         }
+
+        /* --- НИЖНЯЯ КРУГЛАЯ КНОПКА МИКС (ЭРГОНОМИКА) --- */
+        #bottom-bar {
+            position: absolute; bottom: 5vh; width: 100%;
+            display: flex; justify-content: center; align-items: center; z-index: 20;
+        }
+        
+        .btn-action-round {
+            background: linear-gradient(180deg, #ffdf00 0%, #f1c40f 50%, #d4ac0d 100%);
+            color: #4b0d18; border: none; width: 18vw; height: 18vw; max-width: 80px; max-height: 80px;
+            border-radius: 50%; font-size: 6vw; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            box-shadow: 0 6px 0 #9c7e07, 0 10px 15px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8);
+            cursor: pointer; transition: all 0.1s; touch-action: manipulation; user-select: none;
+        }
+        .btn-action-round:active {
+            transform: translateY(6px); box-shadow: 0 0 0 #9c7e07, 0 4px 5px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8);
+        }
+        .btn-action-round span { font-family: 'Russo One', sans-serif; font-size: 3vw; margin-top: -2px; }
+
+        @keyframes pulseBtnAction {
+            0% { transform: scale(1); box-shadow: 0 6px 0 #9c7e07, 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            50% { transform: scale(1.05); box-shadow: 0 6px 0 #9c7e07, 0 0 0 15px rgba(231, 76, 60, 0); }
+            100% { transform: scale(1); box-shadow: 0 6px 0 #9c7e07, 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+        .btn-pulse { animation: pulseBtnAction 1.5s infinite !important; background: linear-gradient(180deg, #ff7675 0%, #e74c3c 50%, #c0392b 100%); }
 
         #message { font-family: 'Russo One', sans-serif; font-size: 6vw; max-font-size: 24px; height: 65px; color: #2ecc71; text-align: center; margin-top: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
 
@@ -268,21 +215,28 @@
         }
         .floating-text.combo { color: #f1c40f; font-size: 8vw; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 15px rgba(241, 196, 15, 0.8); }
 
-        @keyframes floatUp {
-            0% { transform: translateY(0) scale(0.5); opacity: 0; }
-            20% { transform: translateY(-20px) scale(1.2); opacity: 1; }
-            100% { transform: translateY(-60px) scale(1); opacity: 0; }
-        }
+        @keyframes floatUp { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 20% { transform: translateY(-20px) scale(1.2); opacity: 1; } 100% { transform: translateY(-60px) scale(1); opacity: 0; } }
 
-        .confetti {
-            position: absolute; width: 10px; height: 10px; background-color: #f00; z-index: 2000;
-            animation: fall linear forwards;
-        }
-        @keyframes fall {
-            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-        }
+        .confetti { position: absolute; width: 10px; height: 10px; background-color: #f00; z-index: 2000; animation: fall linear forwards; }
+        @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
 
+        #rules-modal { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.95); z-index: 100; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; }
+        #rules-modal h2 { font-family: 'Russo One', sans-serif; font-size: 8vw; color: #f1c40f; margin-bottom: 20px; }
+        #rules-modal p { font-size: 5vw; line-height: 1.5; margin-bottom: 30px; max-width: 400px; }
+
+        @media (min-width: 400px) {
+            .tile { font-size: 56px; border-radius: 14px; } 
+            #main-menu h1 { font-size: 64px; }
+            .btn-small-top { font-size: 16px; }
+            .tile.is-hidden::after { font-size: 32px; }
+            .btn-action-round { font-size: 28px; width: 80px; height: 80px; }
+            .btn-action-round span { font-size: 12px; }
+            .tile { margin-top: calc(var(--z) * -14px); margin-left: calc(var(--z) * -8px); }
+            #hud-difficulty { font-size: 12px; }
+            #hud-score { font-size: 18px; }
+            #progress-container { height: 10px; border-radius: 5px; }
+        }
+        
         #ad-screen {
             display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: rgba(0, 0, 0, 0.95); z-index: 100;
@@ -291,8 +245,7 @@
         #ad-screen h2 { font-family: 'Russo One', sans-serif; font-size: 8vw; color: #f1c40f; margin-bottom: 20px; }
         #ad-screen p { font-size: 5vw; }
         .loader {
-            border: 6px solid #f3f3f3; border-top: 6px solid #e67e22;
-            border-radius: 50%; width: 50px; height: 50px;
+            border: 6px solid #f3f3f3; border-top: 6px solid #e67e22; border-radius: 50%; width: 50px; height: 50px;
             animation: spin 1s linear infinite; margin-bottom: 20px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -302,15 +255,11 @@
 
     <!-- ГЛАВНОЕ МЕНЮ -->
     <div id="main-menu">
-        <!-- Генератор частиц золотой пыли -->
         <div id="particles-container"></div>
-        
         <h1>МАДЖОНГ</h1>
-        
         <div id="menu-level-badge">
             <div id="menu-level-text">УРОВЕНЬ 1</div>
         </div>
-        
         <button id="btn-play" class="btn-massive">▶ ИГРАТЬ</button>
         <button id="btn-rules" class="btn-menu-small">Как играть?</button>
         <div id="btn-reset">Сбросить прогресс</div>
@@ -323,18 +272,34 @@
         <button id="btn-close-rules" class="btn">ПОНЯТНО</button>
     </div>
 
+    <!-- ИГРОВОЙ ЭКРАН -->
     <div id="game-screen">
         <div id="top-bar">
-            <button id="btn-menu" class="btn btn-small btn-secondary">🏠 Меню</button>
+            <button id="btn-menu" class="btn-small-top">🏠 Меню</button>
             <div class="hud-center">
                 <div id="hud-level" title="Нажмите для пропуска уровня">Ур. 1</div>
                 <div id="hud-score">🏆 0</div>
                 <div id="hud-difficulty">🟢 Легко</div>
             </div>
-            <button id="btn-shuffle" class="btn btn-small">🎥 Микс</button>
+            <!-- Чтобы сохранить баланс шапки, добавляем пустой блок или можно убрать -->
+            <div style="width: 25vw; max-width: 80px;"></div> 
         </div>
+        
+        <!-- НОВАЯ ШКАЛА ПРОГРЕССА -->
+        <div id="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+
         <div id="game-board"></div>
         <div id="message"></div>
+        
+        <!-- НИЖНЯЯ КНОПКА ДЛЯ УДОБСТВА БОЛЬШОГО ПАЛЬЦА -->
+        <div id="bottom-bar">
+            <button id="btn-shuffle" class="btn-action-round">
+                🎥
+                <span>Микс</span>
+            </button>
+        </div>
     </div>
 
     <div id="ad-screen">
@@ -344,7 +309,6 @@
     </div>
 
     <script>
-        // Инициализация золотых частиц для меню
         function createParticles() {
             const container = document.getElementById('particles-container');
             container.innerHTML = '';
@@ -366,6 +330,7 @@
         let totalScore = 0;
         let comboCount = 0;
         let lastMatchTime = 0;
+        let totalTilesForLevel = 0; // Для шкалы прогресса
         const COMBO_TIME_LIMIT = 4000; 
 
         try { 
@@ -390,29 +355,7 @@
             ['👕','👖','👔','👗','👙','👘','💄','💋','🧦','🥾','👟','👞','👢','👠','🩴','🎒','🧳','👓','🕶️','🧣'], 
             ['⚽','🏀','🏈','⚾','🎾','🏐','🎱','🏓','🏸','🏒','⛳','🪁','🏹','🎣','🤿','🥊','🥋','🛹','🛼','⛸️'], 
             ['🎸','🎹','🎷','🎺','🎻','🪕','🥁','🪘','🪗','🎧','🎤','🎙️','📻','🎚️','🎛️','🔈','💿','📼','🎼','🎵'], 
-            ['🔮','🪄','🦇','🌙','🧙','🦄','🕸️','🍄','🕯️','🗝️','📜','🧪','🧿','👑','🐉','👽','👻','👺','💀','🤡'], 
-            ['💼','📁','📂','📅','🗒️','📈','📉','📊','📋','📌','📍','📎','📏','📐','✂️','🗃️','🔒','🔓','🔑','🗝️'], 
-            ['✉️','📧','📨','📦','📫','📮','🗳️','✏️','✒️','🖋️','🖊️','🖌️','🖍️','📝','📖','📚','📓','📔','📰','🏷️'], 
-            ['⛔','🚫','🚳','🚭','🚯','🚱','🚷','📵','🔞','☢️','☣️','⬆️','↗️','➡️','↘️','⬇️','↙️','⬅️','↖️','↕️'], 
-            ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓','▶️','⏩','⏯️','◀️','⏪','🔼','🔽','⏸️'], 
-            ['💎','👑','💍','🪙','💰','🏆','🎁','🎀','🔮','✨','🌟','🥂','🍾','🏰','🗝️','🧸','🪞','🛍️','📿','⚜️'], 
-            ['🔬','🔭','🧬','🧲','🧪','🧫','💉','💊','🩺','🩹','🌡️','🩸','🦠','🦷','🦴','👁️','🧠','🫀','🫁','🩻'], 
-            ['🌍','🌕','🌒','🌌','☄️','🌠','🚀','🛸','🛰️','🧑‍🚀','👽','🪐','☀️','⭐','🌟','💫','🌑','🌓','🌔','🌖'], 
-            ['🎮','🕹️','🎲','🧩','♟️','🃏','🀄','🎴','🎯','🎰','🎟️','🎳','🪀','🪁','🎱','👾','🥇','🥈','🥉','🎖️'], 
-            ['🏠','🏰','🏟️','⛺','🏭','⛲','🗽','🗿','🎡','🎢','🎪','🏗️','🏘️','🏙️','🏚️','⛩️','🕍','🕋','🛕','🕌'], 
-            ['🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🥑','🫒','🌶️'], 
-            ['🍆','🥔','🥕','🌽','🥒','🥬','🥦','🧄','🧅','🍄','🥜','🌰','🍞','🥐','🥖','🫓','🥨','🥯','🥞','🧇'], 
-            ['💄','💅','💋','🧴','🪞','🪮','🎀','💈','💇','💆','🛀','🧼','🧽','👗','🥻','👘','🩰','👛','👜','👝'], 
-            ['🏺','🛡️','⚔️','🗡️','📜','⚖️','⏳','⌛','🧭','🗺️','🗿','🏯','🏰','🪙','👑','📿','🧿','🪬','🪓','🏹'], 
-            ['🎃','🎄','🎆','🎇','🎈','🎉','🎊','🧧','🎏','🎐','🎑','🎍','🎎','🏮','🕎','🪔','🎁','🎀','🎂','🧨'], 
-            ['🗺️','🧭','🏔️','🌋','🏖️','🧳','⚓','🎫','🏝️','🏜️','🏞️','🛤️','🛣️','🗾','🌅','🌄','🌆','🏙️','🌃','🌉'], 
-            ['😎','🤠','🥸','🤡','🤖','👹','👺','👻','👽','👾','😺','😸','😹','😻','😼','😽','🙀','😿','😾','🙈'], 
-            ['🀄','🀅','🀆','🀇','🀈','🀉','🀊','🀋','🀌','🀍','🀎','🀏','🀐','🀑','🀒','🀓','🀔','🀕','🀖','🀗'], 
-            ['🀘','🀙','🀚','🀛','🀜','🀝','🀞','🀟','🀠','🀡','🀢','🀣','🀤','🀥','🀦','🀧','🀨','🀩','🀪','🀫'], 
-            ['🃏','🂡','🂢','🂣','🂤','🂥','🂦','🂧','🂨','🂩','🂪','🂫','🂭','🂮','🂱','🂲','🂳','🂴','🂵','🂶'], 
-            ['🁣','🁤','🁥','🁦','🁧','🁨','🁩','🁪','🁫','🁬','🁭','🁮','🁯','🁰','🁱','🁲','🁳','🁴','🁵','🁶'], 
-            ['🕐','🕑','🕒','🕓','🕔','🕕','🕖','🕗','🕘','🕙','🕚','🕛','🕜','🕝','🕞','🕟','🕠','🕡','🕢','🕣'], 
-            ['一','二','三','四','五','六','七','八','九','十','百','千','万','中','发','白','春','夏','秋','冬']  
+            ['🔮','🪄','🦇','🌙','🧙','🦄','🕸️','🍄','🕯️','🗝️','📜','🧪','🧿','👑','🐉','👽','👻','👺','💀','🤡'] 
         ];
 
         const materials = [
@@ -483,7 +426,6 @@
         }
 
         function getSymbolsForLevel(level) {
-            if (level <= 50) return themeSets[(level - 1) % themeSets.length];
             let t1 = Math.floor(Math.random() * themeSets.length), t2 = Math.floor(Math.random() * themeSets.length), t3 = Math.floor(Math.random() * themeSets.length);
             return [...themeSets[t1].slice(0, 7), ...themeSets[t2].slice(7, 14), ...themeSets[t3].slice(14, 20)];
         }
@@ -547,11 +489,19 @@
             return unassigned;
         }
 
+        function updateProgressBar() {
+            let currentTiles = activeTiles.length;
+            if (totalTilesForLevel === 0) return;
+            let percentComplete = ((totalTilesForLevel - currentTiles) / totalTilesForLevel) * 100;
+            document.getElementById('progress-bar').style.width = percentComplete + '%';
+        }
+
         function initGame() {
             const board = document.getElementById('game-board'); 
             board.innerHTML = ''; activeTiles = []; firstTile = null; secondTile = null;
             document.getElementById('message').innerHTML = '';
             document.getElementById('btn-shuffle').classList.remove('btn-pulse');
+            document.getElementById('progress-bar').style.width = '0%';
             comboCount = 0; 
             
             document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
@@ -621,20 +571,21 @@
                 }
             }
             
+            totalTilesForLevel = finalLayout.length;
+
             finalLayout.forEach((obj) => {
                 const el = document.createElement('div'); el.classList.add('tile'); el.innerText = obj.symbol;
                 el.style.setProperty('--x', obj.x); el.style.setProperty('--y', obj.y); el.style.setProperty('--z', obj.z); 
                 el.style.zIndex = (obj.z * 100) + obj.y;
                 
-                if (obj.isHidden) {
-                    el.classList.add('is-hidden');
-                }
+                if (obj.isHidden) el.classList.add('is-hidden');
 
                 obj.el = el;
                 el.addEventListener('click', (e) => handleTileClick(obj, e));
                 board.appendChild(el); activeTiles.push(obj);
             });
             updateFreeState();
+            updateProgressBar();
         }
 
         function updateFreeState() {
@@ -668,7 +619,7 @@
             }
             let btnShuffle = document.getElementById('btn-shuffle');
             if (!hasMoves) {
-                document.getElementById('message').innerText = 'НЕТ ХОДОВ! Нажмите Микс ➔';
+                document.getElementById('message').innerText = 'НЕТ ХОДОВ! Нажмите Микс';
                 document.getElementById('message').style.color = '#e74c3c';
                 btnShuffle.classList.add('btn-pulse');
             } else {
@@ -736,7 +687,9 @@
                     t.el.classList.add('matched'); 
                     firstTile.el.classList.add('matched'); 
                     firstTile = null; 
+                    
                     updateFreeState();
+                    updateProgressBar();
                     
                     if (activeTiles.length === 0) {
                         currentLevel++; localStorage.setItem('mahjong_level', currentLevel);
