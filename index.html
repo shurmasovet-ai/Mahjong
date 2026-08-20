@@ -111,7 +111,7 @@
         #game-board {
             width: 90vw; height: 112.5vw; max-width: 400px; max-height: 500px; 
             position: relative; margin-top: 4vw; 
-            perspective: 1000px; /* Добавлено для 3D-переворота */
+            perspective: 1000px;
         }
         
         .tile {
@@ -134,6 +134,7 @@
             display: flex; justify-content: center; align-items: center;
             border-radius: 12px; border: 2px solid var(--tileBorder);
             box-shadow: var(--shadow), calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(2vw + var(--z) * 0.8vw) rgba(0,0,0,0.85);
+            backdrop-filter: blur(4px); 
             
             touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
             transition: transform 0.2s, filter 0.2s, box-shadow 0.2s, top 0.6s ease-in-out, left 0.6s ease-in-out, margin-top 0.6s, margin-left 0.6s; cursor: pointer;
@@ -158,25 +159,23 @@
         }
         .tile.matched { opacity: 0; pointer-events: none; transform: scale(1.5); filter: brightness(2); }
 
-        /* --- СТИЛИ ДЛЯ ЗАКРЫТЫХ ФИШЕК --- */
         .tile.is-hidden {
             color: transparent !important;
             text-shadow: none !important;
         }
         .tile.is-hidden::after {
-            content: '❖'; /* Элегантный премиум-узор */
+            content: '❖'; 
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             font-size: 8vw;
-            color: rgba(139, 69, 19, 0.35); /* Благородный цвет гравировки */
-            text-shadow: 1px 1px 1px rgba(255,255,255,0.6), -1px -1px 1px rgba(0,0,0,0.2); /* Эффект вдавленности */
+            color: rgba(139, 69, 19, 0.35); 
+            text-shadow: 1px 1px 1px rgba(255,255,255,0.6), -1px -1px 1px rgba(0,0,0,0.2); 
         }
         @media (min-width: 400px) {
             .tile.is-hidden::after { font-size: 32px; }
         }
 
-        /* 3D-АНИМАЦИЯ ПЕРЕВОРОТА */
         .flip-anim { animation: flipTileIn 0.3s ease-out forwards; }
         @keyframes flipTileIn {
             0% { transform: translateY(-3vw) scale(1.08) rotateY(-90deg); }
@@ -503,13 +502,17 @@
                 ];
             }
 
-            // --- ЛОГИКА "СЛЕПЫХ" ФИШЕК ---
+            // --- АККУРАТНАЯ ЛОГИКА "СЛЕПЫХ" ФИШЕК ---
             let isMysteryLevel = (currentLevel % 10 === 7) || (currentLevel % 10 === 8);
             if (isMysteryLevel) {
                 let totalTiles = finalLayout.length;
-                let hideCount = Math.floor(totalTiles * 0.5); // Прячем 50% фишек
                 
-                // Перемешиваем индексы, чтобы спрятать случайные фишки
+                // Скрываем ровно 15%, но не больше 12 фишек (и не меньше 4)
+                let hideCount = Math.floor(totalTiles * 0.15);
+                if (hideCount > 12) hideCount = 12;
+                if (hideCount < 4) hideCount = 4;
+                if (hideCount % 2 !== 0) hideCount++; // Всегда четное число
+                
                 let hideIndices = Array.from({length: totalTiles}, (_, i) => i);
                 for (let i = hideIndices.length - 1; i > 0; i--) { 
                     const j = Math.floor(Math.random() * (i + 1)); 
@@ -607,7 +610,6 @@
         function handleTileClick(t, event) { 
             if (!t.isFree) return;
             
-            // ЕСЛИ ФИШКА СКРЫТА — ОТКРЫВАЕМ ЕЁ АНИМАЦИЕЙ И ДЕЛАЕМ АКТИВНОЙ
             if (t.isHidden) {
                 t.isHidden = false;
                 t.el.classList.remove('is-hidden');
@@ -666,7 +668,6 @@
                 let currentSymbols = activeTiles.map(t => t.symbol);
                 let pairsPool = getPairsFromSymbols(currentSymbols);
                 
-                // Запоминаем, сколько фишек было спрятано, чтобы сохранить баланс
                 let hiddenCount = activeTiles.filter(t => t.isHidden).length;
 
                 let attemptMix = 0;
@@ -688,7 +689,6 @@
                     preparedTiles = assignSymbolsSmart(newLayout, pairsPool, Math.random);
                 }
 
-                // Прячем то же самое количество фишек в новой раскладке
                 let hideIndices = Array.from({length: newLayout.length}, (_, i) => i);
                 for (let i = hideIndices.length - 1; i > 0; i--) { 
                     const j = Math.floor(Math.random() * (i + 1)); 
