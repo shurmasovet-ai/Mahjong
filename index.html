@@ -4,14 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="color-scheme" content="light only">
-    <title>Mahjong Deluxe - Infinity 8888</title>
+    <title>Mahjong Deluxe - Infinity</title>
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
     <style>
         :root { 
             color-scheme: light; 
             --tileBg: #e8dcc8; --tileBorder: #d4c2aa;
-            --tileColor: #1a2a3a;
-            --bgImg: none;
+            --tileColor: #1a2a3a; --bgImg: none;
             --shadow: 0 5px 10px rgba(0,0,0,0.6), inset 0 0 12px rgba(180, 140, 100, 0.4);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -27,13 +26,12 @@
         #main-menu {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             height: 100%; width: 100%; position: absolute; top: 0; left: 0; z-index: 50;
-            overflow: hidden;
         }
 
         .particle {
             position: absolute; background-color: #f1c40f; border-radius: 50%;
             pointer-events: none; box-shadow: 0 0 10px #f1c40f, 0 0 20px #f1c40f;
-            animation: floatUp 15s infinite linear; opacity: 0;
+            animation: floatUp 15s infinite linear; opacity: 0; z-index: 1;
         }
         @keyframes floatUp {
             0% { transform: translateY(100vh) scale(0); opacity: 0; }
@@ -43,94 +41,109 @@
         }
         
         #main-menu h1 {
-            font-family: 'Russo One', sans-serif; font-size: 16vw; margin-bottom: 25px; 
+            font-family: 'Russo One', sans-serif; font-size: 48px; margin-bottom: 30px; 
             background: linear-gradient(180deg, #fff3b0 0%, #f1c40f 50%, #b7950b 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-align: center; letter-spacing: 3px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8)); z-index: 2;
+            text-align: center; letter-spacing: 2px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.8)); z-index: 2;
         }
         
+        /* ПАНЕЛЬ УПРАВЛЕНИЯ УРОВНЕМ В МЕНЮ */
+        #level-controls {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin-bottom: 40px; z-index: 2;
+        }
+
         #menu-level-badge {
             background: rgba(0, 0, 0, 0.4); border: 2px solid rgba(241, 196, 15, 0.5);
             box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.5);
-            border-radius: 30px; padding: 10px 40px; margin-bottom: 50px; z-index: 2; backdrop-filter: blur(5px);
+            border-radius: 20px; padding: 10px 30px; backdrop-filter: blur(5px);
         }
         #menu-level-text { 
-            font-family: 'Russo One', sans-serif; font-size: 6vw; color: #2ecc71; 
-            text-shadow: 0 2px 5px rgba(0,0,0,1); letter-spacing: 1px;
+            font-family: 'Russo One', sans-serif; font-size: 24px; color: #2ecc71; 
+            text-shadow: 0 2px 5px rgba(0,0,0,1); letter-spacing: 1px; white-space: nowrap;
         }
 
+        .btn-arrow {
+            background: rgba(0, 0, 0, 0.4); border: 2px solid rgba(241, 196, 15, 0.5); color: #f1c40f;
+            font-size: 20px; border-radius: 15px; padding: 10px 15px; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: all 0.1s;
+        }
+        .btn-arrow:active { transform: scale(0.9); background: rgba(241, 196, 15, 0.3); }
+
+        /* ИСПРАВЛЕННАЯ КНОПКА ИГРАТЬ */
         .btn-massive {
             background: linear-gradient(180deg, #ffdf00 0%, #f1c40f 50%, #d4ac0d 100%);
-            color: #4b0d18; border: none; padding: 20px 40px;
-            font-family: 'Russo One', sans-serif; font-size: 8vw; font-weight: 900; border-radius: 40px; 
-            box-shadow: 0 10px 0 #9c7e07, 0 20px 25px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8);
+            color: #4b0d18; border: none; padding: 15px 50px;
+            font-family: 'Russo One', sans-serif; font-size: 26px; font-weight: 900; border-radius: 50px; 
+            box-shadow: 0 8px 0 #9c7e07, 0 15px 20px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8);
             cursor: pointer; transition: all 0.1s; touch-action: manipulation; user-select: none; margin-bottom: 25px; 
-            width: 80vw; max-width: 350px; display: flex; justify-content: center; align-items: center; letter-spacing: 2px;
-            z-index: 2; animation: breathe 2s infinite ease-in-out;
+            display: flex; justify-content: center; align-items: center; letter-spacing: 2px;
+            z-index: 2; width: auto; min-width: 220px;
         }
-        @keyframes breathe { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
-        .btn-massive:active { transform: translateY(10px) scale(1) !important; box-shadow: 0 0 0 #9c7e07, 0 5px 10px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8); }
+        .btn-massive:active { transform: translateY(8px) !important; box-shadow: 0 0 0 #9c7e07, 0 5px 10px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8); }
 
         .btn-menu-small {
-            background: transparent; color: #95a5a6; border: 2px solid #95a5a6; padding: 12px 30px; 
-            font-family: sans-serif; font-size: 4.5vw; font-weight: bold; border-radius: 20px; z-index: 2; margin-bottom: 15px; transition: all 0.2s;
+            background: transparent; color: #95a5a6; border: 2px solid #95a5a6; padding: 10px 25px; 
+            font-family: sans-serif; font-size: 16px; font-weight: bold; border-radius: 20px; z-index: 2; margin-bottom: 15px; transition: all 0.2s;
         }
         .btn-menu-small:active { background: rgba(255,255,255,0.1); }
 
-        #btn-reset { margin-top: 15px; color: rgba(231, 76, 60, 0.8); text-decoration: underline; cursor: pointer; font-size: 4vw; font-weight: bold; z-index: 2; }
-        #btn-reset:active { opacity: 0.5; }
+        #btn-reset { margin-top: 10px; color: rgba(231, 76, 60, 0.8); text-decoration: underline; cursor: pointer; font-size: 14px; font-weight: bold; z-index: 2; padding: 10px; }
 
         /* --- ИГРОВОЙ ЭКРАН --- */
         #game-screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; padding-top: 15px; z-index: 10; position: relative; }
         
-        #top-bar { width: 90vw; max-width: 400px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: nowrap; }
+        #top-bar { width: 90vw; max-width: 400px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .hud-center { display: flex; flex-direction: column; align-items: center; flex-grow: 1; }
         
-        #hud-level { font-family: 'Russo One', sans-serif; font-size: 5vw; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.5); cursor: pointer; padding: 2px 10px; white-space: nowrap; line-height: 1.2; text-align: center; }
+        #hud-level { font-family: 'Russo One', sans-serif; font-size: 20px; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.5); cursor: pointer; padding: 2px 10px; white-space: nowrap; line-height: 1.2; text-align: center; }
         #hud-level:active { transform: scale(0.9); }
-        #hud-score { font-family: 'Russo One', sans-serif; font-size: 4.5vw; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); margin-top: 2px; }
-        #hud-difficulty { font-size: 3vw; font-weight: bold; padding: 3px 8px; border-radius: 10px; margin-top: 4px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); box-shadow: 0 2px 4px rgba(0,0,0,0.5); white-space: nowrap; }
+        #hud-score { font-family: 'Russo One', sans-serif; font-size: 18px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); margin-top: 2px; }
+        #hud-difficulty { font-size: 12px; font-weight: bold; padding: 3px 8px; border-radius: 10px; margin-top: 4px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); box-shadow: 0 2px 4px rgba(0,0,0,0.5); white-space: nowrap; }
 
-        #progress-container { width: 90vw; max-width: 400px; height: 8px; background-color: rgba(0,0,0,0.5); border-radius: 4px; margin-bottom: 2vw; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.1); }
-        #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #ffdf00, #f1c40f, #fff3b0); box-shadow: 0 0 10px rgba(241, 196, 15, 0.8); transition: width 0.4s cubic-bezier(0.4, 0.0, 0.2, 1); }
+        #progress-container { width: 90vw; max-width: 400px; height: 8px; background-color: rgba(0,0,0,0.5); border-radius: 4px; margin-bottom: 15px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.1); }
+        #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #ffdf00, #f1c40f, #fff3b0); box-shadow: 0 0 10px rgba(241, 196, 15, 0.8); transition: width 0.4s ease-out; }
 
-        .btn-small-top { font-family: sans-serif; font-size: 4vw; padding: 10px 15px; border-radius: 15px; background-color: #3498db; color: white; border: none; font-weight: bold; box-shadow: 0 4px 0 #2980b9, 0 5px 10px rgba(0,0,0,0.5); transition: all 0.2s; }
+        .btn-small-top { font-family: sans-serif; font-size: 14px; padding: 8px 12px; border-radius: 15px; background-color: #3498db; color: white; border: none; font-weight: bold; box-shadow: 0 4px 0 #2980b9, 0 5px 10px rgba(0,0,0,0.5); transition: all 0.2s; }
         .btn-small-top:active { transform: translateY(4px); box-shadow: 0 0 0 #2980b9; }
 
-        #game-board { width: 90vw; height: 112.5vw; max-width: 400px; max-height: 500px; position: relative; margin-top: 2vw; perspective: 1000px; }
+        #game-board { width: 90vw; height: 112.5vw; max-width: 400px; max-height: 500px; position: relative; perspective: 1000px; }
         
         .tile {
             position: absolute; width: 20%; height: 20%;
             left: calc(var(--x) * 10%); top: calc(var(--y) * 10%); margin-top: calc(var(--z) * -3.5vw); margin-left: calc(var(--z) * -2vw);
             background-color: var(--tileBg); background-image: var(--bgImg); background-size: 14px 14px; background-position: 0 0, 7px 7px;
             color: var(--tileColor); font-size: 14vw; line-height: 1; text-shadow: 2px 3px 4px rgba(0,0,0,0.4); font-family: 'Noto Color Emoji', sans-serif;
-            display: flex; justify-content: center; align-items: center; border-radius: 12px; border: 2px solid var(--tileBorder);
+            display: flex; justify-content: center; align-items: center; border-radius: 10px; border: 2px solid var(--tileBorder);
             box-shadow: var(--shadow), calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(2vw + var(--z) * 0.8vw) rgba(0,0,0,0.85);
             backdrop-filter: blur(4px); touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
-            transition: transform 0.2s, filter 0.2s, box-shadow 0.2s, top 0.6s ease-in-out, left 0.6s ease-in-out, margin-top 0.6s, margin-left 0.6s; cursor: pointer; transform-style: preserve-3d;
+            transition: transform 0.2s, filter 0.2s, box-shadow 0.2s; cursor: pointer; transform-style: preserve-3d;
+        }
+        @media (min-width: 400px) {
+            .tile { font-size: 56px; border-radius: 14px; margin-top: calc(var(--z) * -14px); margin-left: calc(var(--z) * -8px); }
         }
 
         .tile.blocked { filter: brightness(0.5); cursor: not-allowed; }
         .tile.selected { border-color: #f1c40f !important; box-shadow: 0 0 20px #f1c40f, 0 10px 20px rgba(0,0,0,0.9) !important; transform: translateY(-3vw) scale(1.08); z-index: 999 !important; }
         .tile.matched { opacity: 0; pointer-events: none; transform: scale(1.5); filter: brightness(2); }
         .tile.is-hidden { color: transparent !important; text-shadow: none !important; }
-        .tile.is-hidden::after { content: '❖'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 8vw; color: rgba(139, 69, 19, 0.35); text-shadow: 1px 1px 1px rgba(255,255,255,0.6), -1px -1px 1px rgba(0,0,0,0.2); }
+        .tile.is-hidden::after { content: '❖'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 32px; color: rgba(139, 69, 19, 0.35); text-shadow: 1px 1px 1px rgba(255,255,255,0.6), -1px -1px 1px rgba(0,0,0,0.2); }
 
         .flip-anim { animation: flipTileIn 0.3s ease-out forwards; }
         @keyframes flipTileIn { 0% { transform: translateY(-3vw) scale(1.08) rotateY(-90deg); } 100% { transform: translateY(-3vw) scale(1.08) rotateY(0deg); } }
 
-        /* --- УМНЫЕ ЧАСТИЦЫ (ОСКОЛКИ И ТЕМАТИКА) --- */
+        /* --- ЧАСТИЦЫ ДЛЯ ВЗРЫВА ФИШЕК (НАХОДЯТСЯ В BODY) --- */
         .gold-shard {
             position: absolute; width: 12px; height: 12px;
             background: linear-gradient(135deg, #ffdf00, #d4ac0d);
             box-shadow: 0 0 8px rgba(241, 196, 15, 0.9);
-            pointer-events: none; z-index: 1000;
+            pointer-events: none; z-index: 9999;
             animation: shatterAnim 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
         }
         .thematic-particle {
-            position: absolute; font-family: 'Noto Color Emoji', sans-serif;
-            pointer-events: none; z-index: 1000;
-            filter: drop-shadow(0 0 5px rgba(241, 196, 15, 0.6)) drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+            position: absolute; font-family: 'Noto Color Emoji', sans-serif; font-size: 24px;
+            pointer-events: none; z-index: 9999;
+            filter: drop-shadow(0 0 5px rgba(241, 196, 15, 0.8)) drop-shadow(0 5px 10px rgba(0,0,0,0.5));
             animation: shatterAnim 0.7s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
         }
         @keyframes shatterAnim {
@@ -139,35 +152,24 @@
         }
 
         #bottom-bar { position: absolute; bottom: 5vh; width: 100%; display: flex; justify-content: center; align-items: center; z-index: 20; }
-        .btn-action-round { background: linear-gradient(180deg, #ffdf00 0%, #f1c40f 50%, #d4ac0d 100%); color: #4b0d18; border: none; width: 18vw; height: 18vw; max-width: 80px; max-height: 80px; border-radius: 50%; font-size: 6vw; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 6px 0 #9c7e07, 0 10px 15px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8); cursor: pointer; transition: all 0.1s; touch-action: manipulation; user-select: none; }
+        .btn-action-round { background: linear-gradient(180deg, #ffdf00 0%, #f1c40f 50%, #d4ac0d 100%); color: #4b0d18; border: none; width: 70px; height: 70px; border-radius: 50%; font-size: 24px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 6px 0 #9c7e07, 0 10px 15px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8); cursor: pointer; transition: all 0.1s; touch-action: manipulation; user-select: none; }
         .btn-action-round:active { transform: translateY(6px); box-shadow: 0 0 0 #9c7e07, 0 4px 5px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8); }
-        .btn-action-round span { font-family: 'Russo One', sans-serif; font-size: 3vw; margin-top: -2px; }
+        .btn-action-round span { font-family: 'Russo One', sans-serif; font-size: 11px; margin-top: -2px; }
 
         @keyframes pulseBtnAction { 0% { transform: scale(1); box-shadow: 0 6px 0 #9c7e07, 0 0 0 0 rgba(231, 76, 60, 0.7); } 50% { transform: scale(1.05); box-shadow: 0 6px 0 #9c7e07, 0 0 0 15px rgba(231, 76, 60, 0); } 100% { transform: scale(1); box-shadow: 0 6px 0 #9c7e07, 0 0 0 0 rgba(231, 76, 60, 0); } }
         .btn-pulse { animation: pulseBtnAction 1.5s infinite !important; background: linear-gradient(180deg, #ff7675 0%, #e74c3c 50%, #c0392b 100%); }
 
-        #message { font-family: 'Russo One', sans-serif; font-size: 6vw; max-font-size: 24px; height: 65px; color: #2ecc71; text-align: center; margin-top: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        #message { font-family: 'Russo One', sans-serif; font-size: 24px; height: 30px; color: #2ecc71; text-align: center; margin-top: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); z-index: 100;}
 
-        .floating-text { position: absolute; font-family: 'Russo One', sans-serif; font-size: 6vw; color: #2ecc71; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 10px rgba(46, 204, 113, 0.8); pointer-events: none; z-index: 1000; animation: floatUpText 1s ease-out forwards; }
-        .floating-text.combo { color: #f1c40f; font-size: 8vw; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 15px rgba(241, 196, 15, 0.8); }
+        .floating-text { position: absolute; font-family: 'Russo One', sans-serif; font-size: 24px; color: #2ecc71; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 10px rgba(46, 204, 113, 0.8); pointer-events: none; z-index: 9999; animation: floatUpText 1s ease-out forwards; }
+        .floating-text.combo { color: #f1c40f; font-size: 32px; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 15px rgba(241, 196, 15, 0.8); }
         @keyframes floatUpText { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 20% { transform: translateY(-20px) scale(1.2); opacity: 1; } 100% { transform: translateY(-60px) scale(1); opacity: 0; } }
 
-        .confetti { position: absolute; width: 10px; height: 10px; background-color: #f00; z-index: 2000; animation: fall linear forwards; }
-        @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
-
-        #rules-modal, #ad-screen { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.95); z-index: 100; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; }
-        #rules-modal h2, #ad-screen h2 { font-family: 'Russo One', sans-serif; font-size: 8vw; color: #f1c40f; margin-bottom: 20px; }
-        #rules-modal p, #ad-screen p { font-size: 5vw; line-height: 1.5; margin-bottom: 30px; max-width: 400px; }
-        
+        #rules-modal, #ad-screen { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.95); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; }
+        #rules-modal h2, #ad-screen h2 { font-family: 'Russo One', sans-serif; font-size: 32px; color: #f1c40f; margin-bottom: 20px; }
+        #rules-modal p, #ad-screen p { font-size: 18px; line-height: 1.5; margin-bottom: 30px; max-width: 400px; }
         .loader { border: 6px solid #f3f3f3; border-top: 6px solid #e67e22; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        @media (min-width: 400px) {
-            .tile { font-size: 56px; border-radius: 14px; margin-top: calc(var(--z) * -14px); margin-left: calc(var(--z) * -8px); } 
-            #main-menu h1 { font-size: 64px; } .btn-small-top { font-size: 16px; } .tile.is-hidden::after { font-size: 32px; }
-            .btn-action-round { font-size: 28px; width: 80px; height: 80px; } .btn-action-round span { font-size: 12px; }
-            #hud-difficulty { font-size: 12px; } #hud-score { font-size: 18px; } #progress-container { height: 10px; border-radius: 5px; }
-        }
     </style>
 </head>
 <body>
@@ -175,28 +177,34 @@
     <div id="main-menu">
         <div id="particles-container"></div>
         <h1>МАДЖОНГ</h1>
-        <div id="menu-level-badge"><div id="menu-level-text">УРОВЕНЬ 1</div></div>
+        
+        <div id="level-controls">
+            <button id="btn-prev-level" class="btn-arrow">◀</button>
+            <div id="menu-level-badge"><div id="menu-level-text">УРОВЕНЬ 1</div></div>
+            <button id="btn-next-level" class="btn-arrow">▶</button>
+        </div>
+        
         <button id="btn-play" class="btn-massive">▶ ИГРАТЬ</button>
         <button id="btn-rules" class="btn-menu-small">Как играть?</button>
-        <div id="btn-reset">Сбросить прогресс</div>
+        <div id="btn-reset">Сбросить весь прогресс</div>
     </div>
 
     <div id="rules-modal">
         <h2>Как играть?</h2>
         <p>Находите пары одинаковых фишек, чтобы очистить поле.</p>
         <p>Фишка активна, если на ней <b>ничего не лежит</b>, и она <b>свободна слева ИЛИ справа</b>.</p>
-        <button id="btn-close-rules" class="btn btn-massive" style="font-size:5vw; padding:15px">ПОНЯТНО</button>
+        <button id="btn-close-rules" class="btn-massive" style="font-size:20px; padding:10px 30px; min-width:auto;">ПОНЯТНО</button>
     </div>
 
     <div id="game-screen">
         <div id="top-bar">
             <button id="btn-menu" class="btn-small-top">🏠 Меню</button>
             <div class="hud-center">
-                <div id="hud-level" title="Нажмите для пропуска уровня">Ур. 1</div>
+                <div id="hud-level">Ур. 1</div>
                 <div id="hud-score">🏆 0</div>
                 <div id="hud-difficulty">🟢 Легко</div>
             </div>
-            <div style="width: 25vw; max-width: 80px;"></div> 
+            <div style="width: 70px;"></div> 
         </div>
         
         <div id="progress-container"><div id="progress-bar"></div></div>
@@ -210,7 +218,7 @@
 
     <div id="ad-screen">
         <div class="loader"></div>
-        <h2>Рекламная пауза</h2><p>Загрузка...</p>
+        <h2>Рекламная пауза</h2><p>Перестройка поля...</p>
     </div>
 
     <script>
@@ -218,83 +226,64 @@
             const container = document.getElementById('particles-container');
             container.innerHTML = '';
             for(let i=0; i<30; i++) {
-                let p = document.createElement('div');
-                p.classList.add('particle');
-                let size = Math.random() * 4 + 2;
-                p.style.width = size + 'px'; p.style.height = size + 'px';
+                let p = document.createElement('div'); p.classList.add('particle');
+                let size = Math.random() * 4 + 2; p.style.width = size + 'px'; p.style.height = size + 'px';
                 p.style.left = Math.random() * 100 + 'vw';
-                p.style.animationDuration = (Math.random() * 10 + 10) + 's';
-                p.style.animationDelay = (Math.random() * 10) + 's';
+                p.style.animationDuration = (Math.random() * 10 + 10) + 's'; p.style.animationDelay = (Math.random() * 10) + 's';
                 container.appendChild(p);
             }
         }
         createParticles();
 
-        let currentLevel = 1;
-        let totalScore = 0;
-        let comboCount = 0;
-        let lastMatchTime = 0;
-        let totalTilesForLevel = 0; 
+        let currentLevel = 1, totalScore = 0, comboCount = 0, lastMatchTime = 0, totalTilesForLevel = 0;
         const COMBO_TIME_LIMIT = 4000; 
 
         try { 
-            let savedLvl = localStorage.getItem('mahjong_level'); 
-            if (savedLvl) currentLevel = parseInt(savedLvl); 
-            let savedScore = localStorage.getItem('mahjong_score');
-            if (savedScore) totalScore = parseInt(savedScore);
+            let savedLvl = localStorage.getItem('mahjong_level'); if (savedLvl) currentLevel = parseInt(savedLvl); 
+            let savedScore = localStorage.getItem('mahjong_score'); if (savedScore) totalScore = parseInt(savedScore);
         } catch(e){}
         
         const themeSets = [
             ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'], 
             ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'], 
             ['📱','💻','🖥️','🖨️','🖱️','🕹️','💾','💿','📷','📹','🎥','📺','📻','🎙️','⏱️','⏰','⏳','💡','🔦','🔋'], 
-            ['🔨','🪓','⛏️','🛠️','🪚','🔧','🪛','🔩','⚙️','🗜️','⚖️','🔗','🧰','🧲','🪜','🧱','🛡️','💣','🧨','🛢️'], 
-            ['🚪','🛏️','🛋️','🪑','🚽','🚿','🛁','🪒','🧴','🧹','🧺','🧻','🧼','🧽','🛒','🪞','🪟','🖼️','🧸','🗑️'], 
             ['🦁','🐯','🦒','🦊','🐻','🐼','🐨','🐰','🐷','🦝','🐗','🦓','🦌','🐘','🦏','🦛','🐭','🐹','🐿️','🦔'], 
-            ['🦅','🦆','🦉','🦇','🐝','🐛','🦋','🐌','🐞','🐜','🪲','🪳','🕷️','🕸️','🦂','🦟','🪰','🪱','🦜','🦚'], 
-            ['🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🦭','🐊','🐸','🐢','🦦','🦪','🐚','🪸'], 
             ['🚗','🚕','🚙','🚌','🏎️','🚓','🚑','🚒','🚐','🛻','🚚','🚛','🚜','🏍️','🛵','🦽','🛺','🚲','🛴','🛹'], 
-            ['✈️','🚀','🛸','🛰️','🚁','🛶','⛵','🚤','🛥️','🛳️','⛴️','🚢','⚓','🛟','⛽','🚥','🚧','🛢️','⛺','🚂'], 
-            ['🌲','🌳','🌴','🌵','🌾','🌿','🍀','🍁','🍂','🍃','🌍','🌞','🌝','🌛','✨','⚡','🔥','🌪️','🌈','☁️'], 
-            ['👕','👖','👔','👗','👙','👘','💄','💋','🧦','🥾','👟','👞','👢','👠','🩴','🎒','🧳','👓','🕶️','🧣'], 
             ['⚽','🏀','🏈','⚾','🎾','🏐','🎱','🏓','🏸','🏒','⛳','🪁','🏹','🎣','🤿','🥊','🥋','🛹','🛼','⛸️'], 
-            ['🎸','🎹','🎷','🎺','🎻','🪕','🥁','🪘','🪗','🎧','🎤','🎙️','📻','🎚️','🎛️','🔈','💿','📼','🎼','🎵'], 
-            ['🔮','🪄','🦇','🌙','🧙','🦄','🕸️','🍄','🕯️','🗝️','📜','🧪','🧿','👑','🐉','👽','👻','👺','💀','🤡'],
-            ['⛔','🚫','🚳','🚭','🚯','🚱','🚷','📵','🔞','☢️','☣️','⬆️','↗️','➡️','↘️','⬇️','↙️','⬅️','↖️','↕️'],
-            ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓','▶️','⏩','⏯️','◀️','⏪','🔼','🔽','⏸️'],
             ['🀄','🀅','🀆','🀇','🀈','🀉','🀊','🀋','🀌','🀍','🀎','🀏','🀐','🀑','🀒','🀓','🀔','🀕','🀖','🀗'], 
-            ['🀘','🀙','🀚','🀛','🀜','🀝','🀞','🀟','🀠','🀡','🀢','🀣','🀤','🀥','🀦','🀧','🀨','🀩','🀪','🀫'], 
             ['🃏','🂡','🂢','🂣','🂤','🂥','🂦','🂧','🂨','🂩','🂪','🂫','🂭','🂮','🂱','🂲','🂳','🂴','🂵','🂶'], 
-            ['🁣','🁤','🁥','🁦','🁧','🁨','🁩','🁪','🁫','🁬','🁭','🁮','🁯','🁰','🁱','🁲','🁳','🁴','🁵','🁶'], 
             ['🕐','🕑','🕒','🕓','🕔','🕕','🕖','🕗','🕘','🕙','🕚','🕛','🕜','🕝','🕞','🕟','🕠','🕡','🕢','🕣'], 
             ['一','二','三','四','五','六','七','八','九','十','百','千','万','中','发','白','春','夏','秋','冬']
         ];
-
-        // Список всех абстрактных/простых символов, которые бьются на ЗОЛОТЫЕ ОСКОЛКИ
-        const standardSymbols = "🀄🀅🀆🀇🀈🀉🀊🀋🀌🀍🀎🀏🀐🀑🀒🀓🀔🀕🀖🀗🀘🀙🀚🀛🀜🀝🀞🀟🀠🀡🀢🀣🀤🀥🀦🀧🀨🀩🀪🀫🃏🂡🂢🂣🂤🂥🂦🂧🂨🂩🂪🂫🂭🂮🂱🂲🂳🂴🂵🂶🁣🁤🁥🁦🁧🁨🁩🁪🁫🁬🁭🁮🁯🁰🁱🁲🁳🁴🁵🁶🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚🕛🕜🕝🕞🕟🕠🕡🕢🕣一二三四五六七八九十百千万中发白春夏秋冬♈♉♊♋♌♍♎♏♐♑♒♓▶️⏩⏯️◀️⏪🔼🔽⏸️⛔🚫🚳🚭🚯🚱🚷📵🔞☢️☣️⬆️↗️➡️↘️⬇️↙️⬅️↖️↕️";
+        const standardSymbols = "🀄🀅🀆🀇🀈🀉🀊🀋🀌🀍🀎🀏🀐🀑🀒🀓🀔🀕🀖🀗🀘🀙🀚🀛🀜🀝🀞🀟🀠🀡🀢🀣🀤🀥🀦🀧🀨🀩🀪🀫🃏🂡🂢🂣🂤🂥🂦🂧🂨🂩🂪🂫🂭🂮🂱🂲🂳🂴🂵🂶🁣🁤🁥🁦🁧🁨🁩🁪🁫🁬🁭🁮🁯🁰🁱🁲🁳🁴🁵🁶🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚🕛🕜🕝🕞🕟🕠🕡🕢🕣一二三四五六七八九十百千万中发白春夏秋冬♈♉♊♋♌♍♎♏♐♑♒♓";
 
         const materials = [
             { tileBg: '#f3e5ab', tileBorder: '#d2b48c', tileColor: '#3e2723', bgImg: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(139, 69, 19, 0.2)' },
             { tileBg: '#e8dcc8', tileBorder: '#d4c2aa', tileColor: '#2b1d0f', bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 100%)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.05)' }
         ];
 
-        let activeTiles = [], firstTile = null, secondTile = null;
+        let activeTiles = [], firstTile = null;
 
-        document.getElementById('menu-level-text').innerText = 'УРОВЕНЬ ' + currentLevel;
-        updateScoreDisplay();
+        function updateMenuLevelText() { document.getElementById('menu-level-text').innerText = 'УРОВЕНЬ ' + currentLevel; }
+        updateMenuLevelText(); updateScoreDisplay();
         
         document.getElementById('btn-play').addEventListener('click', () => { document.getElementById('main-menu').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; initGame(); });
+        
+        // Кнопки отката уровней в меню
+        document.getElementById('btn-prev-level').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; localStorage.setItem('mahjong_level', currentLevel); updateMenuLevelText(); }});
+        document.getElementById('btn-next-level').addEventListener('click', () => { currentLevel++; localStorage.setItem('mahjong_level', currentLevel); updateMenuLevelText(); });
+
         document.getElementById('btn-reset').addEventListener('click', () => {
             if (confirm('Начать с 1 уровня? Весь прогресс будет удален.')) {
                 currentLevel = 1; totalScore = 0; localStorage.setItem('mahjong_level', 1); localStorage.setItem('mahjong_score', 0);
-                document.getElementById('menu-level-text').innerText = 'УРОВЕНЬ 1'; updateScoreDisplay();
+                updateMenuLevelText(); updateScoreDisplay();
             }
         });
+
         document.getElementById('btn-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'flex');
         document.getElementById('btn-close-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'none');
-        document.getElementById('btn-menu').addEventListener('click', () => { document.getElementById('game-screen').style.display = 'none'; document.getElementById('main-menu').style.display = 'flex'; document.getElementById('menu-level-text').innerText = 'УРОВЕНЬ ' + currentLevel; });
+        document.getElementById('btn-menu').addEventListener('click', () => { document.getElementById('game-screen').style.display = 'none'; document.getElementById('main-menu').style.display = 'flex'; updateMenuLevelText(); });
         document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
-        document.getElementById('hud-level').addEventListener('click', () => { currentLevel++; localStorage.setItem('mahjong_level', currentLevel); initGame(); });
 
         function updateScoreDisplay() { document.getElementById('hud-score').innerText = '🏆 ' + totalScore; }
         function applyMaterial(level) {
@@ -312,12 +301,6 @@
             let t1 = Math.floor(Math.random() * themeSets.length), t2 = Math.floor(Math.random() * themeSets.length), t3 = Math.floor(Math.random() * themeSets.length);
             return [...themeSets[t1].slice(0, 7), ...themeSets[t2].slice(7, 14), ...themeSets[t3].slice(14, 20)];
         }
-        function getPairsFromSymbols(symbolsArray) {
-            let counts = {}; symbolsArray.forEach(s => counts[s] = (counts[s] || 0) + 1);
-            let pairsPool = []; for (let s in counts) { for(let i=0; i < Math.floor(counts[s] / 2); i++) pairsPool.push(s); }
-            return pairsPool;
-        }
-
         function assignSymbolsSmart(layout, pairsPool, customRnd) {
             let unassigned = layout.map(pos => ({...pos, symbol: null}));
             let symbolPool = [...pairsPool];
@@ -349,7 +332,7 @@
         }
 
         function initGame() {
-            const board = document.getElementById('game-board'); board.innerHTML = ''; activeTiles = []; firstTile = null; secondTile = null;
+            const board = document.getElementById('game-board'); board.innerHTML = ''; activeTiles = []; firstTile = null;
             document.getElementById('message').innerHTML = ''; document.getElementById('btn-shuffle').classList.remove('btn-pulse'); document.getElementById('progress-bar').style.width = '0%';
             comboCount = 0; document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel; updateScoreDisplay();
             
@@ -422,70 +405,51 @@
         }
 
         function showFloatingText(element, points, isCombo) {
-            let rect = element.getBoundingClientRect(), boardRect = document.getElementById('game-board').getBoundingClientRect();
+            let rect = element.getBoundingClientRect();
             let floatEl = document.createElement('div'); floatEl.classList.add('floating-text');
             if(isCombo) floatEl.classList.add('combo');
             floatEl.innerText = isCombo ? `+${points} КОМБО!` : `+${points}`;
-            floatEl.style.left = (rect.left - boardRect.left + rect.width / 4) + 'px'; floatEl.style.top = (rect.top - boardRect.top) + 'px';
-            document.getElementById('game-board').appendChild(floatEl); setTimeout(() => floatEl.remove(), 1000);
+            
+            // Позиционируем относительно всей страницы (body), а не доски
+            floatEl.style.left = (rect.left + window.scrollX + rect.width / 4) + 'px'; 
+            floatEl.style.top = (rect.top + window.scrollY - 30) + 'px';
+            document.body.appendChild(floatEl); 
+            setTimeout(() => floatEl.remove(), 1000);
         }
 
-        // --- ГЕНЕРАТОР УМНЫХ ЧАСТИЦ (РАЗРУШЕНИЕ) ---
+        // --- ГЕНЕРАТОР УМНЫХ ЧАСТИЦ ПОВЕРХ ВСЕГО EКРАНА (BODY) ---
         function spawnSymbolBurst(element, symbol) {
             let rect = element.getBoundingClientRect();
-            let board = document.getElementById('game-board');
-            let boardRect = board.getBoundingClientRect();
-            let centerX = rect.left - boardRect.left + rect.width / 2;
-            let centerY = rect.top - boardRect.top + rect.height / 2;
+            // Получаем точные абсолютные координаты центра фишки на экране
+            let centerX = rect.left + window.scrollX + rect.width / 2;
+            let centerY = rect.top + window.scrollY + rect.height / 2;
             
             let isStandard = standardSymbols.includes(symbol);
             
             if (isStandard) {
-                // ЗОЛОТЫЕ ОСКОЛКИ (для простых/скучных фишек)
+                // ЗОЛОТЫЕ ОСКОЛКИ 
                 let shardCount = 12 + Math.floor(Math.random() * 6); 
                 for (let i = 0; i < shardCount; i++) {
-                    let p = document.createElement('div');
-                    p.classList.add('gold-shard');
-                    p.style.left = centerX + 'px';
-                    p.style.top = centerY + 'px';
-                    
+                    let p = document.createElement('div'); p.classList.add('gold-shard');
+                    p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
                     if (Math.random() > 0.5) p.style.borderRadius = '50%';
                     if (Math.random() > 0.7) { p.style.width = '16px'; p.style.height = '6px'; }
-                    
-                    let angle = Math.random() * Math.PI * 2; 
-                    let dist = Math.random() * 80 + 30; 
-                    
-                    p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px');
-                    p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px');
-                    p.style.setProperty('--rot', (Math.random() * 360) + 'deg');
-                    
-                    board.appendChild(p);
+                    let angle = Math.random() * Math.PI * 2, dist = Math.random() * 80 + 30; 
+                    p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); p.style.setProperty('--rot', (Math.random() * 360) + 'deg');
+                    document.body.appendChild(p); // ДОБАВЛЯЕМ В BODY
                     setTimeout(() => p.remove(), 600);
                 }
             } else {
-                // ТЕМАТИЧЕСКИЕ ЧАСТИЦЫ (Сам предмет + Магия)
+                // ТЕМАТИЧЕСКИЕ ЧАСТИЦЫ
                 let particleCount = 5 + Math.floor(Math.random() * 4); 
                 for (let i = 0; i < particleCount; i++) {
-                    let p = document.createElement('div');
-                    p.classList.add('thematic-particle');
-                    
+                    let p = document.createElement('div'); p.classList.add('thematic-particle');
                     let rnd = Math.random();
-                    if (rnd < 0.6) p.innerText = symbol; // Вылетает сам предмет
-                    else if (rnd < 0.8) p.innerText = '✨'; // Магическая искра
-                    else p.innerText = '💨'; // Дымок
-                    
-                    p.style.left = centerX + 'px';
-                    p.style.top = centerY + 'px';
-                    p.style.fontSize = (rect.width * 0.4) + 'px'; 
-                    
-                    let angle = Math.random() * Math.PI * 2; 
-                    let dist = Math.random() * 70 + 40; 
-                    
-                    p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px');
-                    p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px');
-                    p.style.setProperty('--rot', (Math.random() * 180 - 90) + 'deg');
-                    
-                    board.appendChild(p);
+                    if (rnd < 0.6) p.innerText = symbol; else if (rnd < 0.8) p.innerText = '✨'; else p.innerText = '💨';
+                    p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
+                    let angle = Math.random() * Math.PI * 2, dist = Math.random() * 70 + 40; 
+                    p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); p.style.setProperty('--rot', (Math.random() * 180 - 90) + 'deg');
+                    document.body.appendChild(p); // ДОБАВЛЯЕМ В BODY
                     setTimeout(() => p.remove(), 700);
                 }
             }
@@ -513,7 +477,7 @@
                     localStorage.setItem('mahjong_score', totalScore); updateScoreDisplay();
                     showFloatingText(t.el, earnedPoints, comboCount > 1);
 
-                    // ВЫЗЫВАЕМ АНИМАЦИЮ РАЗРУШЕНИЯ ДЛЯ ОБЕИХ ФИШЕК
+                    // САЛЮТ ПЕРЕД ИСЧЕЗНОВЕНИЕМ
                     spawnSymbolBurst(firstTile.el, firstTile.symbol);
                     spawnSymbolBurst(t.el, t.symbol);
 
@@ -524,8 +488,7 @@
                     
                     if (activeTiles.length === 0) {
                         currentLevel++; localStorage.setItem('mahjong_level', currentLevel);
-                        document.getElementById('message').innerHTML = '🎉 УРОВЕНЬ ПРОЙДЕН!';
-                        document.getElementById('message').style.color = '#f1c40f';
+                        document.getElementById('message').innerHTML = '🎉 УРОВЕНЬ ПРОЙДЕН!'; document.getElementById('message').style.color = '#f1c40f';
                         shootConfetti(); setTimeout(() => { initGame(); }, 2500); 
                     }
                 } else { 
@@ -578,7 +541,7 @@
                 firstTile = null; updateFreeState(); comboCount = 0; 
                 document.getElementById('message').innerText = 'Поле перестроено! ✨'; document.getElementById('message').style.color = '#f1c40f';
                 document.getElementById('btn-shuffle').classList.remove('btn-pulse');
-            }, 2000); 
+            }, 1000); 
         }
     </script>
 </body>
