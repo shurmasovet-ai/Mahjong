@@ -124,10 +124,11 @@
             background-image: var(--bgImg);
             background-size: 14px 14px; background-position: 0 0, 7px 7px;
             
-            /* УВЕЛИЧЕННЫЕ И КАЧЕСТВЕННЫЕ ИКОНКИ С ТЕНЬЮ */
+            /* МАКСИМАЛЬНО УВЕЛИЧЕННЫЕ ИКОНКИ С ТЕНЬЮ */
             color: var(--tileColor); 
-            font-size: 9.5vw; 
-            text-shadow: 1px 2px 3px rgba(0,0,0,0.3); 
+            font-size: 14vw; 
+            line-height: 1;
+            text-shadow: 2px 3px 4px rgba(0,0,0,0.4); 
             font-family: 'Noto Color Emoji', sans-serif;
             
             display: flex; justify-content: center; align-items: center;
@@ -140,7 +141,7 @@
         }
         
         @media (min-width: 400px) {
-            .tile { font-size: 40px; border-radius: 14px; } 
+            .tile { font-size: 56px; border-radius: 14px; } 
             #main-menu h1 { font-size: 52px; }
             .btn { font-size: 24px; } .btn-small { font-size: 16px; }
             .tile { margin-top: calc(var(--z) * -14px); margin-left: calc(var(--z) * -8px); }
