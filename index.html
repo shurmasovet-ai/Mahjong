@@ -18,7 +18,7 @@
         
         body {
             font-family: sans-serif; 
-            background-color: #4b0d18; /* Элитный бордовый фон */
+            background-color: #4b0d18; 
             color: white; width: 100vw; height: 100vh; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
@@ -111,6 +111,7 @@
         #game-board {
             width: 90vw; height: 112.5vw; max-width: 400px; max-height: 500px; 
             position: relative; margin-top: 4vw; 
+            perspective: 1000px; /* Добавлено для 3D-переворота */
         }
         
         .tile {
@@ -124,7 +125,6 @@
             background-image: var(--bgImg);
             background-size: 14px 14px; background-position: 0 0, 7px 7px;
             
-            /* МАКСИМАЛЬНО УВЕЛИЧЕННЫЕ ИКОНКИ С ТЕНЬЮ */
             color: var(--tileColor); 
             font-size: 14vw; 
             line-height: 1;
@@ -134,10 +134,10 @@
             display: flex; justify-content: center; align-items: center;
             border-radius: 12px; border: 2px solid var(--tileBorder);
             box-shadow: var(--shadow), calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(2vw + var(--z) * 0.8vw) rgba(0,0,0,0.85);
-            backdrop-filter: blur(4px); 
             
             touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
             transition: transform 0.2s, filter 0.2s, box-shadow 0.2s, top 0.6s ease-in-out, left 0.6s ease-in-out, margin-top 0.6s, margin-left 0.6s; cursor: pointer;
+            transform-style: preserve-3d;
         }
         
         @media (min-width: 400px) {
@@ -157,6 +157,31 @@
             transform: translateY(-3vw) scale(1.08); z-index: 999 !important;
         }
         .tile.matched { opacity: 0; pointer-events: none; transform: scale(1.5); filter: brightness(2); }
+
+        /* --- СТИЛИ ДЛЯ ЗАКРЫТЫХ ФИШЕК --- */
+        .tile.is-hidden {
+            color: transparent !important;
+            text-shadow: none !important;
+        }
+        .tile.is-hidden::after {
+            content: '❖'; /* Элегантный премиум-узор */
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8vw;
+            color: rgba(139, 69, 19, 0.35); /* Благородный цвет гравировки */
+            text-shadow: 1px 1px 1px rgba(255,255,255,0.6), -1px -1px 1px rgba(0,0,0,0.2); /* Эффект вдавленности */
+        }
+        @media (min-width: 400px) {
+            .tile.is-hidden::after { font-size: 32px; }
+        }
+
+        /* 3D-АНИМАЦИЯ ПЕРЕВОРОТА */
+        .flip-anim { animation: flipTileIn 0.3s ease-out forwards; }
+        @keyframes flipTileIn {
+            0% { transform: translateY(-3vw) scale(1.08) rotateY(-90deg); }
+            100% { transform: translateY(-3vw) scale(1.08) rotateY(0deg); }
+        }
 
         #message { font-family: 'Russo One', sans-serif; font-size: 6vw; max-font-size: 24px; height: 65px; color: #2ecc71; text-align: center; margin-top: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
 
@@ -288,7 +313,6 @@
             ['一','二','三','四','五','六','七','八','九','十','百','千','万','中','发','白','春','夏','秋','冬']  
         ];
 
-        // ОСТАВЛЕНО ТОЛЬКО 2 ИДЕАЛЬНЫХ ЦВЕТА ФИШЕК
         const materials = [
             { 
                 tileBg: '#f3e5ab', tileBorder: '#d2b48c', tileColor: '#3e2723', 
@@ -478,11 +502,34 @@
                     {x: 2, y: 4, z: 0, symbol: baseSymbols[1]}, {x: 4, y: 4, z: 0, symbol: baseSymbols[1]}
                 ];
             }
+
+            // --- ЛОГИКА "СЛЕПЫХ" ФИШЕК ---
+            let isMysteryLevel = (currentLevel % 10 === 7) || (currentLevel % 10 === 8);
+            if (isMysteryLevel) {
+                let totalTiles = finalLayout.length;
+                let hideCount = Math.floor(totalTiles * 0.5); // Прячем 50% фишек
+                
+                // Перемешиваем индексы, чтобы спрятать случайные фишки
+                let hideIndices = Array.from({length: totalTiles}, (_, i) => i);
+                for (let i = hideIndices.length - 1; i > 0; i--) { 
+                    const j = Math.floor(Math.random() * (i + 1)); 
+                    [hideIndices[i], hideIndices[j]] = [hideIndices[j], hideIndices[i]]; 
+                }
+                
+                for(let i=0; i<hideCount; i++) {
+                    finalLayout[hideIndices[i]].isHidden = true;
+                }
+            }
             
             finalLayout.forEach((obj) => {
                 const el = document.createElement('div'); el.classList.add('tile'); el.innerText = obj.symbol;
                 el.style.setProperty('--x', obj.x); el.style.setProperty('--y', obj.y); el.style.setProperty('--z', obj.z); 
                 el.style.zIndex = (obj.z * 100) + obj.y;
+                
+                if (obj.isHidden) {
+                    el.classList.add('is-hidden');
+                }
+
                 obj.el = el;
                 el.addEventListener('click', (e) => handleTileClick(obj, e));
                 board.appendChild(el); activeTiles.push(obj);
@@ -560,6 +607,14 @@
         function handleTileClick(t, event) { 
             if (!t.isFree) return;
             
+            // ЕСЛИ ФИШКА СКРЫТА — ОТКРЫВАЕМ ЕЁ АНИМАЦИЕЙ И ДЕЛАЕМ АКТИВНОЙ
+            if (t.isHidden) {
+                t.isHidden = false;
+                t.el.classList.remove('is-hidden');
+                t.el.classList.add('flip-anim');
+                setTimeout(() => t.el.classList.remove('flip-anim'), 350);
+            }
+            
             if (!firstTile) { 
                 t.el.classList.add('selected'); 
                 firstTile = t; 
@@ -610,6 +665,9 @@
                 
                 let currentSymbols = activeTiles.map(t => t.symbol);
                 let pairsPool = getPairsFromSymbols(currentSymbols);
+                
+                // Запоминаем, сколько фишек было спрятано, чтобы сохранить баланс
+                let hiddenCount = activeTiles.filter(t => t.isHidden).length;
 
                 let attemptMix = 0;
                 let preparedTiles = null;
@@ -630,6 +688,14 @@
                     preparedTiles = assignSymbolsSmart(newLayout, pairsPool, Math.random);
                 }
 
+                // Прячем то же самое количество фишек в новой раскладке
+                let hideIndices = Array.from({length: newLayout.length}, (_, i) => i);
+                for (let i = hideIndices.length - 1; i > 0; i--) { 
+                    const j = Math.floor(Math.random() * (i + 1)); 
+                    [hideIndices[i], hideIndices[j]] = [hideIndices[j], hideIndices[i]]; 
+                }
+                let toHide = new Set(hideIndices.slice(0, hiddenCount));
+
                 activeTiles.forEach((tile, index) => {
                     let pt = preparedTiles[index];
                     tile.symbol = pt.symbol;
@@ -639,6 +705,14 @@
                     tile.el.style.setProperty('--x', tile.x); 
                     tile.el.style.setProperty('--y', tile.y); 
                     tile.el.style.setProperty('--z', tile.z);
+                    
+                    if (toHide.has(index)) {
+                        tile.isHidden = true;
+                        tile.el.classList.add('is-hidden');
+                    } else {
+                        tile.isHidden = false;
+                        tile.el.classList.remove('is-hidden');
+                    }
                 });
 
                 firstTile = null;
