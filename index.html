@@ -9,7 +9,7 @@
     <style>
         :root { 
             color-scheme: light; 
-            --tileBg: #fffaf0; --tileBorder: #fdf5e6;
+            --tileBg: #e8dcc8; --tileBorder: #d4c2aa;
             --tileColor: #1a2a3a;
             --bgImg: none;
             --shadow: 0 5px 10px rgba(0,0,0,0.6), inset 0 0 12px rgba(180, 140, 100, 0.4);
@@ -122,8 +122,12 @@
             
             background-color: var(--tileBg); 
             background-image: var(--bgImg);
-            background-size: cover;
-            color: var(--tileColor); font-size: 7.5vw; 
+            background-size: 14px 14px; background-position: 0 0, 7px 7px;
+            
+            /* УВЕЛИЧЕННЫЕ И КАЧЕСТВЕННЫЕ ИКОНКИ С ТЕНЬЮ */
+            color: var(--tileColor); 
+            font-size: 9.5vw; 
+            text-shadow: 1px 2px 3px rgba(0,0,0,0.3); 
             font-family: 'Noto Color Emoji', sans-serif;
             
             display: flex; justify-content: center; align-items: center;
@@ -136,7 +140,7 @@
         }
         
         @media (min-width: 400px) {
-            .tile { font-size: 30px; border-radius: 14px; } 
+            .tile { font-size: 40px; border-radius: 14px; } 
             #main-menu h1 { font-size: 52px; }
             .btn { font-size: 24px; } .btn-small { font-size: 16px; }
             .tile { margin-top: calc(var(--z) * -14px); margin-left: calc(var(--z) * -8px); }
@@ -283,47 +287,17 @@
             ['一','二','三','四','五','六','七','八','九','十','百','千','万','中','发','白','春','夏','秋','冬']  
         ];
 
-        // 10 НОВЫХ 100% ГЛАДКИХ ПАСТЕЛЬНЫХ МАТЕРИАЛОВ
+        // ОСТАВЛЕНО ТОЛЬКО 2 ИДЕАЛЬНЫХ ЦВЕТА ФИШЕК
         const materials = [
-            { // 1. Теплый песок
+            { // 1. Текстурированный светлый бамбук
+                tileBg: '#f3e5ab', tileBorder: '#d2b48c', tileColor: '#3e2723', 
+                bgImg: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px)', 
+                shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(139, 69, 19, 0.2)' 
+            },
+            { // 2. Гладкий теплый песок
                 tileBg: '#e8dcc8', tileBorder: '#d4c2aa', tileColor: '#2b1d0f', 
-                bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 100%)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.05)' 
-            },
-            { // 2. Пыльная мята
-                tileBg: '#c1d5c8', tileBorder: '#a8c2b1', tileColor: '#172b1e', 
-                bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 100%)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.05)' 
-            },
-            { // 3. Старое золото
-                tileBg: '#d4b872', tileBorder: '#c2a254', tileColor: '#302202', 
-                bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 100%)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.05)' 
-            },
-            { // 4. Серо-голубой сланец
-                tileBg: '#a2b0c0', tileBorder: '#8a99a8', tileColor: '#0c1622', 
-                bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 100%)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.05)' 
-            },
-            { // 5. Бледная терракота
-                tileBg: '#e2bda6', tileBorder: '#cca289', tileColor: '#361b0c', 
-                bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 100%)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.05)' 
-            },
-            { // 6. Оливковое дерево
-                tileBg: '#b8c292', tileBorder: '#a0ad74', tileColor: '#1f260d', 
-                bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 100%)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.05)' 
-            },
-            { // 7. Лаванда
-                tileBg: '#c8bccf', tileBorder: '#b0a2b8', tileColor: '#241a2b', 
-                bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 100%)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.05)' 
-            },
-            { // 8. Карамель
-                tileBg: '#d9ae79', tileBorder: '#c2945d', tileColor: '#331d04', 
-                bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 100%)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.05)' 
-            },
-            { // 9. Фисташка
-                tileBg: '#c3d1a7', tileBorder: '#aebd8e', tileColor: '#1f2b0d', 
-                bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 100%)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.05)' 
-            },
-            { // 10. Пыльная роза
-                tileBg: '#d4b4b8', tileBorder: '#bf9a9f', tileColor: '#331519', 
-                bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 100%)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.05)' 
+                bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 100%)', 
+                shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.05)' 
             }
         ];
 
