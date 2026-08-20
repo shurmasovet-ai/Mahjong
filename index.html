@@ -290,12 +290,12 @@
 
         // ОСТАВЛЕНО ТОЛЬКО 2 ИДЕАЛЬНЫХ ЦВЕТА ФИШЕК
         const materials = [
-            { // 1. Текстурированный светлый бамбук
+            { 
                 tileBg: '#f3e5ab', tileBorder: '#d2b48c', tileColor: '#3e2723', 
                 bgImg: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px)', 
                 shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(139, 69, 19, 0.2)' 
             },
-            { // 2. Гладкий теплый песок
+            { 
                 tileBg: '#e8dcc8', tileBorder: '#d4c2aa', tileColor: '#2b1d0f', 
                 bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 100%)', 
                 shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.05)' 
@@ -350,7 +350,7 @@
 
         function getDifficultyParams(level) {
             let cyclePos = (level - 1) % 10;
-            if (cyclePos >= 0 && cyclePos <= 2) return { text: "🟢 Легко", color: "#2ecc71", maxLayers: 2, density: 0.4 };
+            if (cyclePos >= 0 && cyclePos <= 2) return { text: "🟢 Легко", color: "#2ecc71", maxLayers: 2, density: 0.55 };
             else if (cyclePos >= 3 && cyclePos <= 5) return { text: "🟡 Средне", color: "#f1c40f", maxLayers: 3, density: 0.6 };
             else if (cyclePos >= 6 && cyclePos <= 8) return { text: "🟠 Сложно", color: "#e67e22", maxLayers: 4, density: 0.8 };
             else return { text: "🔴 ЭКСПЕРТ", color: "#e74c3c", maxLayers: 5, density: 0.95 };
