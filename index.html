@@ -502,16 +502,13 @@
                 ];
             }
 
-            // --- АККУРАТНАЯ ЛОГИКА "СЛЕПЫХ" ФИШЕК ---
+            // --- ЖЕСТКИЙ ЛИМИТ "СЛЕПЫХ" ФИШЕК ---
             let isMysteryLevel = (currentLevel % 10 === 7) || (currentLevel % 10 === 8);
             if (isMysteryLevel) {
                 let totalTiles = finalLayout.length;
                 
-                // Скрываем ровно 15%, но не больше 12 фишек (и не меньше 4)
-                let hideCount = Math.floor(totalTiles * 0.15);
-                if (hideCount > 12) hideCount = 12;
-                if (hideCount < 4) hideCount = 4;
-                if (hideCount % 2 !== 0) hideCount++; // Всегда четное число
+                // Строжайший лимит: прячем ровно 4 или 6 фишек
+                let hideCount = (totalTiles >= 30) ? 6 : 4;
                 
                 let hideIndices = Array.from({length: totalTiles}, (_, i) => i);
                 for (let i = hideIndices.length - 1; i > 0; i--) { 
