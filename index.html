@@ -94,8 +94,11 @@
         #top-bar { width: 100%; max-width: 500px; padding: 0 15px; display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .hud-center { display: flex; flex-direction: column; align-items: center; flex-grow: 1; margin: 0 10px; }
         
-        #hud-level { font-family: 'Russo One', sans-serif; font-size: 20px; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.5); cursor: pointer; padding: 2px 10px; white-space: nowrap; line-height: 1.2; text-align: center; }
-        #hud-level:active { transform: scale(0.9); }
+        .level-switcher { display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .btn-hud-arrow { background: transparent; border: none; color: #fff; font-size: 22px; cursor: pointer; padding: 0 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); transition: transform 0.1s; }
+        .btn-hud-arrow:active { transform: scale(0.8); color: #f1c40f; }
+
+        #hud-level { font-family: 'Russo One', sans-serif; font-size: 20px; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.5); padding: 2px 5px; white-space: nowrap; line-height: 1.2; text-align: center; }
         #hud-score { font-family: 'Russo One', sans-serif; font-size: 18px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); margin-top: 2px; }
         #hud-difficulty { font-size: 12px; font-weight: bold; padding: 3px 8px; border-radius: 10px; margin-top: 4px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); box-shadow: 0 2px 4px rgba(0,0,0,0.5); white-space: nowrap; }
 
@@ -206,7 +209,12 @@
         <div id="top-bar">
             <button id="btn-menu" class="btn-small-top">🏠 Меню</button>
             <div class="hud-center">
-                <div id="hud-level">Ур. 1</div>
+                <!-- СТРЕЛКИ ДЛЯ БЫСТРОГО ТЕСТИРОВАНИЯ ВО ВРЕМЯ ИГРЫ -->
+                <div class="level-switcher">
+                    <button id="btn-hud-prev" class="btn-hud-arrow">◀</button>
+                    <div id="hud-level">Ур. 1</div>
+                    <button id="btn-hud-next" class="btn-hud-arrow">▶</button>
+                </div>
                 <div id="hud-score">🏆 0</div>
                 <div id="hud-difficulty">🟢 Легко</div>
             </div>
@@ -247,7 +255,7 @@
             let savedScore = localStorage.getItem('mahjong_score'); if (savedScore) totalScore = parseInt(savedScore);
         } catch(e){}
         
-        // --- 10 ПОЛНОСТЬЮ ОБНОВЛЕННЫХ ПРЕМИУМ-НАБОРОВ БЕЗ ФИШЕК И КАРТ ---
+        // --- ПРЕМИУМ-НАБОРЫ ПРЕДМЕТОВ (БЕЗ ИЕРОГЛИФОВ И КАРТ) ---
         const themeSets = [
             ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'], // 0 - Еда
             ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'], // 1 - Сладости
@@ -261,7 +269,7 @@
             ['💎','🔮','🪄','🧿','👑','💍','🪙','💰','🪬','⏳','🩸','🧪','🧬','🔭','🔬','🛸','🚀','🛰️','🪐','👽']  // 9 - Сокровища/Космос
         ];
         
-        // Металлические и магические предметы будут разбиваться в золотые конфетти
+        // Металлические предметы будут разбиваться в золотые конфетти
         const standardSymbols = "📱💻🖥️🖨️🖱️🕹️💾💿📷📹🎥📺📻🎙️⏱️⏰⏳💡🔦🔋🔨🪓⛏️🛠️🪚🔧🪛🔩⚙️🧲🪜🧱🛡️💣🧨🧯🧭⚓🪝⚖️💎🔮🪄🧿👑💍🪙💰🪬⏳🩸🧪🧬🔭🔬🛸🚀🛰️🪐👽";
 
         const materials = [
@@ -271,25 +279,36 @@
 
         let activeTiles = [], firstTile = null;
 
-        function updateMenuLevelText() { document.getElementById('menu-level-text').innerText = 'УРОВЕНЬ ' + currentLevel; }
+        function updateMenuLevelText() { 
+            document.getElementById('menu-level-text').innerText = 'УРОВЕНЬ ' + currentLevel; 
+            document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
+        }
         updateMenuLevelText(); updateScoreDisplay();
         
+        // Кнопки меню
         document.getElementById('btn-play').addEventListener('click', () => { document.getElementById('main-menu').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; initGame(); });
-        
         document.getElementById('btn-prev-level').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; localStorage.setItem('mahjong_level', currentLevel); updateMenuLevelText(); }});
         document.getElementById('btn-next-level').addEventListener('click', () => { currentLevel++; localStorage.setItem('mahjong_level', currentLevel); updateMenuLevelText(); });
-
         document.getElementById('btn-reset').addEventListener('click', () => {
             if (confirm('Начать с 1 уровня? Весь прогресс будет удален.')) {
                 currentLevel = 1; totalScore = 0; localStorage.setItem('mahjong_level', 1); localStorage.setItem('mahjong_score', 0);
                 updateMenuLevelText(); updateScoreDisplay();
             }
         });
-
         document.getElementById('btn-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'flex');
         document.getElementById('btn-close-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'none');
         document.getElementById('btn-menu').addEventListener('click', () => { document.getElementById('game-screen').style.display = 'none'; document.getElementById('main-menu').style.display = 'flex'; updateMenuLevelText(); });
         document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
+
+        // --- НОВЫЕ КНОПКИ ТЕСТИРОВАНИЯ В ИГРЕ ---
+        document.getElementById('btn-hud-prev').addEventListener('click', () => { 
+            if(currentLevel > 1) { 
+                currentLevel--; localStorage.setItem('mahjong_level', currentLevel); initGame(); 
+            }
+        });
+        document.getElementById('btn-hud-next').addEventListener('click', () => { 
+            currentLevel++; localStorage.setItem('mahjong_level', currentLevel); initGame(); 
+        });
 
         function updateScoreDisplay() { document.getElementById('hud-score').innerText = '🏆 ' + totalScore; }
         function applyMaterial(level) {
@@ -346,7 +365,7 @@
         function initGame() {
             const board = document.getElementById('game-board'); board.innerHTML = ''; activeTiles = []; firstTile = null;
             document.getElementById('message').innerHTML = ''; document.getElementById('btn-shuffle').classList.remove('btn-pulse'); document.getElementById('progress-bar').style.width = '0%';
-            comboCount = 0; document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel; updateScoreDisplay();
+            comboCount = 0; updateMenuLevelText(); updateScoreDisplay();
             
             let diff = getDifficultyParams(currentLevel);
             let diffBadge = document.getElementById('hud-difficulty'); diffBadge.innerText = diff.text; diffBadge.style.backgroundColor = diff.color; diffBadge.style.color = (diff.color === "#f1c40f") ? "#000" : "#fff"; 
