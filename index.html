@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="color-scheme" content="light only">
-    <title>Mahjong Deluxe - Infinity</title>
+    <title>Mahjong Deluxe - Infinity 8888</title>
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -209,7 +209,6 @@
         <div id="top-bar">
             <button id="btn-menu" class="btn-small-top">🏠 Меню</button>
             <div class="hud-center">
-                <!-- СТРЕЛКИ ДЛЯ БЫСТРОГО ТЕСТИРОВАНИЯ ВО ВРЕМЯ ИГРЫ -->
                 <div class="level-switcher">
                     <button id="btn-hud-prev" class="btn-hud-arrow">◀</button>
                     <div id="hud-level">Ур. 1</div>
@@ -255,22 +254,46 @@
             let savedScore = localStorage.getItem('mahjong_score'); if (savedScore) totalScore = parseInt(savedScore);
         } catch(e){}
         
-        // --- ПРЕМИУМ-НАБОРЫ ПРЕДМЕТОВ (БЕЗ ИЕРОГЛИФОВ И КАРТ) ---
+        // --- 37 ПРЕМИАЛЬНЫХ НАБОРОВ (740 ПРЕДМЕТОВ) - НИКАКИХ ИЕРОГЛИФОВ ---
         const themeSets = [
-            ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'], // 0 - Еда
-            ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'], // 1 - Сладости
-            ['📱','💻','🖥️','🖨️','🖱️','🕹️','💾','💿','📷','📹','🎥','📺','📻','🎙️','⏱️','⏰','⏳','💡','🔦','🔋'], // 2 - Техника
-            ['🦁','🐯','🦒','🦊','🐻','🐼','🐨','🐰','🐷','🦝','🐗','🦓','🦌','🐘','🦏','🦛','🐭','🐹','🐿️','🦔'], // 3 - Животные
-            ['🚗','🚕','🚙','🚌','🏎️','🚓','🚑','🚒','🚐','🛻','🚚','🚛','🚜','🏍️','🛵','🦽','🛺','🚲','🛴','🛹'], // 4 - Транспорт
-            ['⚽','🏀','🏈','⚾','🎾','🏐','🎱','🏓','🏸','🏒','⛳','🪁','🏹','🎣','🤿','🥊','🥋','🛹','🛼','⛸️'], // 5 - Спорт
-            ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥒'], // 6 - Фрукты/Овощи
-            ['🌲','🌳','🌴','🌵','🌾','🌿','🍀','🍁','🍂','🍃','🌷','🌹','🌻','🌼','🌸','🌺','🪴','🍄','🪷','💐'], // 7 - Природа
-            ['🔨','🪓','⛏️','🛠️','🪚','🔧','🪛','🔩','⚙️','🧲','🪜','🧱','🛡️','💣','🧨','🧯','🧭','⚓','🪝','⚖️'], // 8 - Инструменты
-            ['💎','🔮','🪄','🧿','👑','💍','🪙','💰','🪬','⏳','🩸','🧪','🧬','🔭','🔬','🛸','🚀','🛰️','🪐','👽']  // 9 - Сокровища/Космос
+            ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'], // 0
+            ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'], // 1
+            ['📱','💻','🖥️','🖨️','🖱️','🕹️','💾','💿','📷','📹','🎥','📺','📻','🎙️','⏱️','⏰','⏳','💡','🔦','🔋'], // 2
+            ['🦁','🐯','🦒','🦊','🐻','🐼','🐨','🐰','🐷','🦝','🐗','🦓','🦌','🐘','🦏','🦛','🐭','🐹','🐿️','🦔'], // 3
+            ['🚗','🚕','🚙','🚌','🏎️','🚓','🚑','🚒','🚐','🛻','🚚','🚛','🚜','🏍️','🛵','🦽','🛺','🚲','🛴','🛹'], // 4
+            ['⚽','🏀','🏈','⚾','🎾','🏐','🎱','🏓','🏸','🏒','⛳','🪁','🏹','🎣','🤿','🥊','🥋','🛹','🛼','⛸️'], // 5
+            ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥒'], // 6
+            ['🌲','🌳','🌴','🌵','🌾','🌿','🍀','🍁','🍂','🍃','🌷','🌹','🌻','🌼','🌸','🌺','🪴','🍄','🪷','💐'], // 7
+            ['🔨','🪓','⛏️','🛠️','🪚','🔧','🪛','🔩','⚙️','🧲','🪜','🧱','🛡️','💣','🧨','🧯','🧭','⚓','🪝','⚖️'], // 8
+            ['💎','🔮','🪄','🧿','👑','💍','🪙','💰','🪬','⏳','🩸','🧪','🧬','🔭','🔬','🛸','🚀','🛰️','🪐','👽'], // 9
+            ['🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🦭','🐊','🐸','🐢','🦦','🦪','🐚','🪸'], // 10
+            ['🦅','🦆','🦉','🦇','🐝','🐛','🦋','🐌','🐞','🐜','🪲','🪳','🕷️','🕸️','🦂','🦟','🪰','🪱','🦜','🦚'], // 11
+            ['👕','👖','👔','👗','👙','👘','💄','💋','🧦','🥾','👟','👞','👢','👠','🩴','🎒','🧳','👓','🕶️','🧣'], // 12
+            ['🎸','🎹','🎷','🎺','🎻','🪕','🥁','🪘','🪗','🎧','🎤','🎙️','📻','🎚️','🎛️','🔈','💿','📼','🎼','🎵'], // 13
+            ['🚪','🛏️','🛋️','🪑','🚽','🚿','🛁','🪒','🧴','🧹','🧺','🧻','🧼','🧽','🛒','🪞','🪟','🖼️','🧸','🗑️'], // 14
+            ['🌍','🌞','🌝','🌛','✨','⚡','🔥','🌪️','🌈','☁️','🌤️','⛅','🌥️','🌦️','🌧️','🌨️','🌩️','☔','☂️','❄️'], // 15
+            ['✏️','✒️','🖋️','🖊️','🖌️','🖍️','📝','💼','📁','📂','🗂️','📅','📆','🗒️','🗓️','📇','📈','📉','📊','📋'], // 16
+            ['📕','📖','📗','📘','📙','📚','📓','📒','📃','📜','📄','📰','🗞️','🔖','🏷️','✉️','📧','📨','📩','📤'], // 17
+            ['📥','📦','📫','📪','📬','📭','📮','🗳️','📌','📍','📎','🖇️','📏','📐','✂️','🗑️','🔒','🔓','🔏','🔐'], // 18
+            ['🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨','🏪','🏫','🏩','💒','🏛️','⛪','🕌'], // 19
+            ['🕍','🛕','🕋','⛩️','🛤️','🛣️','🗾','🎑','🏞️','🌅','🌄','🌠','🎇','🎆','🌇','🌆','🏙️','🌃','🌌','🌉'], // 20
+            ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','☺️','😚'], // 21
+            ['😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄'], // 22
+            ['😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳'], // 23
+            ['👈','👉','☝️','👆','🖕','👇','✌️','🤞','🖖','🤘','🤙','🖐️','✋','👌','👍','👎','✊','👊','🤛','🤜'], // 24
+            ['🧗','🤺','🏇','⛷️','🏂','🏌️','🏄','🚣','🏊','🤽','🧜','🧚','🧞','🦸','🦹','🧝','🧙','🧟','🧛','👼'], // 25
+            ['🐮','🐂','🐃','🐄','🐖','🐏','🐑','🐐','🐪','🐫','🦙','🦘','🐎','🐴','🐔','🐓','🐣','🐤','🐥','🐦'], // 26
+            ['🐧','🦅','🦆','🦢','🦉','🦤','🪶','🦩','🦚','🦜','🐸','🐊','🐢','🦎','🐍','🐲','🐉','🦕','🐳','🐋'], // 27
+            ['🔪','🥄','🍴','🍽️','🥣','🥡','🥢','🍶','🥂','🍻','🍺','🍹','🍷','🥃','🍸','🧉','🍾','🧊','🥤','🧋'], // 28
+            ['💈','✂️','🗑️','🛢️','🧴','🧷','🧹','🧺','🧻','🧼','🧽','🚿','🛁','🛀','🪥','🪒','🧴','🧻','🧽','🧼'], // 29
+            ['🎨','🧵','🪡','🧶','🪢','🛍️','🎒','🩴','👓','🕶️','🧣','🧤','🧥','🧦','👗','👘','🥻','🩱','🩲','🩳'], // 30
+            ['🎮','🕹️','🎰','🎲','🧩','🧸','🪀','🪅','🪄','🔮','🧿','🪩','🪆','🪁','🎯','🎳','🥏','🏑','🥍','🏏'], // 31
+            ['🌵','🎄','🌲','🌳','🌴','🪵','🌱','🌿','☘️','🍀','🎍','🪴','🎋','🍃','🍂','🍁','🍄','🌾','💐','🌷'], // 32
+            ['💉','🩸','💊','🩹','🩺','🩻','🧪','🧫','🧬','🔬','🔭','📡','🌡️','🧹','🗑️','⚖️','🛡️','🗡️','⚔️','💣'], // 33
+            ['🚂','🚃','🚄','🚅','🚆','🚇','🚈','🚉','🚊','🚝','🚞','🚋','🚌','🚍','🚎','🚐','🚑','🚒','🚓','🚔'], // 34
+            ['🕰️','🧱','🪨','🪵','🛖','🏕️','⛺','🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨'], // 35
+            ['🍉','🍊','🍋','🍌','🍍','🥭','🍎','🍏','🍐','🍑','🍒','🍓','🫐','🥝','🍅','🫒','🥥','🥑','🍆','🥔']  // 36
         ];
-        
-        // Металлические предметы будут разбиваться в золотые конфетти
-        const standardSymbols = "📱💻🖥️🖨️🖱️🕹️💾💿📷📹🎥📺📻🎙️⏱️⏰⏳💡🔦🔋🔨🪓⛏️🛠️🪚🔧🪛🔩⚙️🧲🪜🧱🛡️💣🧨🧯🧭⚓🪝⚖️💎🔮🪄🧿👑💍🪙💰🪬⏳🩸🧪🧬🔭🔬🛸🚀🛰️🪐👽";
 
         const materials = [
             { tileBg: '#f3e5ab', tileBorder: '#d2b48c', tileColor: '#3e2723', bgImg: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(139, 69, 19, 0.2)' },
@@ -285,7 +308,6 @@
         }
         updateMenuLevelText(); updateScoreDisplay();
         
-        // Кнопки меню
         document.getElementById('btn-play').addEventListener('click', () => { document.getElementById('main-menu').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; initGame(); });
         document.getElementById('btn-prev-level').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; localStorage.setItem('mahjong_level', currentLevel); updateMenuLevelText(); }});
         document.getElementById('btn-next-level').addEventListener('click', () => { currentLevel++; localStorage.setItem('mahjong_level', currentLevel); updateMenuLevelText(); });
@@ -300,11 +322,8 @@
         document.getElementById('btn-menu').addEventListener('click', () => { document.getElementById('game-screen').style.display = 'none'; document.getElementById('main-menu').style.display = 'flex'; updateMenuLevelText(); });
         document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
 
-        // --- НОВЫЕ КНОПКИ ТЕСТИРОВАНИЯ В ИГРЕ ---
         document.getElementById('btn-hud-prev').addEventListener('click', () => { 
-            if(currentLevel > 1) { 
-                currentLevel--; localStorage.setItem('mahjong_level', currentLevel); initGame(); 
-            }
+            if(currentLevel > 1) { currentLevel--; localStorage.setItem('mahjong_level', currentLevel); initGame(); }
         });
         document.getElementById('btn-hud-next').addEventListener('click', () => { 
             currentLevel++; localStorage.setItem('mahjong_level', currentLevel); initGame(); 
@@ -473,37 +492,36 @@
             setTimeout(() => floatEl.remove(), 1000);
         }
 
+        // --- УНИВЕРСАЛЬНЫЙ ДВОЙНОЙ САЛЮТ ДЛЯ ВСЕХ ПРЕДМЕТОВ ---
         function spawnSymbolBurst(element, symbol) {
             let rect = element.getBoundingClientRect();
             let centerX = rect.left + window.scrollX + rect.width / 2;
             let centerY = rect.top + window.scrollY + rect.height / 2;
             
-            let isStandard = standardSymbols.includes(symbol);
+            // 1. Хруст золотых осколков
+            let shardCount = 4 + Math.floor(Math.random() * 3); 
+            for (let i = 0; i < shardCount; i++) {
+                let p = document.createElement('div'); p.classList.add('gold-shard');
+                p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
+                if (Math.random() > 0.5) p.style.borderRadius = '50%';
+                if (Math.random() > 0.7) { p.style.width = '16px'; p.style.height = '6px'; }
+                let angle = Math.random() * Math.PI * 2, dist = Math.random() * 80 + 30; 
+                p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); p.style.setProperty('--rot', (Math.random() * 360) + 'deg');
+                document.body.appendChild(p); 
+                setTimeout(() => p.remove(), 600);
+            }
             
-            if (isStandard) {
-                let shardCount = 12 + Math.floor(Math.random() * 6); 
-                for (let i = 0; i < shardCount; i++) {
-                    let p = document.createElement('div'); p.classList.add('gold-shard');
-                    p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
-                    if (Math.random() > 0.5) p.style.borderRadius = '50%';
-                    if (Math.random() > 0.7) { p.style.width = '16px'; p.style.height = '6px'; }
-                    let angle = Math.random() * Math.PI * 2, dist = Math.random() * 80 + 30; 
-                    p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); p.style.setProperty('--rot', (Math.random() * 360) + 'deg');
-                    document.body.appendChild(p); 
-                    setTimeout(() => p.remove(), 600);
-                }
-            } else {
-                let particleCount = 5 + Math.floor(Math.random() * 4); 
-                for (let i = 0; i < particleCount; i++) {
-                    let p = document.createElement('div'); p.classList.add('thematic-particle');
-                    let rnd = Math.random();
-                    if (rnd < 0.6) p.innerText = symbol; else if (rnd < 0.8) p.innerText = '✨'; else p.innerText = '💨';
-                    p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
-                    let angle = Math.random() * Math.PI * 2, dist = Math.random() * 70 + 40; 
-                    p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); p.style.setProperty('--rot', (Math.random() * 180 - 90) + 'deg');
-                    document.body.appendChild(p);
-                    setTimeout(() => p.remove(), 700);
-                }
+            // 2. Смысловые частицы (сам предмет + магия/дым)
+            let particleCount = 4 + Math.floor(Math.random() * 3); 
+            for (let i = 0; i < particleCount; i++) {
+                let p = document.createElement('div'); p.classList.add('thematic-particle');
+                let rnd = Math.random();
+                if (rnd < 0.6) p.innerText = symbol; else if (rnd < 0.8) p.innerText = '✨'; else p.innerText = '💨';
+                p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
+                let angle = Math.random() * Math.PI * 2, dist = Math.random() * 70 + 40; 
+                p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); p.style.setProperty('--rot', (Math.random() * 180 - 90) + 'deg');
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 700);
             }
         }
 
