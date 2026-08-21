@@ -143,8 +143,24 @@
         .tile.blocked { filter: brightness(0.5); cursor: not-allowed; }
         .tile.selected { border-color: #f1c40f !important; box-shadow: 0 0 20px #f1c40f, 0 10px 20px rgba(0,0,0,0.9) !important; transform: translateY(-3vw) scale(1.08); z-index: 999 !important; }
         .tile.matched { opacity: 0; pointer-events: none; transform: scale(1.5); filter: brightness(2); }
-        .tile.is-hidden { color: transparent !important; text-shadow: none !important; }
-        .tile.is-hidden::after { content: '❖'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 32px; color: rgba(139, 69, 19, 0.35); text-shadow: 1px 1px 1px rgba(255,255,255,0.6), -1px -1px 1px rgba(0,0,0,0.2); }
+        
+        /* --- НОВЫЙ ДИЗАЙН ЗАКРЫТЫХ ФИШЕК (СЮРПРИЗОВ) --- */
+        .tile.is-hidden { 
+            /* Роскошный бордово-красный градиент */
+            background: linear-gradient(135deg, #800020, #4a0e17) !important; 
+            border-color: #d4af37 !important; /* Золотая окантовка */
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.6) !important;
+            color: transparent !important; text-shadow: none !important; 
+        }
+        .tile.is-hidden::after { 
+            content: attr(data-cover); /* Выводим случайный предмет-сюрприз */
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            font-size: 10vw; color: initial;
+            filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.6));
+        }
+        @media (min-width: 400px) {
+            .tile.is-hidden::after { font-size: 40px; }
+        }
 
         .flip-anim { animation: flipTileIn 0.4s ease-in-out forwards; }
         @keyframes flipTileIn { 0% { transform: translateY(-3vw) scale(1.08) rotateY(-90deg); } 100% { transform: translateY(-3vw) scale(1.08) rotateY(0deg); } }
@@ -296,6 +312,9 @@
         ];
         
         const standardSymbols = "📱💻🖥️🖨️🖱️🕹️💾💿📷📹🎥📺📻🎙️⏱️⏰⏳💡🔦🔋🔨🪓⛏️🛠️🪚🔧🪛🔩⚙️🧲🪜🧱🛡️💣🧨🧯🧭⚓🪝⚖️💎🔮🪄🧿👑💍🪙💰🪬⏳🩸🧪🧬🔭🔬🛸🚀🛰️🪐👽";
+        
+        // Массив роскошных контейнеров для скрытых фишек
+        const coverSymbols = ['📕', '🎁', '📦', '🧰', '🧳', '🎒', '🧺', '🗄️', '🚪', '🔒'];
 
         const materials = [
             { tileBg: '#f3e5ab', tileBorder: '#d2b48c', tileColor: '#3e2723', bgImg: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(139, 69, 19, 0.2)' },
@@ -434,18 +453,27 @@
                 finalLayout = prepared || fallbackLayout.map((pos, i) => ({...pos, symbol: fallbackPool[Math.floor(i/2)]}));
             }
 
+            // --- ДОБАВЛЕНИЕ КОНТЕЙНЕРОВ-СЮРПРИЗОВ НА СЛОЖНЫХ УРОВНЯХ ---
             if ((currentLevel % 10 === 7) || (currentLevel % 10 === 8)) {
                 let hideCount = (finalLayout.length >= 30) ? 6 : 4;
                 let hideIndices = Array.from({length: finalLayout.length}, (_, i) => i);
                 for (let i = hideIndices.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [hideIndices[i], hideIndices[j]] = [hideIndices[j], hideIndices[i]]; }
-                for(let i=0; i<hideCount; i++) finalLayout[hideIndices[i]].isHidden = true;
+                for(let i=0; i<hideCount; i++) {
+                    finalLayout[hideIndices[i]].isHidden = true;
+                    finalLayout[hideIndices[i]].coverSymbol = coverSymbols[Math.floor(Math.random() * coverSymbols.length)];
+                }
             }
             
             totalTilesForLevel = finalLayout.length;
             finalLayout.forEach((obj) => {
                 const el = document.createElement('div'); el.classList.add('tile'); el.innerText = obj.symbol;
                 el.style.setProperty('--x', obj.x); el.style.setProperty('--y', obj.y); el.style.setProperty('--z', obj.z); el.style.zIndex = (obj.z * 100) + obj.y;
-                if (obj.isHidden) el.classList.add('is-hidden');
+                
+                if (obj.isHidden) { 
+                    el.classList.add('is-hidden'); 
+                    el.setAttribute('data-cover', obj.coverSymbol);
+                }
+                
                 obj.el = el; el.addEventListener('click', (e) => handleTileClick(obj, e));
                 board.appendChild(el); activeTiles.push(obj);
             });
@@ -501,30 +529,28 @@
             
             let isStandard = standardSymbols.includes(symbol);
             
-            if (isStandard) {
-                let shardCount = 12 + Math.floor(Math.random() * 6); 
-                for (let i = 0; i < shardCount; i++) {
-                    let p = document.createElement('div'); p.classList.add('gold-shard');
-                    p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
-                    if (Math.random() > 0.5) p.style.borderRadius = '50%';
-                    if (Math.random() > 0.7) { p.style.width = '16px'; p.style.height = '6px'; }
-                    let angle = Math.random() * Math.PI * 2, dist = Math.random() * 80 + 30; 
-                    p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); p.style.setProperty('--rot', (Math.random() * 360) + 'deg');
-                    document.body.appendChild(p); 
-                    setTimeout(() => p.remove(), 600);
-                }
-            } else {
-                let particleCount = 5 + Math.floor(Math.random() * 4); 
-                for (let i = 0; i < particleCount; i++) {
-                    let p = document.createElement('div'); p.classList.add('thematic-particle');
-                    let rnd = Math.random();
-                    if (rnd < 0.6) p.innerText = symbol; else if (rnd < 0.8) p.innerText = '✨'; else p.innerText = '💨';
-                    p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
-                    let angle = Math.random() * Math.PI * 2, dist = Math.random() * 70 + 40; 
-                    p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); p.style.setProperty('--rot', (Math.random() * 180 - 90) + 'deg');
-                    document.body.appendChild(p);
-                    setTimeout(() => p.remove(), 700);
-                }
+            let shardCount = 4 + Math.floor(Math.random() * 3); 
+            for (let i = 0; i < shardCount; i++) {
+                let p = document.createElement('div'); p.classList.add('gold-shard');
+                p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
+                if (Math.random() > 0.5) p.style.borderRadius = '50%';
+                if (Math.random() > 0.7) { p.style.width = '16px'; p.style.height = '6px'; }
+                let angle = Math.random() * Math.PI * 2, dist = Math.random() * 80 + 30; 
+                p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); p.style.setProperty('--rot', (Math.random() * 360) + 'deg');
+                document.body.appendChild(p); 
+                setTimeout(() => p.remove(), 600);
+            }
+            
+            let particleCount = 4 + Math.floor(Math.random() * 3); 
+            for (let i = 0; i < particleCount; i++) {
+                let p = document.createElement('div'); p.classList.add('thematic-particle');
+                let rnd = Math.random();
+                if (rnd < 0.6) p.innerText = symbol; else if (rnd < 0.8) p.innerText = '✨'; else p.innerText = '💨';
+                p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
+                let angle = Math.random() * Math.PI * 2, dist = Math.random() * 70 + 40; 
+                p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); p.style.setProperty('--rot', (Math.random() * 180 - 90) + 'deg');
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 700);
             }
         }
 
@@ -532,8 +558,11 @@
             if (!t.isFree) return;
             
             if (t.isHidden) {
-                t.isHidden = false; t.el.classList.remove('is-hidden'); t.el.classList.add('flip-anim');
-                setTimeout(() => t.el.classList.remove('flip-anim'), 350);
+                t.isHidden = false; 
+                t.el.classList.remove('is-hidden'); 
+                t.el.classList.add('flip-anim');
+                setTimeout(() => t.el.classList.remove('flip-anim'), 400);
+                return; // Игрок должен кликнуть еще раз после вскрытия коробки
             }
             
             if (!firstTile) { 
@@ -580,7 +609,6 @@
             }
         }
 
-        // --- УЛУЧШЕННЫЙ МИКС: ФОРМА СОХРАНЯЕТСЯ, ФИШКИ ДЕЛАЮТ САЛЬТО ---
         function watchAdToShuffle() { 
             if (activeTiles.length === 0) return;
             const ad = document.getElementById('ad-screen'); 
@@ -594,18 +622,14 @@
                     let pairsPool = getPairsFromSymbols(currentSymbols);
                     let hiddenCount = activeTiles.filter(t => t.isHidden).length;
                     
-                    // БЕРЕМ ТЕКУЩИЕ КООРДИНАТЫ (ЧТОБЫ СОХРАНИТЬ ФОРМУ)
                     let currentLayout = activeTiles.map(t => ({x: t.x, y: t.y, z: t.z}));
                     let attemptMix = 0, preparedTiles = null;
                     
-                    // Пытаемся решить ТОЛЬКО эту форму
                     while (!preparedTiles && attemptMix < 100) {
                         attemptMix++;
                         preparedTiles = assignSymbolsSmart(currentLayout, pairsPool, Math.random);
                     }
 
-                    // Если вдруг алгоритм не справился с текущей сложной формой,
-                    // мы просто перемешиваем символы случайным образом по этим же местам
                     if (!preparedTiles) {
                         let shuffledSymbols = [...currentSymbols];
                         for (let i = shuffledSymbols.length - 1; i > 0; i--) {
@@ -619,19 +643,24 @@
                     for (let i = hideIndices.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [hideIndices[i], hideIndices[j]] = [hideIndices[j], hideIndices[i]]; }
                     let toHide = new Set(hideIndices.slice(0, hiddenCount));
 
-                    // ПРИМЕНЯЕМ СИМВОЛЫ И ДЕЛАЕМ САЛЬТО ФИШКАМ
                     activeTiles.forEach((tile, index) => {
                         let pt = preparedTiles[index]; 
                         tile.symbol = pt.symbol; 
                         tile.el.innerText = pt.symbol; 
                         tile.el.classList.remove('selected');
                         
-                        // Анимация сальто на месте, чтобы было видно, что они перемешались
                         tile.el.classList.add('flip-anim');
                         setTimeout(() => tile.el.classList.remove('flip-anim'), 400);
                         
-                        if (toHide.has(index)) { tile.isHidden = true; tile.el.classList.add('is-hidden'); } 
-                        else { tile.isHidden = false; tile.el.classList.remove('is-hidden'); }
+                        if (toHide.has(index)) { 
+                            tile.isHidden = true; 
+                            tile.el.classList.add('is-hidden'); 
+                            tile.coverSymbol = coverSymbols[Math.floor(Math.random() * coverSymbols.length)];
+                            tile.el.setAttribute('data-cover', tile.coverSymbol);
+                        } else { 
+                            tile.isHidden = false; 
+                            tile.el.classList.remove('is-hidden'); 
+                        }
                     });
 
                     firstTile = null; 
