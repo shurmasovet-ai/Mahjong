@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="color-scheme" content="light only">
-    <title>Mahjong Deluxe - Infinity</title>
+    <title>Mahjong Deluxe - Infinity 8888</title>
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -168,10 +168,7 @@
             .tile::before { border-radius: 14px 14px 30px 30px / 14px 14px 18px 18px; }
         }
 
-        .tile.blocked { 
-            filter: brightness(0.65) contrast(1.1) saturate(0.85); 
-            cursor: not-allowed; 
-        }
+        .tile.blocked { filter: brightness(0.65) contrast(1.1) saturate(0.85); cursor: not-allowed; }
         .tile.blocked::before { opacity: 0.2; }
 
         .tile.selected { 
@@ -291,9 +288,7 @@
         </div>
         
         <div id="progress-container"><div id="progress-bar"></div></div>
-        
         <div id="message"></div>
-        
         <div id="game-board"></div>
     </div>
 
@@ -303,17 +298,12 @@
     </div>
 
     <script>
-        // --- ПРОФЕССИОНАЛЬНАЯ АУДИОСИСТЕМА (СИНТЕЗ ЗВУКА) ---
+        // --- АУДИОСИСТЕМА ---
         const AudioSys = {
-            ctx: null,
-            enabled: true,
+            ctx: null, enabled: true,
             init: function() {
-                if (!this.ctx) {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
+                if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                if (this.ctx.state === 'suspended') this.ctx.resume();
             },
             playOsc: function(type, freq, dropFreq, duration, vol) {
                 if (!this.enabled || !this.ctx) return;
@@ -321,43 +311,31 @@
                 const gain = this.ctx.createGain();
                 osc.type = type;
                 osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-                if (dropFreq) {
-                    osc.frequency.exponentialRampToValueAtTime(dropFreq, this.ctx.currentTime + duration);
-                }
+                if (dropFreq) osc.frequency.exponentialRampToValueAtTime(dropFreq, this.ctx.currentTime + duration);
                 gain.gain.setValueAtTime(vol, this.ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + duration);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + duration);
             },
             playClick: function(isSelected) {
-                // Плотный тактильный стук дерева/кости
-                let startFreq = isSelected ? 600 : 400;
-                let endFreq = isSelected ? 100 : 80;
+                let startFreq = isSelected ? 600 : 400; let endFreq = isSelected ? 100 : 80;
                 this.playOsc('sine', startFreq, endFreq, 0.05, 0.5);
                 this.playOsc('triangle', startFreq * 1.5, endFreq, 0.05, 0.3);
             },
             playUnlock: function() {
-                // Металлический лязг открытия замка
                 this.playOsc('square', 800, 200, 0.1, 0.2);
                 setTimeout(() => this.playOsc('square', 1200, 300, 0.15, 0.2), 50);
             },
             playMatch: function(comboCount) {
-                // Музыкальный колокольчик, растущий по пентатонике
-                let baseFreq = 392; // G4
-                // Пентатоника: G, A, B, D, E
+                let baseFreq = 392; 
                 let pentatonicSteps = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24]; 
                 let stepIndex = Math.min(comboCount - 1, pentatonicSteps.length - 1);
-                let noteOffset = pentatonicSteps[stepIndex];
-                let freq = baseFreq * Math.pow(1.059463, noteOffset);
-                
+                let freq = baseFreq * Math.pow(1.059463, pentatonicSteps[stepIndex]);
                 this.playOsc('sine', freq, freq * 0.9, 0.6, 0.4);
-                this.playOsc('triangle', freq * 2, freq * 1.8, 0.4, 0.15); // Обертон
+                this.playOsc('triangle', freq * 2, freq * 1.8, 0.4, 0.15); 
             },
             playWin: function() {
-                // Торжественный мажорный аккорд
-                let freqs = [392, 493.88, 587.33, 783.99]; // G, B, D, G
+                let freqs = [392, 493.88, 587.33, 783.99]; 
                 freqs.forEach((f, i) => {
                     setTimeout(() => {
                         this.playOsc('sine', f, f * 0.95, 1.0, 0.3);
@@ -366,12 +344,8 @@
                 });
             },
             playShuffle: function() {
-                // Звук пересыпающихся фишек
                 for(let i = 0; i < 15; i++) {
-                    setTimeout(() => {
-                        let f = 300 + Math.random() * 400;
-                        this.playOsc('sine', f, f/2, 0.04, 0.2);
-                    }, Math.random() * 400);
+                    setTimeout(() => { let f = 300 + Math.random() * 400; this.playOsc('sine', f, f/2, 0.04, 0.2); }, Math.random() * 400);
                 }
             },
             toggle: function() {
@@ -402,47 +376,71 @@
             let savedScore = localStorage.getItem('mahjong_score'); if (savedScore) totalScore = parseInt(savedScore);
         } catch(e){}
         
+        // --- 60 ПРЕМИАЛЬНЫХ НАБОРОВ (1200 ПРЕДМЕТОВ) - МАКСИМАЛЬНЫЙ ЛИМИТ ---
         const themeSets = [
-            ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'], 
-            ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'], 
-            ['📱','💻','🖥️','🖨️','🖱️','🕹️','💾','💿','📷','📹','🎥','📺','📻','🎙️','⏱️','⏰','⏳','💡','🔦','🔋'], 
-            ['🦁','🐯','🦒','🦊','🐻','🐼','🐨','🐰','🐷','🦝','🐗','🦓','🦌','🐘','🦏','🦛','🐭','🐹','🐿️','🦔'], 
-            ['🚗','🚕','🚙','🚌','🏎️','🚓','🚑','🚒','🚐','🛻','🚚','🚛','🚜','🏍️','🛵','🦽','🛺','🚲','🛴','🛹'], 
-            ['⚽','🏀','🏈','⚾','🎾','🏐','🎱','🏓','🏸','🏒','⛳','🪁','🏹','🎣','🤿','🥊','🥋','🛹','🛼','⛸️'], 
-            ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥒'], 
-            ['🌲','🌳','🌴','🌵','🌾','🌿','🍀','🍁','🍂','🍃','🌷','🌹','🌻','🌼','🌸','🌺','🪴','🍄','🪷','💐'], 
-            ['🔨','🪓','⛏️','🛠️','🪚','🔧','🪛','🔩','⚙️','🧲','🪜','🧱','🛡️','💣','🧨','🧯','🧭','⚓','🪝','⚖️'], 
-            ['💎','🔮','🪄','🧿','👑','💍','🪙','💰','🪬','⏳','🩸','🧪','🧬','🔭','🔬','🛸','🚀','🛰️','🪐','👽'], 
-            ['🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🦭','🐊','🐸','🐢','🦦','🦪','🐚','🪸'], 
-            ['🦅','🦆','🦉','🦇','🐝','🐛','🦋','🐌','🐞','🐜','🪲','🪳','🕷️','🕸️','🦂','🦟','🪰','🪱','🦜','🦚'], 
-            ['👕','👖','👔','👗','👙','👘','💄','💋','🧦','🥾','👟','👞','👢','👠','🩴','🎒','🧳','👓','🕶️','🧣'], 
-            ['🎸','🎹','🎷','🎺','🎻','🪕','🥁','🪘','🪗','🎧','🎤','🎙️','📻','🎚️','🎛️','🔈','💿','📼','🎼','🎵'], 
-            ['🚪','🛏️','🛋️','🪑','🚽','🚿','🛁','🪒','🧴','🧹','🧺','🧻','🧼','🧽','🛒','🪞','🪟','🖼️','🧸','🗑️'], 
-            ['🌍','🌞','🌝','🌛','✨','⚡','🔥','🌪️','🌈','☁️','🌤️','⛅','🌥️','🌦️','🌧️','🌨️','🌩️','☔','☂️','❄️'], 
-            ['✏️','✒️','🖋️','🖊️','🖌️','🖍️','📝','💼','📁','📂','🗂️','📅','📆','🗒️','🗓️','📇','📈','📉','📊','📋'], 
-            ['📕','📖','📗','📘','📙','📚','📓','📒','📃','📜','📄','📰','🗞️','🔖','🏷️','✉️','📧','📨','📩','📤'], 
-            ['📥','📦','📫','📪','📬','📭','📮','🗳️','📌','📍','📎','🖇️','📏','📐','✂️','🗑️','🔒','🔓','🔏','🔐'], 
-            ['🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨','🏪','🏫','🏩','💒','🏛️','⛪','🕌'], 
-            ['🕍','🛕','🕋','⛩️','🛤️','🛣️','🗾','🎑','🏞️','🌅','🌄','🌠','🎇','🎆','🌇','🌆','🏙️','🌃','🌌','🌉'], 
-            ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','☺️','😚'], 
-            ['😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄'], 
-            ['😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳'], 
-            ['👈','👉','☝️','👆','🖕','👇','✌️','🤞','🖖','🤘','🤙','🖐️','✋','👌','👍','👎','✊','👊','🤛','🤜'], 
-            ['🧗','🤺','🏇','⛷️','🏂','🏌️','🏄','🚣','🏊','🤽','🧜','🧚','🧞','🦸','🦹','🧝','🧙','🧟','🧛','👼'], 
-            ['🐮','🐂','🐃','🐄','🐖','🐏','🐑','🐐','🐪','🐫','🦙','🦘','🐎','🐴','🐔','🐓','🐣','🐤','🐥','🐦'], 
-            ['🐧','🦅','🦆','🦢','🦉','🦤','🪶','🦩','🦚','🦜','🐸','🐊','🐢','🦎','🐍','🐲','🐉','🦕','🐳','🐋'], 
-            ['🔪','🥄','🍴','🍽️','🥣','🥡','🥢','🍶','🥂','🍻','🍺','🍹','🍷','🥃','🍸','🧉','🍾','🧊','🥤','🧋'], 
-            ['💈','✂️','🗑️','🛢️','🧴','🧷','🧹','🧺','🧻','🧼','🧽','🚿','🛁','🛀','🪥','🪒','🧴','🧻','🧽','🧼'], 
-            ['🎨','🧵','🪡','🧶','🪢','🛍️','🎒','🩴','👓','🕶️','🧣','🧤','🧥','🧦','👗','👘','🥻','🩱','🩲','🩳'], 
-            ['🎮','🕹️','🎰','🎲','🧩','🧸','🪀','🪅','🪄','🔮','🧿','🪩','🪆','🪁','🎯','🎳','🥏','🏑','🥍','🏏'], 
-            ['🌵','🎄','🌲','🌳','🌴','🪵','🌱','🌿','☘️','🍀','🎍','🪴','🎋','🍃','🍂','🍁','🍄','🌾','💐','🌷'], 
-            ['💉','🩸','💊','🩹','🩺','🩻','🧪','🧫','🧬','🔬','🔭','📡','🌡️','🧹','🗑️','⚖️','🛡️','🗡️','⚔️','💣'], 
-            ['🚂','🚃','🚄','🚅','🚆','🚇','🚈','🚉','🚊','🚝','🚞','🚋','🚌','🚍','🚎','🚐','🚑','🚒','🚓','🚔'], 
-            ['🕰️','🧱','🪨','🪵','🛖','🏕️','⛺','🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨'], 
-            ['🍉','🍊','🍋','🍌','🍍','🥭','🍎','🍏','🍐','🍑','🍒','🍓','🫐','🥝','🍅','🫒','🥥','🥑','🍆','🥔']  
+            ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'],
+            ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'],
+            ['📱','💻','🖥️','🖨️','🖱️','🕹️','💾','💿','📷','📹','🎥','📺','📻','🎙️','⏱️','⏰','⏳','💡','🔦','🔋'],
+            ['🦁','🐯','🦒','🦊','🐻','🐼','🐨','🐰','🐷','🦝','🐗','🦓','🦌','🐘','🦏','🦛','🐭','🐹','🐿️','🦔'],
+            ['🚗','🚕','🚙','🚌','🏎️','🚓','🚑','🚒','🚐','🛻','🚚','🚛','🚜','🏍️','🛵','🦽','🛺','🚲','🛴','🛹'],
+            ['⚽','🏀','🏈','⚾','🎾','🏐','🎱','🏓','🏸','🏒','⛳','🪁','🏹','🎣','🤿','🥊','🥋','🛹','🛼','⛸️'],
+            ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥒'],
+            ['🌲','🌳','🌴','🌵','🌾','🌿','🍀','🍁','🍂','🍃','🌷','🌹','🌻','🌼','🌸','🌺','🪴','🍄','🪷','💐'],
+            ['🔨','🪓','⛏️','🛠️','🪚','🔧','🪛','🔩','⚙️','🧲','🪜','🧱','🛡️','💣','🧨','🧯','🧭','⚓','🪝','⚖️'],
+            ['💎','🔮','🪄','🧿','👑','💍','🪙','💰','🪬','⏳','🩸','🧪','🧬','🔭','🔬','🛸','🚀','🛰️','🪐','👽'],
+            ['🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🦭','🐊','🐸','🐢','🦦','🦪','🐚','🪸'],
+            ['🦅','🦆','🦉','🦇','🐝','🐛','🦋','🐌','🐞','🐜','🪲','🪳','🕷️','🕸️','🦂','🦟','🪰','🪱','🦜','🦚'],
+            ['👕','👖','👔','👗','👙','👘','💄','💋','🧦','🥾','👟','👞','👢','👠','🩴','🎒','🧳','👓','🕶️','🧣'],
+            ['🎸','🎹','🎷','🎺','🎻','🪕','🥁','🪘','🪗','🎧','🎤','🎙️','📻','🎚️','🎛️','🔈','💿','📼','🎼','🎵'],
+            ['🚪','🛏️','🛋️','🪑','🚽','🚿','🛁','🪒','🧴','🧹','🧺','🧻','🧼','🧽','🛒','🪞','🪟','🖼️','🧸','🗑️'],
+            ['🌍','🌞','🌝','🌛','✨','⚡','🔥','🌪️','🌈','☁️','🌤️','⛅','🌥️','🌦️','🌧️','🌨️','🌩️','☔','☂️','❄️'],
+            ['✏️','✒️','🖋️','🖊️','🖌️','🖍️','📝','💼','📁','📂','🗂️','📅','📆','🗒️','🗓️','📇','📈','📉','📊','📋'],
+            ['📕','📖','📗','📘','📙','📚','📓','📒','📃','📜','📄','📰','🗞️','🔖','🏷️','✉️','📧','📨','📩','📤'],
+            ['📥','📦','📫','📪','📬','📭','📮','🗳️','📌','📍','📎','🖇️','📏','📐','✂️','🗑️','🔒','🔓','🔏','🔐'],
+            ['🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨','🏪','🏫','🏩','💒','🏛️','⛪','🕌'],
+            ['🕍','🛕','🕋','⛩️','🛤️','🛣️','🗾','🎑','🏞️','🌅','🌄','🌠','🎇','🎆','🌇','🌆','🏙️','🌃','🌌','🌉'],
+            ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','☺️','😚'],
+            ['😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄'],
+            ['😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳'],
+            ['👈','👉','☝️','👆','🖕','👇','✌️','🤞','🖖','🤘','🤙','🖐️','✋','👌','👍','👎','✊','👊','🤛','🤜'],
+            ['🧗','🤺','🏇','⛷️','🏂','🏌️','🏄','🚣','🏊','🤽','🧜','🧚','🧞','🦸','🦹','🧝','🧙','🧟','🧛','👼'],
+            ['🐮','🐂','🐃','🐄','🐖','🐏','🐑','🐐','🐪','🐫','🦙','🦘','🐎','🐴','🐔','🐓','🐣','🐤','🐥','🐦'],
+            ['🐧','🦅','🦆','🦢','🦉','🦤','🪶','🦩','🦚','🦜','🐸','🐊','🐢','🦎','🐍','🐲','🐉','🦕','🐳','🐋'],
+            ['🔪','🥄','🍴','🍽️','🥣','🥡','🥢','🍶','🥂','🍻','🍺','🍹','🍷','🥃','🍸','🧉','🍾','🧊','🥤','🧋'],
+            ['💈','✂️','🗑️','🛢️','🧴','🧷','🧹','🧺','🧻','🧼','🧽','🚿','🛁','🛀','🪥','🪒','🧴','🧻','🧽','🧼'],
+            ['🎨','🧵','🪡','🧶','🪢','🛍️','🎒','🩴','👓','🕶️','🧣','🧤','🧥','🧦','👗','👘','🥻','🩱','🩲','🩳'],
+            ['🎮','🕹️','🎰','🎲','🧩','🧸','🪀','🪅','🪄','🔮','🧿','🪩','🪆','🪁','🎯','🎳','🥏','🏑','🥍','🏏'],
+            ['🌵','🎄','🌲','🌳','🌴','🪵','🌱','🌿','☘️','🍀','🎍','🪴','🎋','🍃','🍂','🍁','🍄','🌾','💐','🌷'],
+            ['💉','🩸','💊','🩹','🩺','🩻','🧪','🧫','🧬','🔬','🔭','📡','🌡️','🧹','🗑️','⚖️','🛡️','🗡️','⚔️','💣'],
+            ['🚂','🚃','🚄','🚅','🚆','🚇','🚈','🚉','🚊','🚝','🚞','🚋','🚌','🚍','🚎','🚐','🚑','🚒','🚓','🚔'],
+            ['🕰️','🧱','🪨','🪵','🛖','🏕️','⛺','🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨'],
+            ['🍉','🍊','🍋','🍌','🍍','🥭','🍎','🍏','🍐','🍑','🍒','🍓','🫐','🥝','🍅','🫒','🥥','🥑','🍆','🥔'],
+            ['✈️','🛫','🛬','🛩️','🚁','🛸','🛶','⛵','🚤','🛥️','🛳️','⛴️','🚢','⚓','🚀','🚟','🚠','🚡','🚜','🛶'],
+            ['😺','😸','😹','😻','😼','😽','🙀','😿','😾','🙈','🙉','🙊','🐵','🐒','🦍','🦧','🐶','🐕','🐩','🐺'],
+            ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝','💟','💌'],
+            ['🔈','🔉','🔊','🔇','📢','📣','📯','🔔','🔕','🎙️','🎚️','🎛️','🎤','🎧','📻','🎷','🪗','🎸','🎹','🎺'],
+            ['👮','🕵️','💂','🥷','👷','🤴','👸','👳','👲','🧕','🤵','👰','🧑‍🚀','🎅','🤶','🦸','🦹','🧙','🧚','🧛'],
+            ['🥋','🎽','🎣','🤿','🥌','🎯','🪀','🪁','🎱','🔮','🧿','🎮','🕹️','🎰','🎲','🧩','🧸','🪅','🪆','🖼️'],
+            ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓','⛎','🌌','☄️','🪐','🌞','🌝','🌛','🌜'],
+            ['☢️','☣️','⚠️','🚸','♻️','⚜️','🔱','📛','🔰','⭕','✅','☑️','✔️','❌','❎','〽️','❇️','✳️','💠','🌀'],
+            ['🔴','🟠','🟡','🟢','🔵','🟣','🟤','⚫','⚪','🟥','🟧','🟨','🟩','🟦','🟪','🟫','⬛','⬜','🔶','🔷'],
+            ['🛍️','🛒','🎁','🎈','🎏','🎀','🎊','🎉','🎎','🏮','🎐','🧧','✉️','📩','📨','📧','💌','📥','📤','📦'],
+            ['🍦','🍧','🍨','🍩','🍪','🎂','🍰','🧁','🥧','🍫','🍬','🍭','🍮','🍯','🍼','🥛','☕','🫖','🍵','🍶'],
+            ['🥢','🍽️','🍴','🥄','🔪','🏺','🍷','🍸','🍹','🍺','🍻','🥂','🥃','🥤','🧋','🧃','🧉','🧊','🧂','🥫'],
+            ['👀','👁️','👅','👄','🧠','🫀','🫁','🦷','🦴','🦵','🦶','👂','🦻','👃','👣','🦾','🦿','🤞','🖖','🤟'],
+            ['🔫','🏹','🗡️','⚔️','💣','🧨','🪓','🔪','🩸','🚬','⚰️','🪦','⚱️','🗿','🔮','📿','🧿','💈','🧲','🧬'],
+            ['🌋','🗻','⛰️','🏔️','🏕️','🏖️','🏜️','🏝️','🏞️','🏟️','🏗️','🧱','🪨','🪵','🛖','🏘️','🏚️','🏠','🏡','🏢'],
+            ['👑','👒','🎩','🎓','🧢','🪖','⛑️','🎒','🧳','💼','👜','👛','👝','👞','👟','🥾','🥿','👠','👡','🩰'],
+            ['⌚','📱','📲','💻','⌨️','🖥️','🖨️','🖱️','🖲️','🕹️','🗜️','💽','💾','💿','📀','📼','📷','📸','📹','🎥'],
+            ['📽️','🎞️','📞','☎️','📟','📠','📺','📻','🎙️','🎚️','🎛️','🧭','⏱️','⏲️','⏰','🕰️','⏳','⌛','📡','🔋'],
+            ['🦇','🦋','🐛','🐜','🐝','🪲','🐞','🦗','🪳','🕷️','🕸️','🦂','🦟','🪰','🪱','🦠','🐾','🐉','🐲','🌵'],
+            ['🗽','🗼','🏰','🏯','🏟️','🎡','🎢','🎠','⛲','⛱️','🏖️','🏝️','🏜️','🌋','⛰️','🏔️','🗻','🏕️','⛺','🛖'],
+            ['🧯','🛒','🦽','🦼','🛴','🚲','🛵','🏍️','🛺','🚔','🚍','🚘','🚖','🚠','🚡','🚀','🛸','🛰️','🚁','🛶'],
+            ['🪴','🌲','🌳','🌴','🪵','🌵','🌱','🌿','☘️','🍀','🎍','🎋','🍃','🍂','🍁','🍄','🌾','💐','🌷','🌹'],
+            ['😢','😭','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','😈','👿','💀','☠️','💩','🤡']
         ];
         
-        const standardSymbols = "📱💻🖥️🖨️🖱️🕹️💾💿📷📹🎥📺📻🎙️⏱️⏰⏳💡🔦🔋🔨🪓⛏️🛠️🪚🔧🪛🔩⚙️🧲🪜🧱🛡️💣🧨🧯🧭⚓🪝⚖️💎🔮🪄🧿👑💍🪙💰🪬⏳🩸🧪🧬🔭🔬🛸🚀🛰️🪐👽";
+        const standardSymbols = "📱💻🖥️🖨️🖱️🕹️💾💿📷📹🎥📺📻🎙️⏱️⏰⏳💡🔦🔋🔨🪓⛏️🛠️🪚🔧🪛🔩⚙️🧲🪜🧱🛡️💣🧨🧯🧭⚓🪝⚖️💎🔮🪄🧿👑💍🪙💰🪬⏳🩸🧪🧬🔭🔬🛸🚀🛰️🪐👽✈️🚁🛸🛶⛵🚤🛥️🛳️⛴️🚢⚓🚀🚟🚠🚡🚜🔈🔉🔊🔇📢📣📯🔔🔕🎙️🎚️🎛️🎤🎧📻🎷🪗🎸🎹🎺⌚📱📲💻⌨️🖥️🖨️🖱️🖲️🕹️🗜️💽💾💿📀📼📷📸📹🎥📽️🎞️📞☎️📟📠📺📻🎙️🎚️🎛️🧭⏱️⏲️⏰🕰️⏳⌛📡🔋";
         const coverSymbols = ['🔒', '🔐'];
 
         const materials = [
@@ -472,7 +470,7 @@
         updateMenuLevelText(); updateScoreDisplay();
         
         document.getElementById('btn-play').addEventListener('click', () => { 
-            AudioSys.init(); // Инициализация аудио по клику пользователя
+            AudioSys.init(); 
             document.getElementById('main-menu').style.display = 'none'; 
             document.getElementById('game-screen').style.display = 'flex'; 
             initGame(); 
@@ -520,10 +518,17 @@
             else if (cyclePos >= 6 && cyclePos <= 8) return { text: "🟠 Сложно", color: "#e67e22", maxLayers: 4, density: 0.8 };
             else return { text: "🔴 ЭКСПЕРТ", color: "#e74c3c", maxLayers: 5, density: 0.95 };
         }
+        
+        // Математически строгий и детерминированный выбор символов для уровня (Никакого Math.random)
         function getSymbolsForLevel(level) {
-            let t1 = Math.floor(Math.random() * themeSets.length), t2 = Math.floor(Math.random() * themeSets.length), t3 = Math.floor(Math.random() * themeSets.length);
+            let s = level * 12345;
+            function localRnd() { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }
+            let t1 = Math.floor(localRnd() * themeSets.length);
+            let t2 = Math.floor(localRnd() * themeSets.length);
+            let t3 = Math.floor(localRnd() * themeSets.length);
             return [...themeSets[t1].slice(0, 7), ...themeSets[t2].slice(7, 14), ...themeSets[t3].slice(14, 20)];
         }
+        
         function getPairsFromSymbols(symbolsArray) {
             let counts = {}; symbolsArray.forEach(s => counts[s] = (counts[s] || 0) + 1);
             let pairsPool = []; for (let s in counts) { for(let i=0; i < Math.floor(counts[s] / 2); i++) pairsPool.push(s); }
@@ -571,12 +576,15 @@
             applyMaterial(currentLevel); 
             
             let baseSymbols = getSymbolsForLevel(currentLevel);
+            
+            // СТРОГАЯ ДЕТЕРМИНИРОВАННАЯ ГЕНЕРАЦИЯ (Без единого Math.random)
             let seed = currentLevel * 13371337, attempt = 0, finalLayout = null;
+            function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
 
             let shapeIndex = (currentLevel - 1) % 8; 
             
             while (!finalLayout && attempt < 500) {
-                attempt++; function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
+                attempt++; 
                 let layout = [], grid = {}, maxCols = 8, maxRows = 8;
                 for (let z = 0; z < diff.maxLayers; z++) {
                     let offset = (z % 2 === 0) ? 0 : 1, shrink = Math.floor(z / 2) * 2 + offset; 
@@ -624,20 +632,24 @@
                 
                 let fallbackPool = [];
                 for(let i = 0; i < maxTiles / 2; i++) {
-                    fallbackPool.push(baseSymbols[Math.floor(Math.random() * baseSymbols.length)]);
+                    fallbackPool.push(baseSymbols[Math.floor(rnd() * baseSymbols.length)]);
                 }
                 
-                let prepared = assignSymbolsSmart(fallbackLayout, fallbackPool, Math.random);
+                let prepared = assignSymbolsSmart(fallbackLayout, fallbackPool, rnd);
                 finalLayout = prepared || fallbackLayout.map((pos, i) => ({...pos, symbol: fallbackPool[Math.floor(i/2)]}));
             }
 
             if ((currentLevel % 10 === 7) || (currentLevel % 10 === 8)) {
                 let hideCount = (finalLayout.length >= 30) ? 6 : 4;
                 let hideIndices = Array.from({length: finalLayout.length}, (_, i) => i);
-                for (let i = hideIndices.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [hideIndices[i], hideIndices[j]] = [hideIndices[j], hideIndices[i]]; }
+                // Идеально строгий шаффл через rnd()
+                for (let i = hideIndices.length - 1; i > 0; i--) { 
+                    const j = Math.floor(rnd() * (i + 1)); 
+                    [hideIndices[i], hideIndices[j]] = [hideIndices[j], hideIndices[i]]; 
+                }
                 for(let i=0; i<hideCount; i++) {
                     finalLayout[hideIndices[i]].isHidden = true;
-                    finalLayout[hideIndices[i]].coverSymbol = coverSymbols[Math.floor(Math.random() * coverSymbols.length)];
+                    finalLayout[hideIndices[i]].coverSymbol = coverSymbols[Math.floor(rnd() * coverSymbols.length)];
                 }
             }
             
@@ -735,7 +747,7 @@
             if (!t.isFree) return;
             
             if (t.isHidden) {
-                AudioSys.playUnlock(); // Звук открытия замка
+                AudioSys.playUnlock(); 
                 t.isHidden = false; 
                 t.el.classList.remove('is-hidden'); 
                 t.el.classList.add('flip-anim');
@@ -744,7 +756,7 @@
             }
             
             if (!firstTile) { 
-                AudioSys.playClick(true); // Звук выделения
+                AudioSys.playClick(true); 
                 t.el.classList.add('selected'); firstTile = t; 
             } else if (firstTile !== t) { 
                 t.el.classList.add('selected'); 
@@ -754,7 +766,7 @@
                     if (now - lastMatchTime < COMBO_TIME_LIMIT) comboCount++; else comboCount = 1;
                     lastMatchTime = now;
                     
-                    AudioSys.playMatch(comboCount); // Звук комбо
+                    AudioSys.playMatch(comboCount); 
                     
                     let earnedPoints = 10 * comboCount; totalScore += earnedPoints;
                     localStorage.setItem('mahjong_score', totalScore); updateScoreDisplay();
@@ -769,18 +781,18 @@
                     updateFreeState(); updateProgressBar();
                     
                     if (activeTiles.length === 0) {
-                        AudioSys.playWin(); // Звук победы
+                        AudioSys.playWin(); 
                         currentLevel++; localStorage.setItem('mahjong_level', currentLevel);
                         document.getElementById('message').innerHTML = '🎉 УРОВЕНЬ ПРОЙДЕН!'; document.getElementById('message').style.color = '#f1c40f';
                         shootConfetti(); setTimeout(() => { initGame(); }, 2500); 
                     }
                 } else { 
-                    AudioSys.playClick(false); // Звук ошибки/отмены
+                    AudioSys.playClick(false); 
                     let t1 = firstTile, t2 = t; firstTile = null;
                     setTimeout(() => { t1.el.classList.remove('selected'); t2.el.classList.remove('selected'); }, 300); 
                 } 
             } else { 
-                AudioSys.playClick(false); // Звук отмены
+                AudioSys.playClick(false); 
                 t.el.classList.remove('selected'); firstTile = null; 
             }
         }
@@ -804,7 +816,7 @@
                 if(ad) ad.style.display = 'none'; 
                 
                 try {
-                    AudioSys.playShuffle(); // Звук перемешивания
+                    AudioSys.playShuffle(); 
                     
                     let currentSymbols = activeTiles.map(t => t.symbol); 
                     let pairsPool = getPairsFromSymbols(currentSymbols);
