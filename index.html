@@ -115,6 +115,9 @@
         
         .btn-mix { background-color: #e67e22; box-shadow: 0 4px 0 #d35400, 0 5px 10px rgba(0,0,0,0.5); }
         .btn-mix:active { box-shadow: 0 0 0 #d35400; }
+        
+        .btn-sound { background-color: #9b59b6; box-shadow: 0 4px 0 #8e44ad, 0 5px 10px rgba(0,0,0,0.5); font-size: 16px; padding: 6px 10px;}
+        .btn-sound:active { box-shadow: 0 0 0 #8e44ad; }
 
         @keyframes pulseBtnTop { 
             0% { transform: scale(1); box-shadow: 0 4px 0 #d35400, 0 0 0 0 rgba(231, 76, 60, 0.7); } 
@@ -125,7 +128,6 @@
 
         #game-board { width: 90vw; height: 112.5vw; max-width: 400px; max-height: 500px; position: relative; perspective: 1000px; }
         
-        /* --- ИДЕАЛЬНО ОТПОЛИРОВАННАЯ ФИШКА --- */
         .tile {
             position: absolute; width: 20%; height: 20%;
             left: calc(var(--x) * 10%); top: calc(var(--y) * 10%); margin-top: calc(var(--z) * -3.5vw); margin-left: calc(var(--z) * -2vw);
@@ -134,27 +136,24 @@
             color: var(--tileColor); 
             font-size: 14vw; line-height: 1; 
             
-            /* Эффект чеканки/гравировки: светлая тень снизу, темная тень сверху-внутри */
             text-shadow: 1px 2px 2px rgba(255,255,255,0.9), -1px -2px 4px rgba(0,0,0,0.4); 
             font-family: 'Noto Color Emoji', sans-serif;
             display: flex; justify-content: center; align-items: center; 
             border-radius: 14px; 
             
-            /* Глубокая фаска и реалистичные боковые грани */
             box-shadow: 
-                inset 3px 3px 6px rgba(255, 255, 255, 1), /* Мощный свет слева сверху */
-                inset -4px -5px 8px rgba(0, 0, 0, 0.18), /* Глубокая тень справа снизу */
-                calc(0.5vw + var(--z) * 0.1vw) calc(0.9vw + var(--z) * 0.2vw) 0px var(--tileSide), /* Физическая толщина */
-                calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(3vw + var(--z) * 0.8vw) rgba(0,0,0,0.65); /* Падающая тень */
+                inset 3px 3px 6px rgba(255, 255, 255, 1), 
+                inset -4px -5px 8px rgba(0, 0, 0, 0.18), 
+                calc(0.5vw + var(--z) * 0.1vw) calc(0.9vw + var(--z) * 0.2vw) 0px var(--tileSide), 
+                calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(3vw + var(--z) * 0.8vw) rgba(0,0,0,0.65); 
             
-            border: 1px solid rgba(255,255,255,0.4); /* Легкий контур для резкости краев */
+            border: 1px solid rgba(255,255,255,0.4); 
 
             backdrop-filter: blur(4px); touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
             transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s, box-shadow 0.2s, top 0.5s ease-in-out, left 0.5s ease-in-out, margin-top 0.5s ease-in-out, margin-left 0.5s ease-in-out; 
             cursor: pointer; transform-style: preserve-3d;
         }
 
-        /* Улучшенный мягкий полированный блик сверху */
         .tile::before {
             content: '';
             position: absolute;
@@ -175,7 +174,6 @@
         }
         .tile.blocked::before { opacity: 0.2; }
 
-        /* Идеальное свечение при выборе */
         .tile.selected { 
             border-color: #fff !important; 
             box-shadow: 
@@ -189,7 +187,6 @@
         }
         .tile.matched { opacity: 0; pointer-events: none; transform: scale(1.6); filter: brightness(2.5); }
         
-        /* РОСКОШНЫЕ ЗАКРЫТЫЕ ФИШКИ (ЗАМКИ) */
         .tile.is-hidden { 
             background: radial-gradient(circle at 30% 30%, #c41e3a 0%, #800020 50%, #4a0e17 100%) !important; 
             border-top: 1px solid #ff7a91 !important;
@@ -277,7 +274,10 @@
 
     <div id="game-screen">
         <div id="top-bar">
-            <button id="btn-menu" class="btn-small-top">🏠 Меню</button>
+            <div>
+                <button id="btn-menu" class="btn-small-top">🏠 Меню</button>
+                <button id="btn-sound" class="btn-small-top btn-sound">🔊</button>
+            </div>
             <div class="hud-center">
                 <div class="level-switcher">
                     <button id="btn-hud-prev" class="btn-hud-arrow">◀</button>
@@ -303,6 +303,84 @@
     </div>
 
     <script>
+        // --- ПРОФЕССИОНАЛЬНАЯ АУДИОСИСТЕМА (СИНТЕЗ ЗВУКА) ---
+        const AudioSys = {
+            ctx: null,
+            enabled: true,
+            init: function() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            },
+            playOsc: function(type, freq, dropFreq, duration, vol) {
+                if (!this.enabled || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                if (dropFreq) {
+                    osc.frequency.exponentialRampToValueAtTime(dropFreq, this.ctx.currentTime + duration);
+                }
+                gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + duration);
+            },
+            playClick: function(isSelected) {
+                // Плотный тактильный стук дерева/кости
+                let startFreq = isSelected ? 600 : 400;
+                let endFreq = isSelected ? 100 : 80;
+                this.playOsc('sine', startFreq, endFreq, 0.05, 0.5);
+                this.playOsc('triangle', startFreq * 1.5, endFreq, 0.05, 0.3);
+            },
+            playUnlock: function() {
+                // Металлический лязг открытия замка
+                this.playOsc('square', 800, 200, 0.1, 0.2);
+                setTimeout(() => this.playOsc('square', 1200, 300, 0.15, 0.2), 50);
+            },
+            playMatch: function(comboCount) {
+                // Музыкальный колокольчик, растущий по пентатонике
+                let baseFreq = 392; // G4
+                // Пентатоника: G, A, B, D, E
+                let pentatonicSteps = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24]; 
+                let stepIndex = Math.min(comboCount - 1, pentatonicSteps.length - 1);
+                let noteOffset = pentatonicSteps[stepIndex];
+                let freq = baseFreq * Math.pow(1.059463, noteOffset);
+                
+                this.playOsc('sine', freq, freq * 0.9, 0.6, 0.4);
+                this.playOsc('triangle', freq * 2, freq * 1.8, 0.4, 0.15); // Обертон
+            },
+            playWin: function() {
+                // Торжественный мажорный аккорд
+                let freqs = [392, 493.88, 587.33, 783.99]; // G, B, D, G
+                freqs.forEach((f, i) => {
+                    setTimeout(() => {
+                        this.playOsc('sine', f, f * 0.95, 1.0, 0.3);
+                        this.playOsc('triangle', f * 2, f * 1.9, 0.8, 0.1);
+                    }, i * 100);
+                });
+            },
+            playShuffle: function() {
+                // Звук пересыпающихся фишек
+                for(let i = 0; i < 15; i++) {
+                    setTimeout(() => {
+                        let f = 300 + Math.random() * 400;
+                        this.playOsc('sine', f, f/2, 0.04, 0.2);
+                    }, Math.random() * 400);
+                }
+            },
+            toggle: function() {
+                this.enabled = !this.enabled;
+                const btn = document.getElementById('btn-sound');
+                if (btn) btn.innerText = this.enabled ? '🔊' : '🔇';
+            }
+        };
+
         function createParticles() {
             const container = document.getElementById('particles-container');
             container.innerHTML = '';
@@ -367,22 +445,18 @@
         const standardSymbols = "📱💻🖥️🖨️🖱️🕹️💾💿📷📹🎥📺📻🎙️⏱️⏰⏳💡🔦🔋🔨🪓⛏️🛠️🪚🔧🪛🔩⚙️🧲🪜🧱🛡️💣🧨🧯🧭⚓🪝⚖️💎🔮🪄🧿👑💍🪙💰🪬⏳🩸🧪🧬🔭🔬🛸🚀🛰️🪐👽";
         const coverSymbols = ['🔒', '🔐'];
 
-        // --- УЛЬТРА-РЕАЛИСТИЧНЫЕ МАТЕРИАЛЫ С РАДИАЛЬНЫМ ОСВЕЩЕНИЕМ ---
         const materials = [
             { 
-                // Премиальная слоновая кость (Теплая, глубокая)
                 tileBg: 'radial-gradient(circle at 30% 30%, #ffffff 0%, #f7ecd5 40%, #e0c89b 100%)', 
                 tileSide: '#b89d70', 
                 tileColor: '#2b1d0f', 
             },
             { 
-                // Нефрит (Полупрозрачный зеленый камень)
                 tileBg: 'radial-gradient(circle at 30% 30%, #f0fff4 0%, #c4e8cf 50%, #82ab91 100%)', 
                 tileSide: '#689679', 
                 tileColor: '#1a3320', 
             },
             { 
-                // Жемчуг (Белый с перламутровым отливом в тени)
                 tileBg: 'radial-gradient(circle at 30% 30%, #ffffff 0%, #fdfcfd 40%, #e8e3ec 80%, #dcd1e3 100%)', 
                 tileSide: '#9b92a3', 
                 tileColor: '#1e242b', 
@@ -397,7 +471,12 @@
         }
         updateMenuLevelText(); updateScoreDisplay();
         
-        document.getElementById('btn-play').addEventListener('click', () => { document.getElementById('main-menu').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; initGame(); });
+        document.getElementById('btn-play').addEventListener('click', () => { 
+            AudioSys.init(); // Инициализация аудио по клику пользователя
+            document.getElementById('main-menu').style.display = 'none'; 
+            document.getElementById('game-screen').style.display = 'flex'; 
+            initGame(); 
+        });
         document.getElementById('btn-prev-level').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; localStorage.setItem('mahjong_level', currentLevel); updateMenuLevelText(); }});
         document.getElementById('btn-next-level').addEventListener('click', () => { currentLevel++; localStorage.setItem('mahjong_level', currentLevel); updateMenuLevelText(); });
         document.getElementById('btn-reset').addEventListener('click', () => {
@@ -410,6 +489,11 @@
         document.getElementById('btn-close-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'none');
         document.getElementById('btn-menu').addEventListener('click', () => { document.getElementById('game-screen').style.display = 'none'; document.getElementById('main-menu').style.display = 'flex'; updateMenuLevelText(); });
         document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
+        
+        document.getElementById('btn-sound').addEventListener('click', () => {
+            AudioSys.init();
+            AudioSys.toggle();
+        });
 
         document.getElementById('btn-hud-prev').addEventListener('click', () => { 
             if(currentLevel > 1) { currentLevel--; localStorage.setItem('mahjong_level', currentLevel); initGame(); }
@@ -651,6 +735,7 @@
             if (!t.isFree) return;
             
             if (t.isHidden) {
+                AudioSys.playUnlock(); // Звук открытия замка
                 t.isHidden = false; 
                 t.el.classList.remove('is-hidden'); 
                 t.el.classList.add('flip-anim');
@@ -659,6 +744,7 @@
             }
             
             if (!firstTile) { 
+                AudioSys.playClick(true); // Звук выделения
                 t.el.classList.add('selected'); firstTile = t; 
             } else if (firstTile !== t) { 
                 t.el.classList.add('selected'); 
@@ -667,6 +753,8 @@
                     let now = Date.now();
                     if (now - lastMatchTime < COMBO_TIME_LIMIT) comboCount++; else comboCount = 1;
                     lastMatchTime = now;
+                    
+                    AudioSys.playMatch(comboCount); // Звук комбо
                     
                     let earnedPoints = 10 * comboCount; totalScore += earnedPoints;
                     localStorage.setItem('mahjong_score', totalScore); updateScoreDisplay();
@@ -681,15 +769,20 @@
                     updateFreeState(); updateProgressBar();
                     
                     if (activeTiles.length === 0) {
+                        AudioSys.playWin(); // Звук победы
                         currentLevel++; localStorage.setItem('mahjong_level', currentLevel);
                         document.getElementById('message').innerHTML = '🎉 УРОВЕНЬ ПРОЙДЕН!'; document.getElementById('message').style.color = '#f1c40f';
                         shootConfetti(); setTimeout(() => { initGame(); }, 2500); 
                     }
                 } else { 
+                    AudioSys.playClick(false); // Звук ошибки/отмены
                     let t1 = firstTile, t2 = t; firstTile = null;
                     setTimeout(() => { t1.el.classList.remove('selected'); t2.el.classList.remove('selected'); }, 300); 
                 } 
-            } else { t.el.classList.remove('selected'); firstTile = null; }
+            } else { 
+                AudioSys.playClick(false); // Звук отмены
+                t.el.classList.remove('selected'); firstTile = null; 
+            }
         }
 
         function shootConfetti() {
@@ -711,6 +804,8 @@
                 if(ad) ad.style.display = 'none'; 
                 
                 try {
+                    AudioSys.playShuffle(); // Звук перемешивания
+                    
                     let currentSymbols = activeTiles.map(t => t.symbol); 
                     let pairsPool = getPairsFromSymbols(currentSymbols);
                     let hiddenCount = activeTiles.filter(t => t.isHidden).length;
