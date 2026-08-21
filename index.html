@@ -56,14 +56,14 @@
             background: rgba(0, 0, 0, 0.4); border: 2px solid rgba(241, 196, 15, 0.5);
             box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.5);
             border-radius: 20px; padding: 10px 30px; backdrop-filter: blur(5px);
-            display: flex; flex-direction: column; align-items: center;
+            display: flex; flex-direction: column; align-items: center; min-width: 250px;
         }
         #menu-level-text { 
             font-family: 'Russo One', sans-serif; font-size: 24px; color: #2ecc71; 
             text-shadow: 0 2px 5px rgba(0,0,0,1); letter-spacing: 1px; white-space: nowrap;
         }
         #menu-chapter-title {
-            font-size: 14px; color: #f1c40f; margin-top: 5px; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,1); text-align: center;
+            font-size: 13px; color: #f1c40f; margin-top: 5px; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,1); text-align: center;
         }
 
         .btn-arrow {
@@ -110,7 +110,7 @@
         .btn-hud-arrow { background: transparent; border: none; color: #fff; font-size: 22px; cursor: pointer; padding: 0 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); transition: transform 0.1s; }
         .btn-hud-arrow:active { transform: scale(0.8); color: #f1c40f; }
 
-        #hud-level-container { display: flex; flex-direction: column; align-items: center; }
+        #hud-level-container { display: flex; flex-direction: column; align-items: center; text-align: center; }
         #hud-level { font-family: 'Russo One', sans-serif; font-size: 18px; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.8); white-space: nowrap; line-height: 1.1;}
         #hud-chapter-text { font-size: 10px; color: #a2d9ce; font-weight: bold; text-transform: uppercase; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); margin-bottom: 2px;}
 
@@ -134,7 +134,7 @@
 
         #game-board { width: 90vw; height: 112.5vw; max-width: 400px; max-height: 500px; position: relative; perspective: 1000px; }
         
-        /* --- ОРИГИНАЛЬНЫЕ ПЛИТКИ --- */
+        /* ПЛИТКИ */
         .tile {
             position: absolute; width: 20%; height: 20%;
             left: calc(var(--x) * 10%); top: calc(var(--y) * 10%); margin-top: calc(var(--z) * -3.5vw); margin-left: calc(var(--z) * -2vw);
@@ -233,7 +233,7 @@
             <button id="btn-prev-level" class="btn-arrow">◀</button>
             <div id="menu-level-badge">
                 <div id="menu-level-text">УРОВЕНЬ 1</div>
-                <div id="menu-chapter-title">Начало пути</div>
+                <div id="menu-chapter-title">ГЛАВА 1: Начало пути</div>
             </div>
             <button id="btn-next-level" class="btn-arrow">▶</button>
         </div>
@@ -276,7 +276,7 @@
                     <button id="btn-hud-prev" class="btn-hud-arrow">◀</button>
                     <div id="hud-level-container">
                         <div id="hud-level">Ур. 1</div>
-                        <div id="hud-chapter-text">Начало пути</div>
+                        <div id="hud-chapter-text">ГЛАВА 1: Начало пути</div>
                     </div>
                     <button id="btn-hud-next" class="btn-hud-arrow">▶</button>
                 </div>
@@ -323,7 +323,6 @@
             },
             playMatch: function() {
                 if (!this.enabled || !this.ctx) return;
-                // Двойной бархатный АСМР стук
                 let playTock = (delay, pitchOffset) => {
                     setTimeout(() => {
                         let osc = this.ctx.createOscillator(); let gain = this.ctx.createGain();
@@ -441,24 +440,54 @@
             { tileBg: 'radial-gradient(circle at 30% 30%, #ffffff 0%, #fdfcfd 40%, #e8e3ec 80%, #dcd1e3 100%)', tileSide: '#9b92a3', tileColor: '#1e242b' }
         ];
 
+        // --- УЛУЧШЕННЫЙ ПРОЦЕДУРНЫЙ ГЕНЕРАТОР ГЛАВ (27 000 КОМБИНАЦИЙ + НОМЕР) ---
         const baseChapters = [
             "Начало пути", "Постижение реальности", "Пробуждение разума", "Тени прошлого", 
             "Врата вечности", "Шепот вселенной", "Лабиринт судьбы", "Зеркало души",
             "Тропа просветления", "Горизонт событий"
         ];
-        const wordsA = ["Эра", "Эхо", "Лабиринт", "Храм", "Свет", "Осколки", "Путь", "Сны", "Венец", "Пепел", "Секрет", "Корона", "Рубеж"];
-        const wordsB = ["Древних", "Забытых", "Скрытых", "Вечных", "Падших", "Небесных", "Темных", "Истинных", "Мертвых", "Святых", "Слепых", "Тайных"];
-        const wordsC = ["Богов", "Духов", "Иллюзий", "Миров", "Звезд", "Времен", "Королей", "Теней", "Истин", "Чудес", "Создателей", "Снов"];
+        
+        const wordsA = [
+            "Эра", "Эхо", "Лабиринт", "Храм", "Свет", "Осколки", "Путь", "Сны", "Венец", "Пепел", 
+            "Секрет", "Корона", "Рубеж", "Обитель", "Цитадель", "Бастион", "Чертог", "Арена", 
+            "Бездна", "Рассвет", "Закат", "Исток", "Колыбель", "Гробница", "Алтарь", "Призрак", 
+            "Пламя", "Кристалл", "Океан", "Остров"
+        ];
+        
+        const wordsB = [
+            "Древних", "Забытых", "Скрытых", "Вечных", "Падших", "Небесных", "Темных", "Истинных", 
+            "Мертвых", "Святых", "Слепых", "Тайных", "Багровых", "Ледяных", "Золотых", "Пустых", 
+            "Глухих", "Немых", "Спящих", "Иллюзорных", "Кровавых", "Астральных", "Мрачных", 
+            "Проклятых", "Великих", "Незримых", "Потусторонних", "Огненных", "Серебряных", "Звездных"
+        ];
+        
+        const wordsC = [
+            "Богов", "Духов", "Иллюзий", "Миров", "Звезд", "Времен", "Королей", "Теней", "Истин", 
+            "Чудес", "Создателей", "Снов", "Героев", "Демонов", "Магов", "Владык", "Судеб", 
+            "Надежд", "Страхов", "Ветров", "Империй", "Легенд", "Тайн", "Преданий", "Мудрецов", 
+            "Пророков", "Странников", "Воинов", "Монстров", "Варваров"
+        ];
 
         function getChapterName(level) {
-            let chapter = Math.floor((level - 1) / 10);
-            if (chapter < baseChapters.length) return baseChapters[chapter];
-            let s = chapter * 99991; 
-            function rndC() { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }
-            let a = wordsA[Math.floor(rndC() * wordsA.length)];
-            let b = wordsB[Math.floor(rndC() * wordsB.length)];
-            let c = wordsC[Math.floor(rndC() * wordsC.length)];
-            return a + " " + b + " " + c;
+            let chapterIndex = Math.floor((level - 1) / 10);
+            let chapterNum = chapterIndex + 1;
+            let title = "";
+
+            if (chapterIndex < baseChapters.length) {
+                title = baseChapters[chapterIndex];
+            } else {
+                // Мощный уникальный сид для каждой главы
+                let s = (chapterIndex * 2654435761) % 4294967296; 
+                function rndC() { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }
+                
+                let a = wordsA[Math.floor(rndC() * wordsA.length)];
+                let b = wordsB[Math.floor(rndC() * wordsB.length)];
+                let c = wordsC[Math.floor(rndC() * wordsC.length)];
+                title = a + " " + b + " " + c;
+            }
+            
+            // Физически гарантированная уникальность за счет номера
+            return `ГЛАВА ${chapterNum}: ${title}`;
         }
 
         let activeTiles = [], firstTile = null;
@@ -651,63 +680,60 @@
             document.body.appendChild(floatEl); setTimeout(() => floatEl.remove(), 1000);
         }
 
-        // --- УМНЫЕ ЭФФЕКТЫ СМЫСЛОВЫХ ЧАСТИЦ ---
+        // --- УМНЫЕ СМЫСЛОВЫЕ ЭФФЕКТЫ ---
+        function getSymbolCategory(sym) {
+            const catFood = [0, 1, 6, 28, 36, 46, 47];
+            const catTech = [2, 16, 50, 52, 53, 54, 57];
+            const catZodiac = [9, 15, 42, 43];
+            const catEmotion = [21, 22, 23, 39, 59];
+            
+            for (let i = 0; i < themeSets.length; i++) {
+                if (themeSets[i].includes(sym)) {
+                    if (catFood.includes(i)) return 'food';
+                    if (catTech.includes(i)) return 'tech';
+                    if (catZodiac.includes(i)) return 'zodiac';
+                    if (catEmotion.includes(i)) return 'emotion';
+                    return 'general';
+                }
+            }
+            return 'general';
+        }
+
         function spawnSmartBurst(element, symbol) {
             let rect = element.getBoundingClientRect(); 
             let centerX = rect.left + window.scrollX + rect.width / 2; 
             let centerY = rect.top + window.scrollY + rect.height / 2;
+            let category = getSymbolCategory(symbol);
             
-            let cat = 'general';
-            if ("🍔🍕🌭🍟🥐🥞🥨🧀🌮🌯🍜🍣🍱🥟🍤🥩🥓🍗🥚🍞🍹🍸🥤🧊🧉🥛☕🍵🧃🍯🍩🍪🍫🍬🍭🧁🍰🍧🍨🍿🍎🍐🍊🍋🍌🍉🍇🍓🍈🍒🍑🥭🍍🥥🥝🍅🍆🥑🥦🥒🍉🍊🍋🍌🍍🥭🍎🍏🍐🍑🍒🍓🫐🥝🍅🫒🥥🥑🍆🥔🍦🍧🍨🍩🍪🎂🍰🧁🥧🍫🍬🍭🍮🍯🍼🥛☕🫖🍵🍶".includes(symbol)) cat = 'food';
-            else if ("📱💻🖥️🖨️🖱️🕹️💾💿📷📹🎥📺📻🎙️⏱️⏰⏳💡🔦🔋⌚📱📲💻⌨️🖥️🖨️🖱️🖲️🕹️🗜️💽💾💿📀📼📷📸📹🎥📽️🎞️📞☎️📟📠📺📻🎙️🎚️🎛️🧭⏱️⏲️⏰🕰️⏳⌛📡🔋".includes(symbol)) cat = 'tech';
-            else if ("♈♉♊♋♌♍♎♏♐♑♒♓⛎🌌☄️🪐🌞🌝🌛🌜🌍🌞🌝🌛✨⚡🔥🌪️🌈☁️🌤️⛅🌥️🌦️🌧️🌨️🌩️☔☂️❄️".includes(symbol)) cat = 'zodiac';
-            else if ("😀😃😄😁😆😅🤣😂🙂🙃😉😊😇🥰😍🤩😘😗☺️😚😙🥲😋😛😜🤪😝🤑🤗🤭🤫🤔🤐🤨😐😑😶😏😒🙄😬🤥😌😔😪🤤😴😷🤒🤕🤢🤮🤧🥵🥶🥴😵🤯🤠🥳😢😭😱😖😣😞😓😩😫🥱😤😡😠🤬😈👿💀☠️💩🤡".includes(symbol)) cat = 'emotion';
-            else if ("🦁🐯🦒🦊🐻🐼🐨🐰🐷🦝🐗🦓🦌🐘🦏🦛🐭🐹🐿️🦔🐙🦑🦐🦞🦀🐡🐠🐟🐬🐳🐋🦈🦭🐊🐸🐢🦦🦪🐚🪸🦅🦆🦉🦇🐝🐛🦋🐌🐞🐜🪲🪳🕷️🕸️🦂🦟🪰🪱🦜🦚🐮🐂🐃🐄🐖🐏🐑🐐🐪🐫🦙🦘🐎🐴🐔🐓🐣🐤🐥🐦🐧🦅🦆🦢🦉🦤🪶🦩🦚🦜🐸🐊🐢🦎🐍🐲🐉🦕🐳🐋😺😸😹😻😼😽🙀😿😾🙈🙉🙊🐵🐒🦍🦧🐶🐕🐩🐺🦇🦋🐛🐜🐝🪲🐞🦗🪳🕷️🕸️🦂🦟🪰🪱🦠🐾🐉🐲🌵".includes(symbol)) cat = 'animal';
-            else if ("🚗🚕🚙🚌🏎️🚓🚑🚒🚐🛻🚚🚛🚜🏍️🛵🦽🛺🚲🛴🛹✈️🛫🛬🛩️🚁🛸🛶⛵🚤🛥️🛳️⛴️🚢⚓🚀🚟🚠🚡🚜🛶🚂🚃🚄🚅🚆🚇🚈🚉🚊🚝🚞🚋🚌🚍🚎🚐🚑🚒🚓🚔".includes(symbol)) cat = 'transport';
-            
-            // Если это еда, создаем корзинку 🧺
-            if (cat === 'food') {
+            if (category === 'food') {
                 let basket = document.createElement('div');
                 basket.classList.add('basket-container'); basket.innerText = '🧺';
                 basket.style.left = centerX + 'px'; basket.style.top = centerY + 'px';
-                document.body.appendChild(basket);
-                setTimeout(() => basket.remove(), 1000);
+                document.body.appendChild(basket); setTimeout(() => basket.remove(), 1200);
             }
 
-            // Выбор частиц в зависимости от категории
-            let pOpts = [symbol, '✅', '🟢'];
-            if (cat === 'food') pOpts = [symbol, '✅', '🍎', '🥕', '💧'];
-            else if (cat === 'tech') pOpts = [symbol, '✅', '🔋', '📶', '⚙️'];
-            else if (cat === 'zodiac') pOpts = [symbol, '✨', '🌙', '🌟', '☄️'];
-            else if (cat === 'emotion') pOpts = [symbol, '❤️', '👍', '😊', '🔥'];
-            else if (cat === 'animal') pOpts = [symbol, '✅', '🐾', '🌿'];
-            else if (cat === 'transport') pOpts = [symbol, '✅', '💨', '🏁'];
-            
+            let particleOptions = [];
+            if (category === 'food') particleOptions = [symbol, '✅', '🟢', '🍎'];
+            else if (category === 'tech') particleOptions = [symbol, '✅', '🔋', '📶'];
+            else if (category === 'zodiac') particleOptions = [symbol, '✨', '🌙', '🌟'];
+            else if (category === 'emotion') particleOptions = [symbol, '❤️', '👍', '😊'];
+            else particleOptions = [symbol, '✅', '🟢', '✨'];
+
             let particleCount = 4 + Math.floor(Math.random() * 3); 
             for (let i = 0; i < particleCount; i++) {
                 let p = document.createElement('div'); p.classList.add('smart-particle'); 
-                p.innerText = pOpts[Math.floor(Math.random() * pOpts.length)];
+                p.innerText = particleOptions[Math.floor(Math.random() * particleOptions.length)];
                 
-                // Строгий размер частиц 16-24px
                 p.style.fontSize = (16 + Math.random() * 8) + 'px'; 
                 p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
                 
-                let angle, dist;
-                if (cat === 'food') {
-                    // Из корзинки вылетает веером вверх
-                    angle = Math.PI + (Math.random() * Math.PI); 
-                    dist = 40 + Math.random() * 60;
-                } else {
-                    // Обычный радиальный взрыв
-                    angle = Math.random() * Math.PI * 2;
-                    dist = 40 + Math.random() * 60;
-                }
-                
+                let angle = (category === 'food') ? (Math.PI + Math.random() * Math.PI) : (Math.random() * Math.PI * 2);
+                let dist = 40 + Math.random() * 60; 
                 p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); 
                 p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); 
                 p.style.setProperty('--rot', (Math.random() * 360) + 'deg');
                 
-                document.body.appendChild(p); setTimeout(() => p.remove(), 900);
+                document.body.appendChild(p); setTimeout(() => p.remove(), 800);
             }
         }
 
@@ -720,7 +746,7 @@
                 t.el.classList.add('selected'); 
                 if (firstTile.symbol === t.symbol) { 
                     let now = Date.now(); if (now - lastMatchTime < COMBO_TIME_LIMIT) comboCount++; else comboCount = 1; lastMatchTime = now;
-                    AudioSys.playMatch(); // АСМР Стук дерева
+                    AudioSys.playMatch(); 
                     
                     let earnedPoints = 10 * comboCount; totalScore += earnedPoints; localStorage.setItem('mahjong_score', totalScore); updateScoreDisplay();
                     showFloatingText(t.el, earnedPoints, comboCount > 1);
@@ -774,8 +800,7 @@
                         preparedTiles = assignSymbolsSmart(currentLayout, pairsPool, Math.random); 
                     }
                     
-                    // ЕСЛИ ГЕОМЕТРИЯ ОКАЗАЛАСЬ МЕРТВОЙ (Например, 2 фишки лежат друг на друге)
-                    // Мы МЕНЯЕМ ФОРМУ, расплющивая ее в 2D ряд, чтобы избежать бесконечного тупика.
+                    // ЕСЛИ ТУПИК (например 2 фишки друг на друге) - МЕНЯЕМ ФОРМУ на плоскую
                     if (!preparedTiles) {
                         currentLayout = [];
                         let fX = 0, fY = 4;
@@ -797,7 +822,6 @@
                     activeTiles.forEach((tile, index) => {
                         let pt = preparedTiles[index]; 
                         
-                        // Применяем новые координаты (Если форма была расплющена)
                         tile.x = pt.x; tile.y = pt.y; tile.z = pt.z;
                         tile.el.style.setProperty('--x', tile.x); tile.el.style.setProperty('--y', tile.y); tile.el.style.setProperty('--z', tile.z);
                         
