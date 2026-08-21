@@ -144,16 +144,15 @@
         .tile.selected { border-color: #f1c40f !important; box-shadow: 0 0 20px #f1c40f, 0 10px 20px rgba(0,0,0,0.9) !important; transform: translateY(-3vw) scale(1.08); z-index: 999 !important; }
         .tile.matched { opacity: 0; pointer-events: none; transform: scale(1.5); filter: brightness(2); }
         
-        /* --- НОВЫЙ ДИЗАЙН ЗАКРЫТЫХ ФИШЕК (СЮРПРИЗОВ) --- */
+        /* --- НОВЫЙ ДИЗАЙН ЗАКРЫТЫХ ФИШЕК (ЗАМКИ) --- */
         .tile.is-hidden { 
-            /* Роскошный бордово-красный градиент */
             background: linear-gradient(135deg, #800020, #4a0e17) !important; 
-            border-color: #d4af37 !important; /* Золотая окантовка */
+            border-color: #d4af37 !important; 
             box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.6) !important;
             color: transparent !important; text-shadow: none !important; 
         }
         .tile.is-hidden::after { 
-            content: attr(data-cover); /* Выводим случайный предмет-сюрприз */
+            content: attr(data-cover); 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
             font-size: 10vw; color: initial;
             filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.6));
@@ -270,7 +269,6 @@
             let savedScore = localStorage.getItem('mahjong_score'); if (savedScore) totalScore = parseInt(savedScore);
         } catch(e){}
         
-        // --- 37 ПРЕМИАЛЬНЫХ НАБОРОВ (740 ПРЕДМЕТОВ) ---
         const themeSets = [
             ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'], 
             ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'], 
@@ -313,8 +311,8 @@
         
         const standardSymbols = "📱💻🖥️🖨️🖱️🕹️💾💿📷📹🎥📺📻🎙️⏱️⏰⏳💡🔦🔋🔨🪓⛏️🛠️🪚🔧🪛🔩⚙️🧲🪜🧱🛡️💣🧨🧯🧭⚓🪝⚖️💎🔮🪄🧿👑💍🪙💰🪬⏳🩸🧪🧬🔭🔬🛸🚀🛰️🪐👽";
         
-        // Массив роскошных контейнеров для скрытых фишек
-        const coverSymbols = ['📕', '🎁', '📦', '🧰', '🧳', '🎒', '🧺', '🗄️', '🚪', '🔒'];
+        // --- ОБНОВЛЕННЫЙ МАССИВ ЗАМКОВ ДЛЯ СКРЫТЫХ ФИШЕК ---
+        const coverSymbols = ['🔒', '🔐'];
 
         const materials = [
             { tileBg: '#f3e5ab', tileBorder: '#d2b48c', tileColor: '#3e2723', bgImg: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(139, 69, 19, 0.2)' },
@@ -453,7 +451,6 @@
                 finalLayout = prepared || fallbackLayout.map((pos, i) => ({...pos, symbol: fallbackPool[Math.floor(i/2)]}));
             }
 
-            // --- ДОБАВЛЕНИЕ КОНТЕЙНЕРОВ-СЮРПРИЗОВ НА СЛОЖНЫХ УРОВНЯХ ---
             if ((currentLevel % 10 === 7) || (currentLevel % 10 === 8)) {
                 let hideCount = (finalLayout.length >= 30) ? 6 : 4;
                 let hideIndices = Array.from({length: finalLayout.length}, (_, i) => i);
@@ -562,7 +559,7 @@
                 t.el.classList.remove('is-hidden'); 
                 t.el.classList.add('flip-anim');
                 setTimeout(() => t.el.classList.remove('flip-anim'), 400);
-                return; // Игрок должен кликнуть еще раз после вскрытия коробки
+                return; 
             }
             
             if (!firstTile) { 
