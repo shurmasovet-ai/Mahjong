@@ -175,12 +175,45 @@
         .flip-anim { animation: flipTileIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes flipTileIn { 0% { transform: translateY(-4vw) scale(1.1) rotateY(-90deg); } 100% { transform: translateY(-4vw) scale(1.1) rotateY(0deg); } }
 
-        /* --- СМАРТ-ЧАСТИЦЫ --- */
-        .basket-container { position: absolute; font-size: 32px; z-index: 9998; animation: basketPop 1.2s ease-out forwards; pointer-events: none; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6)); }
-        @keyframes basketPop { 0% { transform: translate(-50%, -50%) scale(0) rotate(-10deg); opacity: 0; } 15% { transform: translate(-50%, -50%) scale(1.3) rotate(5deg); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1.3) rotate(0deg); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; } }
+        /* --- КРАСИВАЯ КОРЗИНА (CSS) И ФОНТАН ЧАСТИЦ --- */
+        .css-basket-wrap {
+            position: absolute; z-index: 9998;
+            animation: popBasket 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            pointer-events: none; transform-origin: bottom center;
+        }
+        .css-basket {
+            width: 60px; height: 40px; position: relative;
+            background: repeating-linear-gradient(45deg, #c08b5c, #c08b5c 6px, #a87343 6px, #a87343 12px);
+            border-radius: 5px 5px 20px 20px;
+            border: 3px solid #4a2c17; border-top: 6px solid #4a2c17;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.6), inset 0 -5px 10px rgba(0,0,0,0.5);
+        }
+        .css-basket::before {
+            content: ''; position: absolute;
+            top: -24px; left: 8px; width: 38px; height: 24px;
+            border: 5px solid #a87343; border-bottom: none;
+            border-radius: 20px 20px 0 0;
+            box-shadow: inset 0 2px 2px rgba(255,255,255,0.3);
+        }
+        @keyframes popBasket {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(-15deg); opacity: 0; }
+            15% { transform: translate(-50%, -50%) scale(1.1) rotate(5deg); opacity: 1; }
+            30% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+            80% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: translate(-50%, -30%) scale(0.5) rotate(0deg); opacity: 0; }
+        }
 
-        .smart-particle { position: absolute; font-family: 'Noto Color Emoji', sans-serif; pointer-events: none; z-index: 9999; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.5)); animation: smartSpill 0.9s cubic-bezier(0.1, 0.8, 0.3, 1) forwards; }
-        @keyframes smartSpill { 0% { opacity: 1; transform: translate(-50%, -50%) scale(0.3) rotate(0deg); } 100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1) rotate(var(--rot)); } }
+        .smart-particle {
+            position: absolute; font-family: 'Noto Color Emoji', sans-serif;
+            pointer-events: none; z-index: 9999; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
+            animation: fountainSpill 1s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+        }
+        @keyframes fountainSpill {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.2) rotate(0deg); }
+            30% { opacity: 1; transform: translate(calc(-50% + var(--tx)*0.5), calc(-50% + var(--up-y))) scale(1.3) rotate(var(--rot1)); }
+            80% { opacity: 1; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty)*0.8)) scale(1) rotate(var(--rot2)); }
+            100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.5) rotate(var(--rot2)); }
+        }
 
         .floating-text { position: absolute; font-family: 'Russo One', sans-serif; font-size: 26px; color: #2ecc71; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 12px rgba(46, 204, 113, 0.9); pointer-events: none; z-index: 9999; animation: floatUpText 1s ease-out forwards; }
         .floating-text.combo { color: #f1c40f; font-size: 34px; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 18px rgba(241, 196, 15, 0.9); }
@@ -278,7 +311,6 @@
         <div id="message"></div>
         <div id="game-board"></div>
 
-        <!-- ПАНЕЛЬ БУСТЕРОВ -->
         <div id="boosters-bar">
             <button class="booster" id="bst-hint" data-unlock="2" data-cost="50">🪄<div class="b-cost">50</div><div class="b-lock">Ур.2</div></button>
             <button class="booster" id="bst-undo" data-unlock="4" data-cost="100">↩️<div class="b-cost">100</div><div class="b-lock">Ур.4</div></button>
@@ -293,7 +325,7 @@
     </div>
 
     <script>
-        // --- АСМР АУДИОСИСТЕМА (Глухой деревянный стук) ---
+        // --- АСМР АУДИОСИСТЕМА (Тупой приятный щелчок) ---
         const AudioSys = {
             ctx: null, enabled: true,
             init: function() {
@@ -316,16 +348,18 @@
             playUnlock: function() { this.playOsc('square', 600, 200, 0.1, 0.1); setTimeout(() => this.playOsc('square', 800, 300, 0.1, 0.1), 50); },
             playMatch: function() {
                 if (!this.enabled || !this.ctx) return;
-                let playTock = (delay, pitchOffset) => {
+                // Двойной тупой АСМР стук без звона
+                let playTock = (delay, freq) => {
                     setTimeout(() => {
                         let osc = this.ctx.createOscillator(); let gain = this.ctx.createGain();
-                        osc.type = 'sine'; osc.frequency.setValueAtTime(300 + pitchOffset, this.ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(50, this.ctx.currentTime + 0.05);
-                        gain.gain.setValueAtTime(0.8, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
+                        osc.type = 'sine'; osc.frequency.setValueAtTime(freq, this.ctx.currentTime); 
+                        osc.frequency.exponentialRampToValueAtTime(freq * 0.2, this.ctx.currentTime + 0.04);
+                        gain.gain.setValueAtTime(0.7, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.04);
                         osc.connect(gain); gain.connect(this.ctx.destination);
-                        osc.start(); osc.stop(this.ctx.currentTime + 0.06);
+                        osc.start(); osc.stop(this.ctx.currentTime + 0.05);
                     }, delay);
                 };
-                playTock(0, 0); playTock(40, -20); 
+                playTock(0, 250); playTock(35, 300); 
             },
             playWin: function() {
                 let freqs = [392, 493.88, 587.33, 783.99]; 
@@ -350,7 +384,7 @@
         createParticles();
 
         let currentLevel = 1, totalScore = 0, comboCount = 0, lastMatchTime = 0, totalTilesForLevel = 0;
-        let matchHistory = []; // Для Отмены хода
+        let matchHistory = [];
         const COMBO_TIME_LIMIT = 4000; 
 
         try { 
@@ -434,13 +468,10 @@
         const wordsC = ["Богов", "Духов", "Иллюзий", "Миров", "Звезд", "Времен", "Королей", "Теней", "Истин", "Чудес", "Создателей", "Снов", "Героев", "Демонов", "Магов", "Владык", "Судеб", "Надежд", "Страхов", "Ветров", "Империй", "Легенд", "Тайн", "Преданий", "Мудрецов", "Пророков", "Странников", "Воинов", "Монстров", "Варваров"];
 
         function getChapterName(level) {
-            let chapterIndex = Math.floor((level - 1) / 10);
-            let chapterNum = chapterIndex + 1;
-            let title = "";
+            let chapterIndex = Math.floor((level - 1) / 10); let chapterNum = chapterIndex + 1; let title = "";
             if (chapterIndex < baseChapters.length) { title = baseChapters[chapterIndex]; } 
             else {
-                let s = (chapterIndex * 2654435761) % 4294967296; 
-                function rndC() { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }
+                let s = (chapterIndex * 2654435761) % 4294967296; function rndC() { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }
                 let a = wordsA[Math.floor(rndC() * wordsA.length)]; let b = wordsB[Math.floor(rndC() * wordsB.length)]; let c = wordsC[Math.floor(rndC() * wordsC.length)];
                 title = a + " " + b + " " + c;
             }
@@ -462,9 +493,7 @@
         document.getElementById('btn-prev-level').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; localStorage.setItem('mahjong_level', currentLevel); updateMenuLevelText(); updateBoostersUI(); }});
         document.getElementById('btn-next-level').addEventListener('click', () => { currentLevel++; localStorage.setItem('mahjong_level', currentLevel); updateMenuLevelText(); updateBoostersUI(); });
         document.getElementById('btn-reset').addEventListener('click', () => {
-            if (confirm('Начать с 1 уровня? Весь прогресс будет удален.')) {
-                currentLevel = 1; totalScore = 0; localStorage.setItem('mahjong_level', 1); localStorage.setItem('mahjong_score', 0); updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI();
-            }
+            if (confirm('Начать с 1 уровня? Весь прогресс будет удален.')) { currentLevel = 1; totalScore = 0; localStorage.setItem('mahjong_level', 1); localStorage.setItem('mahjong_score', 0); updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI(); }
         });
         document.getElementById('btn-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'flex');
         document.getElementById('btn-close-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'none');
@@ -474,11 +503,7 @@
         document.getElementById('btn-hud-prev').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; localStorage.setItem('mahjong_level', currentLevel); initGame(); }});
         document.getElementById('btn-hud-next').addEventListener('click', () => { currentLevel++; localStorage.setItem('mahjong_level', currentLevel); initGame(); });
 
-        function updateScoreDisplay() { 
-            let el = document.getElementById('hud-score');
-            el.innerText = '🏆 ' + totalScore; 
-            updateBoostersUI();
-        }
+        function updateScoreDisplay() { let el = document.getElementById('hud-score'); el.innerText = '🏆 ' + totalScore; updateBoostersUI(); }
         
         function applyMaterial(level) {
             let root = document.documentElement; let matIndex = (level - 1) % materials.length; let mat = materials[matIndex];
@@ -494,8 +519,7 @@
         }
         
         function getSymbolsForLevel(level) {
-            let s = level * 12345;
-            function localRnd() { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }
+            let s = level * 12345; function localRnd() { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }
             let t1 = Math.floor(localRnd() * themeSets.length); let t2 = Math.floor(localRnd() * themeSets.length); let t3 = Math.floor(localRnd() * themeSets.length);
             return [...themeSets[t1].slice(0, 7), ...themeSets[t2].slice(7, 14), ...themeSets[t3].slice(14, 20)];
         }
@@ -636,37 +660,88 @@
             document.body.appendChild(floatEl); setTimeout(() => floatEl.remove(), 1000);
         }
 
+        // --- УМНЫЕ СМЫСЛОВЫЕ ЭФФЕКТЫ (С CSS КОРЗИНОЙ И ФОНТАНОМ) ---
         function getSymbolCategory(sym) {
-            const catFood = [0, 1, 6, 28, 36, 46, 47]; const catTech = [2, 16, 50, 52, 53, 54, 57];
-            const catZodiac = [9, 15, 42, 43]; const catEmotion = [21, 22, 23, 39, 59];
+            const catFood = [0, 1, 6, 28, 36, 47, 48];
+            const catTech = [2, 16, 53, 54];
+            const catZodiac = [9, 15, 43];
+            const catEmotion = [21, 22, 23, 39, 59];
+            const catAnimal = [3, 10, 11, 26, 27, 38, 55];
+            const catTransport = [4, 34, 37, 57];
+            
             for (let i = 0; i < themeSets.length; i++) {
                 if (themeSets[i].includes(sym)) {
-                    if (catFood.includes(i)) return 'food'; if (catTech.includes(i)) return 'tech';
-                    if (catZodiac.includes(i)) return 'zodiac'; if (catEmotion.includes(i)) return 'emotion';
+                    if (catFood.includes(i)) return 'food';
+                    if (catTech.includes(i)) return 'tech';
+                    if (catZodiac.includes(i)) return 'zodiac';
+                    if (catEmotion.includes(i)) return 'emotion';
+                    if (catAnimal.includes(i)) return 'animal';
+                    if (catTransport.includes(i)) return 'transport';
                     return 'general';
                 }
-            } return 'general';
+            }
+            return 'general';
         }
 
         function spawnSmartBurst(element, symbol) {
-            let rect = element.getBoundingClientRect(); let centerX = rect.left + window.scrollX + rect.width / 2; let centerY = rect.top + window.scrollY + rect.height / 2;
+            let rect = element.getBoundingClientRect(); 
+            let centerX = rect.left + window.scrollX + rect.width / 2; 
+            let centerY = rect.top + window.scrollY + rect.height / 2;
             let category = getSymbolCategory(symbol);
+            
+            // Если еда, спавним красивую CSS корзину
             if (category === 'food') {
-                let basket = document.createElement('div'); basket.classList.add('basket-container'); basket.innerText = '🧺';
-                basket.style.left = centerX + 'px'; basket.style.top = centerY + 'px'; document.body.appendChild(basket); setTimeout(() => basket.remove(), 1200);
+                let basketWrap = document.createElement('div');
+                basketWrap.className = 'css-basket-wrap';
+                let basket = document.createElement('div');
+                basket.className = 'css-basket';
+                basketWrap.appendChild(basket);
+                
+                basketWrap.style.left = centerX + 'px'; 
+                basketWrap.style.top = (centerY + 10) + 'px'; 
+                document.body.appendChild(basketWrap); 
+                setTimeout(() => basketWrap.remove(), 1500);
             }
-            let particleOptions = [];
-            if (category === 'food') particleOptions = [symbol, '✅', '🟢', '🍎']; else if (category === 'tech') particleOptions = [symbol, '✅', '🔋', '📶'];
-            else if (category === 'zodiac') particleOptions = [symbol, '✨', '🌙', '🌟']; else if (category === 'emotion') particleOptions = [symbol, '❤️', '👍', '😊'];
-            else particleOptions = [symbol, '✅', '🟢', '✨'];
 
-            let particleCount = 4 + Math.floor(Math.random() * 3); 
+            let pOpts = [symbol, '✅', '🟢'];
+            if (category === 'food') pOpts = [symbol, '✅', '🍎', '🥦', '🥐'];
+            else if (category === 'tech') pOpts = [symbol, '✅', '🔋', '⚙️', '💡'];
+            else if (category === 'zodiac') pOpts = [symbol, '✨', '🌙', '🌟', '☄️'];
+            else if (category === 'emotion') pOpts = [symbol, '❤️', '👍', '😊', '🔥'];
+            else if (category === 'animal') pOpts = [symbol, '✅', '🐾', '🌿'];
+            else if (category === 'transport') pOpts = [symbol, '✅', '💨', '🏁'];
+            
+            let particleCount = 6 + Math.floor(Math.random() * 4); // 6-9 частиц для густоты
+            
             for (let i = 0; i < particleCount; i++) {
-                let p = document.createElement('div'); p.classList.add('smart-particle'); p.innerText = particleOptions[Math.floor(Math.random() * particleOptions.length)];
-                p.style.fontSize = (16 + Math.random() * 8) + 'px'; p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
-                let angle = (category === 'food') ? (Math.PI + Math.random() * Math.PI) : (Math.random() * Math.PI * 2); let dist = 40 + Math.random() * 60; 
-                p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); p.style.setProperty('--rot', (Math.random() * 360) + 'deg');
-                document.body.appendChild(p); setTimeout(() => p.remove(), 800);
+                let p = document.createElement('div'); p.classList.add('smart-particle'); 
+                p.innerText = pOpts[Math.floor(Math.random() * pOpts.length)];
+                
+                p.style.fontSize = (16 + Math.random() * 14) + 'px'; // 16-30px
+                p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
+                
+                let powerX, powerY;
+                if (category === 'food') {
+                    // Эффект фонтана (из корзины вверх и в стороны)
+                    let angle = Math.PI + (Math.random() * Math.PI); // Только вверх
+                    let dist = 60 + Math.random() * 40; 
+                    powerX = Math.cos(angle) * dist;
+                    powerY = Math.sin(angle) * dist - 30; // Пик высоты
+                } else {
+                    // Радиальный разлет
+                    let angle = Math.random() * Math.PI * 2;
+                    let dist = 50 + Math.random() * 60;
+                    powerX = Math.cos(angle) * dist;
+                    powerY = Math.sin(angle) * dist - 30;
+                }
+                
+                p.style.setProperty('--tx', powerX + 'px'); 
+                p.style.setProperty('--up-y', powerY + 'px'); 
+                p.style.setProperty('--ty', (Math.random() * 40 + 20) + 'px'); // Конечная точка ниже пика
+                p.style.setProperty('--rot1', (Math.random() * 180 - 90) + 'deg');
+                p.style.setProperty('--rot2', (Math.random() * 360 - 180) + 'deg');
+                
+                document.body.appendChild(p); setTimeout(() => p.remove(), 1000);
             }
         }
 
@@ -681,12 +756,14 @@
                     let now = Date.now(); if (now - lastMatchTime < COMBO_TIME_LIMIT) comboCount++; else comboCount = 1; lastMatchTime = now;
                     AudioSys.playMatch(); 
                     
-                    // Сохраняем ход для Отмены
                     matchHistory.push([firstTile, t]);
                     
                     let earnedPoints = 10 * comboCount; totalScore += earnedPoints; localStorage.setItem('mahjong_score', totalScore); updateScoreDisplay();
                     showFloatingText(t.el, earnedPoints, comboCount > 1);
-                    spawnSmartBurst(firstTile.el, firstTile.symbol); spawnSmartBurst(t.el, t.symbol);
+                    
+                    spawnSmartBurst(firstTile.el, firstTile.symbol); 
+                    spawnSmartBurst(t.el, t.symbol);
+                    
                     activeTiles = activeTiles.filter(x => x !== firstTile && x !== t); 
                     t.el.classList.add('matched'); firstTile.el.classList.add('matched'); firstTile = null; 
                     updateFreeState(); updateProgressBar();
@@ -726,7 +803,13 @@
                     
                     let currentLayout = activeTiles.map(t => ({x: t.x, y: t.y, z: t.z}));
                     let attemptMix = 0, preparedTiles = null;
-                    while (!preparedTiles && attemptMix < 100) { attemptMix++; preparedTiles = assignSymbolsSmart(currentLayout, pairsPool, Math.random); }
+                    
+                    while (!preparedTiles && attemptMix < 100) { 
+                        attemptMix++; 
+                        preparedTiles = assignSymbolsSmart(currentLayout, pairsPool, Math.random); 
+                    }
+                    
+                    // БЕЗОПАСНАЯ ГЕОМЕТРИЯ ПРИ МИКСЕ (Исключение Deadlock)
                     if (!preparedTiles) {
                         currentLayout = []; let fX = 0, fY = 4;
                         for (let i = 0; i < activeTiles.length; i++) { currentLayout.push({x: fX, y: fY, z: 0}); fX += 2; if (fX > 8) { fX = 0; fY += 2; } }
@@ -739,7 +822,8 @@
                     let toHide = new Set(hideIndices.slice(0, hiddenCount));
 
                     activeTiles.forEach((tile, index) => {
-                        let pt = preparedTiles[index]; tile.x = pt.x; tile.y = pt.y; tile.z = pt.z;
+                        let pt = preparedTiles[index]; 
+                        tile.x = pt.x; tile.y = pt.y; tile.z = pt.z;
                         tile.el.style.setProperty('--x', tile.x); tile.el.style.setProperty('--y', tile.y); tile.el.style.setProperty('--z', tile.z);
                         tile.symbol = pt.symbol; tile.el.innerText = pt.symbol; tile.el.classList.remove('selected');
                         tile.el.classList.add('flip-anim'); setTimeout(() => tile.el.classList.remove('flip-anim'), 400);
@@ -754,7 +838,7 @@
             }, 1000); 
         }
 
-        // --- БУСТЕРЫ И ЭКОНОМИКА ---
+        // --- ПАНЕЛЬ БУСТЕРОВ ---
         function updateBoostersUI() {
             document.querySelectorAll('.booster').forEach(btn => {
                 let unlockLvl = parseInt(btn.getAttribute('data-unlock'));
@@ -771,8 +855,6 @@
                         btn.classList.add('disabled');
                     } else {
                         btn.classList.remove('disabled');
-                        
-                        // Доп. проверки состояния
                         if (btn.id === 'bst-undo' && matchHistory.length === 0) btn.classList.add('disabled');
                         if (btn.id === 'bst-hint' && getAvailablePairs().length === 0) btn.classList.add('disabled');
                     }
@@ -785,14 +867,10 @@
             if (btn.classList.contains('locked') || btn.classList.contains('disabled')) {
                 AudioSys.playError();
                 let scoreEl = document.getElementById('hud-score');
-                scoreEl.style.color = '#e74c3c'; setTimeout(() => scoreEl.style.color = '#fff', 300);
-                return;
+                scoreEl.style.color = '#e74c3c'; setTimeout(() => scoreEl.style.color = '#fff', 300); return;
             }
-            totalScore -= cost;
-            localStorage.setItem('mahjong_score', totalScore);
-            updateScoreDisplay();
-            AudioSys.playBooster();
-            action();
+            totalScore -= cost; localStorage.setItem('mahjong_score', totalScore); updateScoreDisplay();
+            AudioSys.playBooster(); action();
         }
 
         function getAvailablePairs() {
@@ -802,11 +880,9 @@
                 for (let j = i + 1; j < freeTiles.length; j++) {
                     if (freeTiles[i].symbol === freeTiles[j].symbol) pairs.push([freeTiles[i], freeTiles[j]]);
                 }
-            }
-            return pairs;
+            } return pairs;
         }
 
-        // 1. Подсказка (🪄)
         document.getElementById('bst-hint').addEventListener('click', () => {
             buyBooster('bst-hint', 50, () => {
                 let pairs = getAvailablePairs();
@@ -818,30 +894,25 @@
             });
         });
 
-        // 2. Отмена хода (↩️)
         document.getElementById('bst-undo').addEventListener('click', () => {
             buyBooster('bst-undo', 100, () => {
                 if (matchHistory.length === 0) return;
                 let pair = matchHistory.pop();
                 pair[0].el.classList.remove('matched', 'selected'); pair[1].el.classList.remove('matched', 'selected');
                 activeTiles.push(pair[0], pair[1]);
-                comboCount = 0;
-                updateFreeState(); updateProgressBar();
+                comboCount = 0; updateFreeState(); updateProgressBar();
             });
         });
 
-        // 3. Бомба (💣)
         document.getElementById('bst-bomb').addEventListener('click', () => {
             buyBooster('bst-bomb', 300, () => {
-                let pairs = getAvailablePairs();
-                let destroyed = 0;
+                let pairs = getAvailablePairs(); let destroyed = 0;
                 pairs.forEach(pair => {
                     if (destroyed >= 2) return;
                     if (activeTiles.includes(pair[0]) && activeTiles.includes(pair[1])) {
                         spawnSmartBurst(pair[0].el, pair[0].symbol); spawnSmartBurst(pair[1].el, pair[1].symbol);
                         pair[0].el.classList.add('matched'); pair[1].el.classList.add('matched');
-                        activeTiles = activeTiles.filter(x => x !== pair[0] && x !== pair[1]);
-                        destroyed++;
+                        activeTiles = activeTiles.filter(x => x !== pair[0] && x !== pair[1]); destroyed++;
                     }
                 });
                 matchHistory = []; updateFreeState(); updateProgressBar();
@@ -853,23 +924,14 @@
             });
         });
 
-        // 4. Молния (⚡)
         document.getElementById('bst-light').addEventListener('click', () => {
             buyBooster('bst-light', 600, () => {
                 if (activeTiles.length === 0) return;
                 let randomTile = activeTiles[Math.floor(Math.random() * activeTiles.length)];
-                let targetSym = randomTile.symbol;
-                
-                // Молния сжигает все фишки этого символа (даже заблокированные и закрытые)
-                let targets = activeTiles.filter(t => t.symbol === targetSym);
-                targets.forEach(t => {
-                    spawnSmartBurst(t.el, t.symbol);
-                    t.el.classList.add('matched');
-                });
-                
-                activeTiles = activeTiles.filter(t => t.symbol !== targetSym);
+                let targets = activeTiles.filter(t => t.symbol === randomTile.symbol);
+                targets.forEach(t => { spawnSmartBurst(t.el, t.symbol); t.el.classList.add('matched'); });
+                activeTiles = activeTiles.filter(t => t.symbol !== randomTile.symbol);
                 matchHistory = []; updateFreeState(); updateProgressBar();
-                
                 if (activeTiles.length === 0) {
                     AudioSys.playWin(); currentLevel++; localStorage.setItem('mahjong_level', currentLevel);
                     document.getElementById('message').innerHTML = '🎉 УРОВЕНЬ ПРОЙДЕН!'; document.getElementById('message').style.color = '#f1c40f';
@@ -885,48 +947,34 @@
         const btnSpin = document.getElementById('btn-spin');
         const btnCloseWheel = document.getElementById('btn-close-wheel');
         
-        const wheelPrizes = [
-            { text: "+1000", val: 1000, color: "#e74c3c" }, { text: "+5000", val: 5000, color: "#f1c40f" }, { text: "+500", val: 500, color: "#3498db" },
-            { text: "+2000", val: 2000, color: "#2ecc71" }, { text: "ДЖЕКПОТ", val: 15000, color: "#9b59b6" }, { text: "+750", val: 750, color: "#e67e22" }
-        ];
-
+        const wheelPrizes = [ { text: "+1000", val: 1000, color: "#e74c3c" }, { text: "+5000", val: 5000, color: "#f1c40f" }, { text: "+500", val: 500, color: "#3498db" }, { text: "+2000", val: 2000, color: "#2ecc71" }, { text: "ДЖЕКПОТ", val: 15000, color: "#9b59b6" }, { text: "+750", val: 750, color: "#e67e22" } ];
         let conicGradient = []; let sliceAngle = 360 / wheelPrizes.length;
         wheelPrizes.forEach((prize, i) => {
-            let start = i * sliceAngle; let end = (i + 1) * sliceAngle;
-            conicGradient.push(`${prize.color} ${start}deg ${end}deg`);
+            let start = i * sliceAngle; let end = (i + 1) * sliceAngle; conicGradient.push(`${prize.color} ${start}deg ${end}deg`);
             let textEl = document.createElement('div'); textEl.className = 'wheel-text'; textEl.innerText = prize.text;
-            textEl.style.transform = `translateX(-50%) rotate(${start + sliceAngle/2}deg)`; textEl.style.transformOrigin = `50% 150px`;
-            wheelSpinner.appendChild(textEl);
+            textEl.style.transform = `translateX(-50%) rotate(${start + sliceAngle/2}deg)`; textEl.style.transformOrigin = `50% 150px`; wheelSpinner.appendChild(textEl);
         });
         wheelSpinner.style.background = `conic-gradient(${conicGradient.join(', ')})`;
 
         let isSpinning = false;
         btnOpenWheel.addEventListener('click', () => { AudioSys.init(); wheelModal.style.display = 'flex'; checkWheelTimer(); });
         btnCloseWheel.addEventListener('click', () => { if(!isSpinning) wheelModal.style.display = 'none'; });
-
         document.getElementById('wheel-cheat-reset').addEventListener('click', () => { localStorage.removeItem('mahjong_last_spin'); checkWheelTimer(); alert("Таймер сброшен!"); });
 
         function checkWheelTimer() {
             let lastSpin = localStorage.getItem('mahjong_last_spin');
             if (lastSpin && Date.now() - parseInt(lastSpin) < 86400000) {
-                let timeLeft = 86400000 - (Date.now() - parseInt(lastSpin));
-                let hours = Math.floor(timeLeft / (1000 * 60 * 60)); let mins = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                let timeLeft = 86400000 - (Date.now() - parseInt(lastSpin)); let hours = Math.floor(timeLeft / (1000 * 60 * 60)); let mins = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
                 btnSpin.innerText = `ОЖИДАНИЕ (${hours}ч ${mins}м)`; btnSpin.style.background = "gray"; btnSpin.style.boxShadow = "none"; btnSpin.disabled = true;
-            } else {
-                btnSpin.innerText = "КРУТИТЬ"; btnSpin.style.background = "linear-gradient(180deg, #ffdf00 0%, #f1c40f 50%, #d4ac0d 100%)";
-                btnSpin.style.boxShadow = "0 8px 0 #9c7e07, 0 15px 20px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8)"; btnSpin.disabled = false;
-            }
+            } else { btnSpin.innerText = "КРУТИТЬ"; btnSpin.style.background = "linear-gradient(180deg, #ffdf00 0%, #f1c40f 50%, #d4ac0d 100%)"; btnSpin.style.boxShadow = "0 8px 0 #9c7e07, 0 15px 20px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8)"; btnSpin.disabled = false; }
         }
 
         btnSpin.addEventListener('click', () => {
             if(isSpinning || btnSpin.disabled) return;
             isSpinning = true; btnSpin.innerText = "ВРАЩЕНИЕ..."; AudioSys.playShuffle();
-            let prizeIndex = Math.floor(Math.random() * wheelPrizes.length);
-            let targetSliceAngle = (prizeIndex * sliceAngle) + (sliceAngle / 2);
-            let rotateAngle = 360 * 5 + (360 - targetSliceAngle); 
+            let prizeIndex = Math.floor(Math.random() * wheelPrizes.length); let targetSliceAngle = (prizeIndex * sliceAngle) + (sliceAngle / 2); let rotateAngle = 360 * 5 + (360 - targetSliceAngle); 
             wheelSpinner.style.transform = `rotate(${rotateAngle}deg)`;
             let ticks = 0; let tickInterval = setInterval(() => { AudioSys.playWheelTick(); ticks++; if(ticks > 25) clearInterval(tickInterval); }, 150);
-
             setTimeout(() => {
                 AudioSys.playWin(); let wonPrize = wheelPrizes[prizeIndex];
                 totalScore += wonPrize.val; localStorage.setItem('mahjong_score', totalScore); localStorage.setItem('mahjong_last_spin', Date.now().toString());
