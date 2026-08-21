@@ -311,8 +311,9 @@
         <div id="message"></div>
         <div id="game-board"></div>
 
+        <!-- ИСПРАВЛЕННЫЙ БУСТЕР ПОДСКАЗКИ С ЛУПОЙ ВМЕСТО ПУСТОГО КВАДРАТА -->
         <div id="boosters-bar">
-            <button class="booster" id="bst-hint" data-unlock="2" data-cost="50">🪄<div class="b-cost">50</div><div class="b-lock">Ур.2</div></button>
+            <button class="booster" id="bst-hint" data-unlock="2" data-cost="50">🔍<div class="b-cost">50</div><div class="b-lock">Ур.2</div></button>
             <button class="booster" id="bst-undo" data-unlock="4" data-cost="100">↩️<div class="b-cost">100</div><div class="b-lock">Ур.4</div></button>
             <button class="booster" id="bst-bomb" data-unlock="7" data-cost="300">💣<div class="b-cost">300</div><div class="b-lock">Ур.7</div></button>
             <button class="booster" id="bst-light" data-unlock="10" data-cost="600">⚡<div class="b-cost">600</div><div class="b-lock">Ур.10</div></button>
@@ -348,7 +349,6 @@
             playUnlock: function() { this.playOsc('square', 600, 200, 0.1, 0.1); setTimeout(() => this.playOsc('square', 800, 300, 0.1, 0.1), 50); },
             playMatch: function() {
                 if (!this.enabled || !this.ctx) return;
-                // Двойной тупой АСМР стук без звона
                 let playTock = (delay, freq) => {
                     setTimeout(() => {
                         let osc = this.ctx.createOscillator(); let gain = this.ctx.createGain();
@@ -392,7 +392,6 @@
             let savedScore = localStorage.getItem('mahjong_score'); if (savedScore) totalScore = parseInt(savedScore);
         } catch(e){}
         
-        // --- 60 ПРЕМИАЛЬНЫХ НАБОРОВ (1200 ПРЕДМЕТОВ) ---
         const themeSets = [
             ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'],
             ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'],
@@ -660,87 +659,42 @@
             document.body.appendChild(floatEl); setTimeout(() => floatEl.remove(), 1000);
         }
 
-        // --- УМНЫЕ СМЫСЛОВЫЕ ЭФФЕКТЫ (С CSS КОРЗИНОЙ И ФОНТАНОМ) ---
         function getSymbolCategory(sym) {
-            const catFood = [0, 1, 6, 28, 36, 47, 48];
-            const catTech = [2, 16, 53, 54];
-            const catZodiac = [9, 15, 43];
-            const catEmotion = [21, 22, 23, 39, 59];
-            const catAnimal = [3, 10, 11, 26, 27, 38, 55];
-            const catTransport = [4, 34, 37, 57];
-            
+            const catFood = [0, 1, 6, 28, 36, 47, 48]; const catTech = [2, 16, 53, 54];
+            const catZodiac = [9, 15, 43]; const catEmotion = [21, 22, 23, 39, 59];
+            const catAnimal = [3, 10, 11, 26, 27, 38, 55]; const catTransport = [4, 34, 37, 57];
             for (let i = 0; i < themeSets.length; i++) {
                 if (themeSets[i].includes(sym)) {
-                    if (catFood.includes(i)) return 'food';
-                    if (catTech.includes(i)) return 'tech';
-                    if (catZodiac.includes(i)) return 'zodiac';
-                    if (catEmotion.includes(i)) return 'emotion';
-                    if (catAnimal.includes(i)) return 'animal';
-                    if (catTransport.includes(i)) return 'transport';
+                    if (catFood.includes(i)) return 'food'; if (catTech.includes(i)) return 'tech';
+                    if (catZodiac.includes(i)) return 'zodiac'; if (catEmotion.includes(i)) return 'emotion';
+                    if (catAnimal.includes(i)) return 'animal'; if (catTransport.includes(i)) return 'transport';
                     return 'general';
                 }
-            }
-            return 'general';
+            } return 'general';
         }
 
         function spawnSmartBurst(element, symbol) {
-            let rect = element.getBoundingClientRect(); 
-            let centerX = rect.left + window.scrollX + rect.width / 2; 
-            let centerY = rect.top + window.scrollY + rect.height / 2;
+            let rect = element.getBoundingClientRect(); let centerX = rect.left + window.scrollX + rect.width / 2; let centerY = rect.top + window.scrollY + rect.height / 2;
             let category = getSymbolCategory(symbol);
-            
-            // Если еда, спавним красивую CSS корзину
             if (category === 'food') {
-                let basketWrap = document.createElement('div');
-                basketWrap.className = 'css-basket-wrap';
-                let basket = document.createElement('div');
-                basket.className = 'css-basket';
-                basketWrap.appendChild(basket);
-                
-                basketWrap.style.left = centerX + 'px'; 
-                basketWrap.style.top = (centerY + 10) + 'px'; 
-                document.body.appendChild(basketWrap); 
-                setTimeout(() => basketWrap.remove(), 1500);
+                let basketWrap = document.createElement('div'); basketWrap.className = 'css-basket-wrap';
+                let basket = document.createElement('div'); basket.className = 'css-basket';
+                basketWrap.appendChild(basket); basketWrap.style.left = centerX + 'px'; basketWrap.style.top = (centerY + 10) + 'px'; 
+                document.body.appendChild(basketWrap); setTimeout(() => basketWrap.remove(), 1500);
             }
-
             let pOpts = [symbol, '✅', '🟢'];
-            if (category === 'food') pOpts = [symbol, '✅', '🍎', '🥦', '🥐'];
-            else if (category === 'tech') pOpts = [symbol, '✅', '🔋', '⚙️', '💡'];
-            else if (category === 'zodiac') pOpts = [symbol, '✨', '🌙', '🌟', '☄️'];
-            else if (category === 'emotion') pOpts = [symbol, '❤️', '👍', '😊', '🔥'];
-            else if (category === 'animal') pOpts = [symbol, '✅', '🐾', '🌿'];
-            else if (category === 'transport') pOpts = [symbol, '✅', '💨', '🏁'];
+            if (category === 'food') pOpts = [symbol, '✅', '🍎', '🥦', '🥐']; else if (category === 'tech') pOpts = [symbol, '✅', '🔋', '⚙️', '💡'];
+            else if (category === 'zodiac') pOpts = [symbol, '✨', '🌙', '🌟', '☄️']; else if (category === 'emotion') pOpts = [symbol, '❤️', '👍', '😊', '🔥'];
+            else if (category === 'animal') pOpts = [symbol, '✅', '🐾', '🌿']; else if (category === 'transport') pOpts = [symbol, '✅', '💨', '🏁'];
             
-            let particleCount = 6 + Math.floor(Math.random() * 4); // 6-9 частиц для густоты
-            
+            let particleCount = 6 + Math.floor(Math.random() * 4); 
             for (let i = 0; i < particleCount; i++) {
-                let p = document.createElement('div'); p.classList.add('smart-particle'); 
-                p.innerText = pOpts[Math.floor(Math.random() * pOpts.length)];
-                
-                p.style.fontSize = (16 + Math.random() * 14) + 'px'; // 16-30px
-                p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
-                
+                let p = document.createElement('div'); p.classList.add('smart-particle'); p.innerText = pOpts[Math.floor(Math.random() * pOpts.length)];
+                p.style.fontSize = (16 + Math.random() * 14) + 'px'; p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
                 let powerX, powerY;
-                if (category === 'food') {
-                    // Эффект фонтана (из корзины вверх и в стороны)
-                    let angle = Math.PI + (Math.random() * Math.PI); // Только вверх
-                    let dist = 60 + Math.random() * 40; 
-                    powerX = Math.cos(angle) * dist;
-                    powerY = Math.sin(angle) * dist - 30; // Пик высоты
-                } else {
-                    // Радиальный разлет
-                    let angle = Math.random() * Math.PI * 2;
-                    let dist = 50 + Math.random() * 60;
-                    powerX = Math.cos(angle) * dist;
-                    powerY = Math.sin(angle) * dist - 30;
-                }
-                
-                p.style.setProperty('--tx', powerX + 'px'); 
-                p.style.setProperty('--up-y', powerY + 'px'); 
-                p.style.setProperty('--ty', (Math.random() * 40 + 20) + 'px'); // Конечная точка ниже пика
-                p.style.setProperty('--rot1', (Math.random() * 180 - 90) + 'deg');
-                p.style.setProperty('--rot2', (Math.random() * 360 - 180) + 'deg');
-                
+                if (category === 'food') { let angle = Math.PI + (Math.random() * Math.PI); let dist = 60 + Math.random() * 40; powerX = Math.cos(angle) * dist; powerY = Math.sin(angle) * dist - 30; } 
+                else { let angle = Math.random() * Math.PI * 2; let dist = 50 + Math.random() * 60; powerX = Math.cos(angle) * dist; powerY = Math.sin(angle) * dist - 30; }
+                p.style.setProperty('--tx', powerX + 'px'); p.style.setProperty('--up-y', powerY + 'px'); p.style.setProperty('--ty', (Math.random() * 40 + 20) + 'px'); p.style.setProperty('--rot1', (Math.random() * 180 - 90) + 'deg'); p.style.setProperty('--rot2', (Math.random() * 360 - 180) + 'deg');
                 document.body.appendChild(p); setTimeout(() => p.remove(), 1000);
             }
         }
@@ -760,10 +714,7 @@
                     
                     let earnedPoints = 10 * comboCount; totalScore += earnedPoints; localStorage.setItem('mahjong_score', totalScore); updateScoreDisplay();
                     showFloatingText(t.el, earnedPoints, comboCount > 1);
-                    
-                    spawnSmartBurst(firstTile.el, firstTile.symbol); 
-                    spawnSmartBurst(t.el, t.symbol);
-                    
+                    spawnSmartBurst(firstTile.el, firstTile.symbol); spawnSmartBurst(t.el, t.symbol);
                     activeTiles = activeTiles.filter(x => x !== firstTile && x !== t); 
                     t.el.classList.add('matched'); firstTile.el.classList.add('matched'); firstTile = null; 
                     updateFreeState(); updateProgressBar();
@@ -803,13 +754,7 @@
                     
                     let currentLayout = activeTiles.map(t => ({x: t.x, y: t.y, z: t.z}));
                     let attemptMix = 0, preparedTiles = null;
-                    
-                    while (!preparedTiles && attemptMix < 100) { 
-                        attemptMix++; 
-                        preparedTiles = assignSymbolsSmart(currentLayout, pairsPool, Math.random); 
-                    }
-                    
-                    // БЕЗОПАСНАЯ ГЕОМЕТРИЯ ПРИ МИКСЕ (Исключение Deadlock)
+                    while (!preparedTiles && attemptMix < 100) { attemptMix++; preparedTiles = assignSymbolsSmart(currentLayout, pairsPool, Math.random); }
                     if (!preparedTiles) {
                         currentLayout = []; let fX = 0, fY = 4;
                         for (let i = 0; i < activeTiles.length; i++) { currentLayout.push({x: fX, y: fY, z: 0}); fX += 2; if (fX > 8) { fX = 0; fY += 2; } }
@@ -822,8 +767,7 @@
                     let toHide = new Set(hideIndices.slice(0, hiddenCount));
 
                     activeTiles.forEach((tile, index) => {
-                        let pt = preparedTiles[index]; 
-                        tile.x = pt.x; tile.y = pt.y; tile.z = pt.z;
+                        let pt = preparedTiles[index]; tile.x = pt.x; tile.y = pt.y; tile.z = pt.z;
                         tile.el.style.setProperty('--x', tile.x); tile.el.style.setProperty('--y', tile.y); tile.el.style.setProperty('--z', tile.z);
                         tile.symbol = pt.symbol; tile.el.innerText = pt.symbol; tile.el.classList.remove('selected');
                         tile.el.classList.add('flip-anim'); setTimeout(() => tile.el.classList.remove('flip-anim'), 400);
@@ -841,19 +785,13 @@
         // --- ПАНЕЛЬ БУСТЕРОВ ---
         function updateBoostersUI() {
             document.querySelectorAll('.booster').forEach(btn => {
-                let unlockLvl = parseInt(btn.getAttribute('data-unlock'));
-                let cost = parseInt(btn.getAttribute('data-cost'));
-                let lockTag = btn.querySelector('.b-lock');
-                
+                let unlockLvl = parseInt(btn.getAttribute('data-unlock')); let cost = parseInt(btn.getAttribute('data-cost')); let lockTag = btn.querySelector('.b-lock');
                 if (currentLevel < unlockLvl) {
-                    btn.classList.add('locked'); btn.classList.remove('disabled');
-                    if(lockTag) lockTag.style.display = 'block';
+                    btn.classList.add('locked'); btn.classList.remove('disabled'); if(lockTag) lockTag.style.display = 'block';
                 } else {
-                    btn.classList.remove('locked');
-                    if(lockTag) lockTag.style.display = 'none';
-                    if (totalScore < cost || activeTiles.length === 0) {
-                        btn.classList.add('disabled');
-                    } else {
+                    btn.classList.remove('locked'); if(lockTag) lockTag.style.display = 'none';
+                    if (totalScore < cost || activeTiles.length === 0) { btn.classList.add('disabled'); } 
+                    else {
                         btn.classList.remove('disabled');
                         if (btn.id === 'bst-undo' && matchHistory.length === 0) btn.classList.add('disabled');
                         if (btn.id === 'bst-hint' && getAvailablePairs().length === 0) btn.classList.add('disabled');
@@ -864,43 +802,27 @@
 
         function buyBooster(btnId, cost, action) {
             let btn = document.getElementById(btnId);
-            if (btn.classList.contains('locked') || btn.classList.contains('disabled')) {
-                AudioSys.playError();
-                let scoreEl = document.getElementById('hud-score');
-                scoreEl.style.color = '#e74c3c'; setTimeout(() => scoreEl.style.color = '#fff', 300); return;
-            }
-            totalScore -= cost; localStorage.setItem('mahjong_score', totalScore); updateScoreDisplay();
-            AudioSys.playBooster(); action();
+            if (btn.classList.contains('locked') || btn.classList.contains('disabled')) { AudioSys.playError(); let scoreEl = document.getElementById('hud-score'); scoreEl.style.color = '#e74c3c'; setTimeout(() => scoreEl.style.color = '#fff', 300); return; }
+            totalScore -= cost; localStorage.setItem('mahjong_score', totalScore); updateScoreDisplay(); AudioSys.playBooster(); action();
         }
 
         function getAvailablePairs() {
-            let freeTiles = activeTiles.filter(t => t.isFree && !t.isHidden);
-            let pairs = [];
-            for (let i = 0; i < freeTiles.length; i++) {
-                for (let j = i + 1; j < freeTiles.length; j++) {
-                    if (freeTiles[i].symbol === freeTiles[j].symbol) pairs.push([freeTiles[i], freeTiles[j]]);
-                }
-            } return pairs;
+            let freeTiles = activeTiles.filter(t => t.isFree && !t.isHidden); let pairs = [];
+            for (let i = 0; i < freeTiles.length; i++) { for (let j = i + 1; j < freeTiles.length; j++) { if (freeTiles[i].symbol === freeTiles[j].symbol) pairs.push([freeTiles[i], freeTiles[j]]); } } return pairs;
         }
 
         document.getElementById('bst-hint').addEventListener('click', () => {
             buyBooster('bst-hint', 50, () => {
                 let pairs = getAvailablePairs();
-                if (pairs.length > 0) {
-                    let pair = pairs[0];
-                    pair[0].el.classList.add('hinted'); pair[1].el.classList.add('hinted');
-                    setTimeout(() => { pair[0].el.classList.remove('hinted'); pair[1].el.classList.remove('hinted'); }, 3000);
-                }
+                if (pairs.length > 0) { let pair = pairs[0]; pair[0].el.classList.add('hinted'); pair[1].el.classList.add('hinted'); setTimeout(() => { pair[0].el.classList.remove('hinted'); pair[1].el.classList.remove('hinted'); }, 3000); }
             });
         });
 
         document.getElementById('bst-undo').addEventListener('click', () => {
             buyBooster('bst-undo', 100, () => {
                 if (matchHistory.length === 0) return;
-                let pair = matchHistory.pop();
-                pair[0].el.classList.remove('matched', 'selected'); pair[1].el.classList.remove('matched', 'selected');
-                activeTiles.push(pair[0], pair[1]);
-                comboCount = 0; updateFreeState(); updateProgressBar();
+                let pair = matchHistory.pop(); pair[0].el.classList.remove('matched', 'selected'); pair[1].el.classList.remove('matched', 'selected');
+                activeTiles.push(pair[0], pair[1]); comboCount = 0; updateFreeState(); updateProgressBar();
             });
         });
 
@@ -930,8 +852,7 @@
                 let randomTile = activeTiles[Math.floor(Math.random() * activeTiles.length)];
                 let targets = activeTiles.filter(t => t.symbol === randomTile.symbol);
                 targets.forEach(t => { spawnSmartBurst(t.el, t.symbol); t.el.classList.add('matched'); });
-                activeTiles = activeTiles.filter(t => t.symbol !== randomTile.symbol);
-                matchHistory = []; updateFreeState(); updateProgressBar();
+                activeTiles = activeTiles.filter(t => t.symbol !== randomTile.symbol); matchHistory = []; updateFreeState(); updateProgressBar();
                 if (activeTiles.length === 0) {
                     AudioSys.playWin(); currentLevel++; localStorage.setItem('mahjong_level', currentLevel);
                     document.getElementById('message').innerHTML = '🎉 УРОВЕНЬ ПРОЙДЕН!'; document.getElementById('message').style.color = '#f1c40f';
@@ -941,18 +862,12 @@
         });
 
         // --- ЛОГИКА КОЛЕСА ФОРТУНЫ ---
-        const wheelModal = document.getElementById('wheel-modal');
-        const wheelSpinner = document.getElementById('wheel-spinner');
-        const btnOpenWheel = document.getElementById('btn-open-wheel');
-        const btnSpin = document.getElementById('btn-spin');
-        const btnCloseWheel = document.getElementById('btn-close-wheel');
-        
+        const wheelModal = document.getElementById('wheel-modal'); const wheelSpinner = document.getElementById('wheel-spinner'); const btnOpenWheel = document.getElementById('btn-open-wheel'); const btnSpin = document.getElementById('btn-spin'); const btnCloseWheel = document.getElementById('btn-close-wheel');
         const wheelPrizes = [ { text: "+1000", val: 1000, color: "#e74c3c" }, { text: "+5000", val: 5000, color: "#f1c40f" }, { text: "+500", val: 500, color: "#3498db" }, { text: "+2000", val: 2000, color: "#2ecc71" }, { text: "ДЖЕКПОТ", val: 15000, color: "#9b59b6" }, { text: "+750", val: 750, color: "#e67e22" } ];
         let conicGradient = []; let sliceAngle = 360 / wheelPrizes.length;
         wheelPrizes.forEach((prize, i) => {
             let start = i * sliceAngle; let end = (i + 1) * sliceAngle; conicGradient.push(`${prize.color} ${start}deg ${end}deg`);
-            let textEl = document.createElement('div'); textEl.className = 'wheel-text'; textEl.innerText = prize.text;
-            textEl.style.transform = `translateX(-50%) rotate(${start + sliceAngle/2}deg)`; textEl.style.transformOrigin = `50% 150px`; wheelSpinner.appendChild(textEl);
+            let textEl = document.createElement('div'); textEl.className = 'wheel-text'; textEl.innerText = prize.text; textEl.style.transform = `translateX(-50%) rotate(${start + sliceAngle/2}deg)`; textEl.style.transformOrigin = `50% 150px`; wheelSpinner.appendChild(textEl);
         });
         wheelSpinner.style.background = `conic-gradient(${conicGradient.join(', ')})`;
 
@@ -976,11 +891,9 @@
             wheelSpinner.style.transform = `rotate(${rotateAngle}deg)`;
             let ticks = 0; let tickInterval = setInterval(() => { AudioSys.playWheelTick(); ticks++; if(ticks > 25) clearInterval(tickInterval); }, 150);
             setTimeout(() => {
-                AudioSys.playWin(); let wonPrize = wheelPrizes[prizeIndex];
-                totalScore += wonPrize.val; localStorage.setItem('mahjong_score', totalScore); localStorage.setItem('mahjong_last_spin', Date.now().toString());
+                AudioSys.playWin(); let wonPrize = wheelPrizes[prizeIndex]; totalScore += wonPrize.val; localStorage.setItem('mahjong_score', totalScore); localStorage.setItem('mahjong_last_spin', Date.now().toString());
                 updateScoreDisplay(); alert(`ПОЗДРАВЛЯЕМ! Вы выиграли ${wonPrize.text}`);
-                isSpinning = false; wheelSpinner.style.transition = 'none'; wheelSpinner.style.transform = `rotate(${360 - targetSliceAngle}deg)`; 
-                setTimeout(() => wheelSpinner.style.transition = 'transform 4s cubic-bezier(0.175, 0.885, 0.32, 1.275)', 50); checkWheelTimer();
+                isSpinning = false; wheelSpinner.style.transition = 'none'; wheelSpinner.style.transform = `rotate(${360 - targetSliceAngle}deg)`; setTimeout(() => wheelSpinner.style.transition = 'transform 4s cubic-bezier(0.175, 0.885, 0.32, 1.275)', 50); checkWheelTimer();
             }, 4000);
         });
     </script>
