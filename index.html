@@ -47,7 +47,6 @@
             text-align: center; letter-spacing: 2px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.8)); z-index: 2;
         }
         
-        /* ПАНЕЛЬ УПРАВЛЕНИЯ УРОВНЕМ В МЕНЮ */
         #level-controls {
             display: flex; align-items: center; justify-content: center; gap: 10px;
             margin-bottom: 40px; z-index: 2;
@@ -92,7 +91,7 @@
         /* --- ИГРОВОЙ ЭКРАН --- */
         #game-screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; padding-top: 15px; z-index: 10; position: relative; }
         
-        #top-bar { width: 90vw; max-width: 400px; display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+        #top-bar { width: 100%; max-width: 500px; padding: 0 15px; display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .hud-center { display: flex; flex-direction: column; align-items: center; flex-grow: 1; margin: 0 10px; }
         
         #hud-level { font-family: 'Russo One', sans-serif; font-size: 20px; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.5); cursor: pointer; padding: 2px 10px; white-space: nowrap; line-height: 1.2; text-align: center; }
@@ -100,15 +99,27 @@
         #hud-score { font-family: 'Russo One', sans-serif; font-size: 18px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); margin-top: 2px; }
         #hud-difficulty { font-size: 12px; font-weight: bold; padding: 3px 8px; border-radius: 10px; margin-top: 4px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); box-shadow: 0 2px 4px rgba(0,0,0,0.5); white-space: nowrap; }
 
-        #progress-container { width: 90vw; max-width: 400px; height: 8px; background-color: rgba(0,0,0,0.5); border-radius: 4px; margin-bottom: 15px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.1); }
+        #progress-container { width: 90vw; max-width: 400px; height: 8px; background-color: rgba(0,0,0,0.5); border-radius: 4px; margin-bottom: 5px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.1); }
         #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #ffdf00, #f1c40f, #fff3b0); box-shadow: 0 0 10px rgba(241, 196, 15, 0.8); transition: width 0.4s ease-out; }
+
+        #message { 
+            font-family: 'Russo One', sans-serif; font-size: 20px; height: 26px; 
+            color: #2ecc71; text-align: center; margin-bottom: 10px; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8); z-index: 100;
+        }
 
         .btn-small-top { font-family: sans-serif; font-size: 14px; padding: 8px 12px; border-radius: 15px; background-color: #3498db; color: white; border: none; font-weight: bold; box-shadow: 0 4px 0 #2980b9, 0 5px 10px rgba(0,0,0,0.5); transition: all 0.2s; cursor: pointer; white-space: nowrap; }
         .btn-small-top:active { transform: translateY(4px); box-shadow: 0 0 0 #2980b9; }
         
-        /* Цветовое выделение кнопки МИКС наверху */
         .btn-mix { background-color: #e67e22; box-shadow: 0 4px 0 #d35400, 0 5px 10px rgba(0,0,0,0.5); }
         .btn-mix:active { box-shadow: 0 0 0 #d35400; }
+
+        @keyframes pulseBtnTop { 
+            0% { transform: scale(1); box-shadow: 0 4px 0 #d35400, 0 0 0 0 rgba(231, 76, 60, 0.7); } 
+            50% { transform: scale(1.05); box-shadow: 0 4px 0 #d35400, 0 0 0 10px rgba(231, 76, 60, 0); } 
+            100% { transform: scale(1); box-shadow: 0 4px 0 #d35400, 0 0 0 0 rgba(231, 76, 60, 0); } 
+        }
+        .btn-pulse { animation: pulseBtnTop 1.5s infinite !important; background-color: #e74c3c !important; box-shadow: 0 4px 0 #c0392b !important;}
 
         #game-board { width: 90vw; height: 112.5vw; max-width: 400px; max-height: 500px; position: relative; perspective: 1000px; }
         
@@ -120,7 +131,7 @@
             display: flex; justify-content: center; align-items: center; border-radius: 10px; border: 2px solid var(--tileBorder);
             box-shadow: var(--shadow), calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(2vw + var(--z) * 0.8vw) rgba(0,0,0,0.85);
             backdrop-filter: blur(4px); touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
-            transition: transform 0.2s, filter 0.2s, box-shadow 0.2s; cursor: pointer; transform-style: preserve-3d;
+            transition: transform 0.2s, filter 0.2s, box-shadow 0.2s, top 0.5s ease-in-out, left 0.5s ease-in-out, margin-top 0.5s ease-in-out, margin-left 0.5s ease-in-out; cursor: pointer; transform-style: preserve-3d;
         }
         @media (min-width: 400px) {
             .tile { font-size: 56px; border-radius: 14px; margin-top: calc(var(--z) * -14px); margin-left: calc(var(--z) * -8px); }
@@ -135,7 +146,6 @@
         .flip-anim { animation: flipTileIn 0.3s ease-out forwards; }
         @keyframes flipTileIn { 0% { transform: translateY(-3vw) scale(1.08) rotateY(-90deg); } 100% { transform: translateY(-3vw) scale(1.08) rotateY(0deg); } }
 
-        /* --- ЧАСТИЦЫ ДЛЯ ВЗРЫВА ФИШЕК (НАХОДЯТСЯ В BODY) --- */
         .gold-shard {
             position: absolute; width: 12px; height: 12px;
             background: linear-gradient(135deg, #ffdf00, #d4ac0d);
@@ -154,18 +164,12 @@
             100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.3) rotate(var(--rot)); }
         }
 
-        @keyframes pulseBtnTop { 
-            0% { transform: scale(1); box-shadow: 0 4px 0 #d35400, 0 0 0 0 rgba(231, 76, 60, 0.7); } 
-            50% { transform: scale(1.05); box-shadow: 0 4px 0 #d35400, 0 0 0 10px rgba(231, 76, 60, 0); } 
-            100% { transform: scale(1); box-shadow: 0 4px 0 #d35400, 0 0 0 0 rgba(231, 76, 60, 0); } 
-        }
-        .btn-pulse { animation: pulseBtnTop 1.5s infinite !important; background-color: #e74c3c !important; box-shadow: 0 4px 0 #c0392b !important;}
-
-        #message { font-family: 'Russo One', sans-serif; font-size: 24px; height: 30px; color: #2ecc71; text-align: center; margin-top: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); z-index: 100;}
-
         .floating-text { position: absolute; font-family: 'Russo One', sans-serif; font-size: 24px; color: #2ecc71; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 10px rgba(46, 204, 113, 0.8); pointer-events: none; z-index: 9999; animation: floatUpText 1s ease-out forwards; }
         .floating-text.combo { color: #f1c40f; font-size: 32px; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 15px rgba(241, 196, 15, 0.8); }
         @keyframes floatUpText { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 20% { transform: translateY(-20px) scale(1.2); opacity: 1; } 100% { transform: translateY(-60px) scale(1); opacity: 0; } }
+
+        .confetti { position: absolute; width: 10px; height: 10px; background-color: #f00; z-index: 2000; animation: fall linear forwards; }
+        @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
 
         #rules-modal, #ad-screen { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.95); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; }
         #rules-modal h2, #ad-screen h2 { font-family: 'Russo One', sans-serif; font-size: 32px; color: #f1c40f; margin-bottom: 20px; }
@@ -206,13 +210,14 @@
                 <div id="hud-score">🏆 0</div>
                 <div id="hud-difficulty">🟢 Легко</div>
             </div>
-            <!-- Микс вернулся наверх, где никому не мешает -->
             <button id="btn-shuffle" class="btn-small-top btn-mix">🎥 Микс</button>
         </div>
         
         <div id="progress-container"><div id="progress-bar"></div></div>
-        <div id="game-board"></div>
+        
         <div id="message"></div>
+        
+        <div id="game-board"></div>
     </div>
 
     <div id="ad-screen">
@@ -268,7 +273,6 @@
         
         document.getElementById('btn-play').addEventListener('click', () => { document.getElementById('main-menu').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; initGame(); });
         
-        // Кнопки отката уровней в меню
         document.getElementById('btn-prev-level').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; localStorage.setItem('mahjong_level', currentLevel); updateMenuLevelText(); }});
         document.getElementById('btn-next-level').addEventListener('click', () => { currentLevel++; localStorage.setItem('mahjong_level', currentLevel); updateMenuLevelText(); });
 
@@ -300,6 +304,12 @@
             let t1 = Math.floor(Math.random() * themeSets.length), t2 = Math.floor(Math.random() * themeSets.length), t3 = Math.floor(Math.random() * themeSets.length);
             return [...themeSets[t1].slice(0, 7), ...themeSets[t2].slice(7, 14), ...themeSets[t3].slice(14, 20)];
         }
+        function getPairsFromSymbols(symbolsArray) {
+            let counts = {}; symbolsArray.forEach(s => counts[s] = (counts[s] || 0) + 1);
+            let pairsPool = []; for (let s in counts) { for(let i=0; i < Math.floor(counts[s] / 2); i++) pairsPool.push(s); }
+            return pairsPool;
+        }
+
         function assignSymbolsSmart(layout, pairsPool, customRnd) {
             let unassigned = layout.map(pos => ({...pos, symbol: null}));
             let symbolPool = [...pairsPool];
@@ -359,7 +369,27 @@
                 let prepared = assignSymbolsSmart(layout, pairsPool, rnd); if (prepared) finalLayout = prepared; 
             }
 
-            if (!finalLayout) finalLayout = [{x: 2, y: 2, z: 0, symbol: baseSymbols[0]}, {x: 4, y: 2, z: 0, symbol: baseSymbols[0]}, {x: 2, y: 4, z: 0, symbol: baseSymbols[1]}, {x: 4, y: 4, z: 0, symbol: baseSymbols[1]}];
+            if (!finalLayout) {
+                console.warn("Сложная 3D-форма не удалась, генерируем плоский страховочный уровень.");
+                let fallbackLayout = [];
+                let maxTiles = Math.min(40, Math.max(8, currentLevel * 2));
+                if (maxTiles % 2 !== 0) maxTiles++; 
+                
+                let fX = 0, fY = 0;
+                for (let i = 0; i < maxTiles; i++) {
+                    fallbackLayout.push({x: fX, y: fY, z: 0});
+                    fX += 2;
+                    if (fX > 8) { fX = 0; fY += 2; }
+                }
+                
+                let fallbackPool = [];
+                for(let i = 0; i < maxTiles / 2; i++) {
+                    fallbackPool.push(baseSymbols[Math.floor(Math.random() * baseSymbols.length)]);
+                }
+                
+                let prepared = assignSymbolsSmart(fallbackLayout, fallbackPool, Math.random);
+                finalLayout = prepared || fallbackLayout.map((pos, i) => ({...pos, symbol: fallbackPool[Math.floor(i/2)]}));
+            }
 
             if ((currentLevel % 10 === 7) || (currentLevel % 10 === 8)) {
                 let hideCount = (finalLayout.length >= 30) ? 6 : 4;
@@ -399,8 +429,14 @@
             let freeTiles = activeTiles.filter(t => t.isFree), symbolsSet = new Set(), hasMoves = false;
             for (let t of freeTiles) { if (symbolsSet.has(t.symbol)) { hasMoves = true; break; } symbolsSet.add(t.symbol); }
             let btnShuffle = document.getElementById('btn-shuffle');
-            if (!hasMoves) { document.getElementById('message').innerText = 'НЕТ ХОДОВ! Нажмите Микс ➔'; document.getElementById('message').style.color = '#e74c3c'; btnShuffle.classList.add('btn-pulse'); } 
-            else { document.getElementById('message').innerHTML = ''; btnShuffle.classList.remove('btn-pulse'); }
+            if (!hasMoves) { 
+                document.getElementById('message').innerText = 'НЕТ ХОДОВ! Нажмите Микс ➔'; 
+                document.getElementById('message').style.color = '#e74c3c'; 
+                btnShuffle.classList.add('btn-pulse'); 
+            } else { 
+                document.getElementById('message').innerHTML = ''; 
+                btnShuffle.classList.remove('btn-pulse'); 
+            }
         }
 
         function showFloatingText(element, points, isCombo) {
@@ -415,7 +451,6 @@
             setTimeout(() => floatEl.remove(), 1000);
         }
 
-        // --- ГЕНЕРАТОР УМНЫХ ЧАСТИЦ ПОВЕРХ ВСЕГО EКРАНА ---
         function spawnSymbolBurst(element, symbol) {
             let rect = element.getBoundingClientRect();
             let centerX = rect.left + window.scrollX + rect.width / 2;
@@ -424,7 +459,6 @@
             let isStandard = standardSymbols.includes(symbol);
             
             if (isStandard) {
-                // ЗОЛОТЫЕ ОСКОЛКИ 
                 let shardCount = 12 + Math.floor(Math.random() * 6); 
                 for (let i = 0; i < shardCount; i++) {
                     let p = document.createElement('div'); p.classList.add('gold-shard');
@@ -437,7 +471,6 @@
                     setTimeout(() => p.remove(), 600);
                 }
             } else {
-                // ТЕМАТИЧЕСКИЕ ЧАСТИЦЫ
                 let particleCount = 5 + Math.floor(Math.random() * 4); 
                 for (let i = 0; i < particleCount; i++) {
                     let p = document.createElement('div'); p.classList.add('thematic-particle');
@@ -474,7 +507,6 @@
                     localStorage.setItem('mahjong_score', totalScore); updateScoreDisplay();
                     showFloatingText(t.el, earnedPoints, comboCount > 1);
 
-                    // САЛЮТ ПЕРЕД ИСЧЕЗНОВЕНИЕМ
                     spawnSymbolBurst(firstTile.el, firstTile.symbol);
                     spawnSymbolBurst(t.el, t.symbol);
 
@@ -507,37 +539,69 @@
 
         function watchAdToShuffle() { 
             if (activeTiles.length === 0) return;
-            const ad = document.getElementById('ad-screen'); ad.style.display = 'flex'; 
+            const ad = document.getElementById('ad-screen'); 
+            if(ad) ad.style.display = 'flex'; 
             
             setTimeout(() => { 
-                ad.style.display = 'none'; 
-                let currentSymbols = activeTiles.map(t => t.symbol); let pairsPool = getPairsFromSymbols(currentSymbols);
-                let hiddenCount = activeTiles.filter(t => t.isHidden).length;
-                let attemptMix = 0, preparedTiles = null, newLayout = [];
+                if(ad) ad.style.display = 'none'; 
                 
-                while (!preparedTiles && attemptMix < 100) {
-                    attemptMix++; newLayout = []; let fX = 0, fY = 0, fZ = 0;
-                    for (let i = 0; i < activeTiles.length; i++) {
-                        newLayout.push({x: fX, y: fY, z: fZ}); fX += 2; 
-                        if (fX > 8) { fX = 0; fY += 2; if (fY > 8) { fY = (fZ % 2 === 0) ? 1 : 0; fX = (fZ % 2 === 0) ? 1 : 0; fZ += 1; } }
+                try {
+                    let currentSymbols = activeTiles.map(t => t.symbol); 
+                    let pairsPool = getPairsFromSymbols(currentSymbols);
+                    let hiddenCount = activeTiles.filter(t => t.isHidden).length;
+                    let attemptMix = 0, preparedTiles = null, newLayout = [];
+                    
+                    while (!preparedTiles && attemptMix < 100) {
+                        attemptMix++; newLayout = []; let fX = 0, fY = 0, fZ = 0;
+                        for (let i = 0; i < activeTiles.length; i++) {
+                            newLayout.push({x: fX, y: fY, z: fZ}); fX += 2; 
+                            if (fX > 8) { 
+                                fX = 0; fY += 2; 
+                                if (fY > 8) { 
+                                    fZ += 1; 
+                                    fY = (fZ % 2 === 0) ? 0 : 1; 
+                                    fX = (fZ % 2 === 0) ? 0 : 1; 
+                                } 
+                            }
+                        }
+                        preparedTiles = assignSymbolsSmart(newLayout, pairsPool, Math.random);
                     }
-                    preparedTiles = assignSymbolsSmart(newLayout, pairsPool, Math.random);
+
+                    if (!preparedTiles) {
+                        preparedTiles = newLayout.map((pos, i) => ({...pos, symbol: currentSymbols[i]}));
+                    }
+
+                    let hideIndices = Array.from({length: newLayout.length}, (_, i) => i);
+                    for (let i = hideIndices.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [hideIndices[i], hideIndices[j]] = [hideIndices[j], hideIndices[i]]; }
+                    let toHide = new Set(hideIndices.slice(0, hiddenCount));
+
+                    activeTiles.forEach((tile, index) => {
+                        let pt = preparedTiles[index]; 
+                        tile.symbol = pt.symbol; 
+                        tile.el.innerText = pt.symbol; 
+                        tile.el.classList.remove('selected');
+                        tile.x = pt.x; tile.y = pt.y; tile.z = pt.z;
+                        
+                        tile.el.style.setProperty('--x', tile.x); 
+                        tile.el.style.setProperty('--y', tile.y); 
+                        tile.el.style.setProperty('--z', tile.z);
+                        
+                        if (toHide.has(index)) { tile.isHidden = true; tile.el.classList.add('is-hidden'); } 
+                        else { tile.isHidden = false; tile.el.classList.remove('is-hidden'); }
+                    });
+
+                    firstTile = null; 
+                    updateFreeState(); 
+                    comboCount = 0; 
+                    
+                    let msg = document.getElementById('message');
+                    if(msg) { msg.innerText = 'Поле перестроено! ✨'; msg.style.color = '#f1c40f'; }
+                    let btn = document.getElementById('btn-shuffle');
+                    if(btn) btn.classList.remove('btn-pulse');
+                    
+                } catch(e) {
+                    console.error("Ошибка микса:", e);
                 }
-
-                let hideIndices = Array.from({length: newLayout.length}, (_, i) => i);
-                for (let i = hideIndices.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [hideIndices[i], hideIndices[j]] = [hideIndices[j], hideIndices[i]]; }
-                let toHide = new Set(hideIndices.slice(0, hiddenCount));
-
-                activeTiles.forEach((tile, index) => {
-                    let pt = preparedTiles[index]; tile.symbol = pt.symbol; tile.el.innerText = pt.symbol; tile.el.classList.remove('selected');
-                    tile.x = pt.x; tile.y = pt.y; tile.z = pt.z;
-                    tile.el.style.setProperty('--x', tile.x); tile.el.style.setProperty('--y', tile.y); tile.el.style.setProperty('--z', tile.z);
-                    if (toHide.has(index)) { tile.isHidden = true; tile.el.classList.add('is-hidden'); } else { tile.isHidden = false; tile.el.classList.remove('is-hidden'); }
-                });
-
-                firstTile = null; updateFreeState(); comboCount = 0; 
-                document.getElementById('message').innerText = 'Поле перестроено! ✨'; document.getElementById('message').style.color = '#f1c40f';
-                document.getElementById('btn-shuffle').classList.remove('btn-pulse');
             }, 1000); 
         }
     </script>
