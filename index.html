@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="color-scheme" content="light only">
-    <title>Mahjong Deluxe - Infinity 8888</title>
+    <title>Mahjong Deluxe - Infinity</title>
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -146,7 +146,7 @@
         .tile.is-hidden { color: transparent !important; text-shadow: none !important; }
         .tile.is-hidden::after { content: '❖'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 32px; color: rgba(139, 69, 19, 0.35); text-shadow: 1px 1px 1px rgba(255,255,255,0.6), -1px -1px 1px rgba(0,0,0,0.2); }
 
-        .flip-anim { animation: flipTileIn 0.3s ease-out forwards; }
+        .flip-anim { animation: flipTileIn 0.4s ease-in-out forwards; }
         @keyframes flipTileIn { 0% { transform: translateY(-3vw) scale(1.08) rotateY(-90deg); } 100% { transform: translateY(-3vw) scale(1.08) rotateY(0deg); } }
 
         .gold-shard {
@@ -229,7 +229,7 @@
 
     <div id="ad-screen">
         <div class="loader"></div>
-        <h2>Рекламная пауза</h2><p>Перестройка поля...</p>
+        <h2>Рекламная пауза</h2><p>Перемешиваем фишки...</p>
     </div>
 
     <script>
@@ -254,46 +254,48 @@
             let savedScore = localStorage.getItem('mahjong_score'); if (savedScore) totalScore = parseInt(savedScore);
         } catch(e){}
         
-        // --- 37 ПРЕМИАЛЬНЫХ НАБОРОВ (740 ПРЕДМЕТОВ) - НИКАКИХ ИЕРОГЛИФОВ ---
+        // --- 37 ПРЕМИАЛЬНЫХ НАБОРОВ (740 ПРЕДМЕТОВ) ---
         const themeSets = [
-            ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'], // 0
-            ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'], // 1
-            ['📱','💻','🖥️','🖨️','🖱️','🕹️','💾','💿','📷','📹','🎥','📺','📻','🎙️','⏱️','⏰','⏳','💡','🔦','🔋'], // 2
-            ['🦁','🐯','🦒','🦊','🐻','🐼','🐨','🐰','🐷','🦝','🐗','🦓','🦌','🐘','🦏','🦛','🐭','🐹','🐿️','🦔'], // 3
-            ['🚗','🚕','🚙','🚌','🏎️','🚓','🚑','🚒','🚐','🛻','🚚','🚛','🚜','🏍️','🛵','🦽','🛺','🚲','🛴','🛹'], // 4
-            ['⚽','🏀','🏈','⚾','🎾','🏐','🎱','🏓','🏸','🏒','⛳','🪁','🏹','🎣','🤿','🥊','🥋','🛹','🛼','⛸️'], // 5
-            ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥒'], // 6
-            ['🌲','🌳','🌴','🌵','🌾','🌿','🍀','🍁','🍂','🍃','🌷','🌹','🌻','🌼','🌸','🌺','🪴','🍄','🪷','💐'], // 7
-            ['🔨','🪓','⛏️','🛠️','🪚','🔧','🪛','🔩','⚙️','🧲','🪜','🧱','🛡️','💣','🧨','🧯','🧭','⚓','🪝','⚖️'], // 8
-            ['💎','🔮','🪄','🧿','👑','💍','🪙','💰','🪬','⏳','🩸','🧪','🧬','🔭','🔬','🛸','🚀','🛰️','🪐','👽'], // 9
-            ['🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🦭','🐊','🐸','🐢','🦦','🦪','🐚','🪸'], // 10
-            ['🦅','🦆','🦉','🦇','🐝','🐛','🦋','🐌','🐞','🐜','🪲','🪳','🕷️','🕸️','🦂','🦟','🪰','🪱','🦜','🦚'], // 11
-            ['👕','👖','👔','👗','👙','👘','💄','💋','🧦','🥾','👟','👞','👢','👠','🩴','🎒','🧳','👓','🕶️','🧣'], // 12
-            ['🎸','🎹','🎷','🎺','🎻','🪕','🥁','🪘','🪗','🎧','🎤','🎙️','📻','🎚️','🎛️','🔈','💿','📼','🎼','🎵'], // 13
-            ['🚪','🛏️','🛋️','🪑','🚽','🚿','🛁','🪒','🧴','🧹','🧺','🧻','🧼','🧽','🛒','🪞','🪟','🖼️','🧸','🗑️'], // 14
-            ['🌍','🌞','🌝','🌛','✨','⚡','🔥','🌪️','🌈','☁️','🌤️','⛅','🌥️','🌦️','🌧️','🌨️','🌩️','☔','☂️','❄️'], // 15
-            ['✏️','✒️','🖋️','🖊️','🖌️','🖍️','📝','💼','📁','📂','🗂️','📅','📆','🗒️','🗓️','📇','📈','📉','📊','📋'], // 16
-            ['📕','📖','📗','📘','📙','📚','📓','📒','📃','📜','📄','📰','🗞️','🔖','🏷️','✉️','📧','📨','📩','📤'], // 17
-            ['📥','📦','📫','📪','📬','📭','📮','🗳️','📌','📍','📎','🖇️','📏','📐','✂️','🗑️','🔒','🔓','🔏','🔐'], // 18
-            ['🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨','🏪','🏫','🏩','💒','🏛️','⛪','🕌'], // 19
-            ['🕍','🛕','🕋','⛩️','🛤️','🛣️','🗾','🎑','🏞️','🌅','🌄','🌠','🎇','🎆','🌇','🌆','🏙️','🌃','🌌','🌉'], // 20
-            ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','☺️','😚'], // 21
-            ['😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄'], // 22
-            ['😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳'], // 23
-            ['👈','👉','☝️','👆','🖕','👇','✌️','🤞','🖖','🤘','🤙','🖐️','✋','👌','👍','👎','✊','👊','🤛','🤜'], // 24
-            ['🧗','🤺','🏇','⛷️','🏂','🏌️','🏄','🚣','🏊','🤽','🧜','🧚','🧞','🦸','🦹','🧝','🧙','🧟','🧛','👼'], // 25
-            ['🐮','🐂','🐃','🐄','🐖','🐏','🐑','🐐','🐪','🐫','🦙','🦘','🐎','🐴','🐔','🐓','🐣','🐤','🐥','🐦'], // 26
-            ['🐧','🦅','🦆','🦢','🦉','🦤','🪶','🦩','🦚','🦜','🐸','🐊','🐢','🦎','🐍','🐲','🐉','🦕','🐳','🐋'], // 27
-            ['🔪','🥄','🍴','🍽️','🥣','🥡','🥢','🍶','🥂','🍻','🍺','🍹','🍷','🥃','🍸','🧉','🍾','🧊','🥤','🧋'], // 28
-            ['💈','✂️','🗑️','🛢️','🧴','🧷','🧹','🧺','🧻','🧼','🧽','🚿','🛁','🛀','🪥','🪒','🧴','🧻','🧽','🧼'], // 29
-            ['🎨','🧵','🪡','🧶','🪢','🛍️','🎒','🩴','👓','🕶️','🧣','🧤','🧥','🧦','👗','👘','🥻','🩱','🩲','🩳'], // 30
-            ['🎮','🕹️','🎰','🎲','🧩','🧸','🪀','🪅','🪄','🔮','🧿','🪩','🪆','🪁','🎯','🎳','🥏','🏑','🥍','🏏'], // 31
-            ['🌵','🎄','🌲','🌳','🌴','🪵','🌱','🌿','☘️','🍀','🎍','🪴','🎋','🍃','🍂','🍁','🍄','🌾','💐','🌷'], // 32
-            ['💉','🩸','💊','🩹','🩺','🩻','🧪','🧫','🧬','🔬','🔭','📡','🌡️','🧹','🗑️','⚖️','🛡️','🗡️','⚔️','💣'], // 33
-            ['🚂','🚃','🚄','🚅','🚆','🚇','🚈','🚉','🚊','🚝','🚞','🚋','🚌','🚍','🚎','🚐','🚑','🚒','🚓','🚔'], // 34
-            ['🕰️','🧱','🪨','🪵','🛖','🏕️','⛺','🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨'], // 35
-            ['🍉','🍊','🍋','🍌','🍍','🥭','🍎','🍏','🍐','🍑','🍒','🍓','🫐','🥝','🍅','🫒','🥥','🥑','🍆','🥔']  // 36
+            ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'], 
+            ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'], 
+            ['📱','💻','🖥️','🖨️','🖱️','🕹️','💾','💿','📷','📹','🎥','📺','📻','🎙️','⏱️','⏰','⏳','💡','🔦','🔋'], 
+            ['🦁','🐯','🦒','🦊','🐻','🐼','🐨','🐰','🐷','🦝','🐗','🦓','🦌','🐘','🦏','🦛','🐭','🐹','🐿️','🦔'], 
+            ['🚗','🚕','🚙','🚌','🏎️','🚓','🚑','🚒','🚐','🛻','🚚','🚛','🚜','🏍️','🛵','🦽','🛺','🚲','🛴','🛹'], 
+            ['⚽','🏀','🏈','⚾','🎾','🏐','🎱','🏓','🏸','🏒','⛳','🪁','🏹','🎣','🤿','🥊','🥋','🛹','🛼','⛸️'], 
+            ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥒'], 
+            ['🌲','🌳','🌴','🌵','🌾','🌿','🍀','🍁','🍂','🍃','🌷','🌹','🌻','🌼','🌸','🌺','🪴','🍄','🪷','💐'], 
+            ['🔨','🪓','⛏️','🛠️','🪚','🔧','🪛','🔩','⚙️','🧲','🪜','🧱','🛡️','💣','🧨','🧯','🧭','⚓','🪝','⚖️'], 
+            ['💎','🔮','🪄','🧿','👑','💍','🪙','💰','🪬','⏳','🩸','🧪','🧬','🔭','🔬','🛸','🚀','🛰️','🪐','👽'], 
+            ['🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🦭','🐊','🐸','🐢','🦦','🦪','🐚','🪸'], 
+            ['🦅','🦆','🦉','🦇','🐝','🐛','🦋','🐌','🐞','🐜','🪲','🪳','🕷️','🕸️','🦂','🦟','🪰','🪱','🦜','🦚'], 
+            ['👕','👖','👔','👗','👙','👘','💄','💋','🧦','🥾','👟','👞','👢','👠','🩴','🎒','🧳','👓','🕶️','🧣'], 
+            ['🎸','🎹','🎷','🎺','🎻','🪕','🥁','🪘','🪗','🎧','🎤','🎙️','📻','🎚️','🎛️','🔈','💿','📼','🎼','🎵'], 
+            ['🚪','🛏️','🛋️','🪑','🚽','🚿','🛁','🪒','🧴','🧹','🧺','🧻','🧼','🧽','🛒','🪞','🪟','🖼️','🧸','🗑️'], 
+            ['🌍','🌞','🌝','🌛','✨','⚡','🔥','🌪️','🌈','☁️','🌤️','⛅','🌥️','🌦️','🌧️','🌨️','🌩️','☔','☂️','❄️'], 
+            ['✏️','✒️','🖋️','🖊️','🖌️','🖍️','📝','💼','📁','📂','🗂️','📅','📆','🗒️','🗓️','📇','📈','📉','📊','📋'], 
+            ['📕','📖','📗','📘','📙','📚','📓','📒','📃','📜','📄','📰','🗞️','🔖','🏷️','✉️','📧','📨','📩','📤'], 
+            ['📥','📦','📫','📪','📬','📭','📮','🗳️','📌','📍','📎','🖇️','📏','📐','✂️','🗑️','🔒','🔓','🔏','🔐'], 
+            ['🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨','🏪','🏫','🏩','💒','🏛️','⛪','🕌'], 
+            ['🕍','🛕','🕋','⛩️','🛤️','🛣️','🗾','🎑','🏞️','🌅','🌄','🌠','🎇','🎆','🌇','🌆','🏙️','🌃','🌌','🌉'], 
+            ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','☺️','😚'], 
+            ['😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄'], 
+            ['😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳'], 
+            ['👈','👉','☝️','👆','🖕','👇','✌️','🤞','🖖','🤘','🤙','🖐️','✋','👌','👍','👎','✊','👊','🤛','🤜'], 
+            ['🧗','🤺','🏇','⛷️','🏂','🏌️','🏄','🚣','🏊','🤽','🧜','🧚','🧞','🦸','🦹','🧝','🧙','🧟','🧛','👼'], 
+            ['🐮','🐂','🐃','🐄','🐖','🐏','🐑','🐐','🐪','🐫','🦙','🦘','🐎','🐴','🐔','🐓','🐣','🐤','🐥','🐦'], 
+            ['🐧','🦅','🦆','🦢','🦉','🦤','🪶','🦩','🦚','🦜','🐸','🐊','🐢','🦎','🐍','🐲','🐉','🦕','🐳','🐋'], 
+            ['🔪','🥄','🍴','🍽️','🥣','🥡','🥢','🍶','🥂','🍻','🍺','🍹','🍷','🥃','🍸','🧉','🍾','🧊','🥤','🧋'], 
+            ['💈','✂️','🗑️','🛢️','🧴','🧷','🧹','🧺','🧻','🧼','🧽','🚿','🛁','🛀','🪥','🪒','🧴','🧻','🧽','🧼'], 
+            ['🎨','🧵','🪡','🧶','🪢','🛍️','🎒','🩴','👓','🕶️','🧣','🧤','🧥','🧦','👗','👘','🥻','🩱','🩲','🩳'], 
+            ['🎮','🕹️','🎰','🎲','🧩','🧸','🪀','🪅','🪄','🔮','🧿','🪩','🪆','🪁','🎯','🎳','🥏','🏑','🥍','🏏'], 
+            ['🌵','🎄','🌲','🌳','🌴','🪵','🌱','🌿','☘️','🍀','🎍','🪴','🎋','🍃','🍂','🍁','🍄','🌾','💐','🌷'], 
+            ['💉','🩸','💊','🩹','🩺','🩻','🧪','🧫','🧬','🔬','🔭','📡','🌡️','🧹','🗑️','⚖️','🛡️','🗡️','⚔️','💣'], 
+            ['🚂','🚃','🚄','🚅','🚆','🚇','🚈','🚉','🚊','🚝','🚞','🚋','🚌','🚍','🚎','🚐','🚑','🚒','🚓','🚔'], 
+            ['🕰️','🧱','🪨','🪵','🛖','🏕️','⛺','🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨'], 
+            ['🍉','🍊','🍋','🍌','🍍','🥭','🍎','🍏','🍐','🍑','🍒','🍓','🫐','🥝','🍅','🫒','🥥','🥑','🍆','🥔']  
         ];
+        
+        const standardSymbols = "📱💻🖥️🖨️🖱️🕹️💾💿📷📹🎥📺📻🎙️⏱️⏰⏳💡🔦🔋🔨🪓⛏️🛠️🪚🔧🪛🔩⚙️🧲🪜🧱🛡️💣🧨🧯🧭⚓🪝⚖️💎🔮🪄🧿👑💍🪙💰🪬⏳🩸🧪🧬🔭🔬🛸🚀🛰️🪐👽";
 
         const materials = [
             { tileBg: '#f3e5ab', tileBorder: '#d2b48c', tileColor: '#3e2723', bgImg: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(139, 69, 19, 0.2)' },
@@ -492,36 +494,37 @@
             setTimeout(() => floatEl.remove(), 1000);
         }
 
-        // --- УНИВЕРСАЛЬНЫЙ ДВОЙНОЙ САЛЮТ ДЛЯ ВСЕХ ПРЕДМЕТОВ ---
         function spawnSymbolBurst(element, symbol) {
             let rect = element.getBoundingClientRect();
             let centerX = rect.left + window.scrollX + rect.width / 2;
             let centerY = rect.top + window.scrollY + rect.height / 2;
             
-            // 1. Хруст золотых осколков
-            let shardCount = 4 + Math.floor(Math.random() * 3); 
-            for (let i = 0; i < shardCount; i++) {
-                let p = document.createElement('div'); p.classList.add('gold-shard');
-                p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
-                if (Math.random() > 0.5) p.style.borderRadius = '50%';
-                if (Math.random() > 0.7) { p.style.width = '16px'; p.style.height = '6px'; }
-                let angle = Math.random() * Math.PI * 2, dist = Math.random() * 80 + 30; 
-                p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); p.style.setProperty('--rot', (Math.random() * 360) + 'deg');
-                document.body.appendChild(p); 
-                setTimeout(() => p.remove(), 600);
-            }
+            let isStandard = standardSymbols.includes(symbol);
             
-            // 2. Смысловые частицы (сам предмет + магия/дым)
-            let particleCount = 4 + Math.floor(Math.random() * 3); 
-            for (let i = 0; i < particleCount; i++) {
-                let p = document.createElement('div'); p.classList.add('thematic-particle');
-                let rnd = Math.random();
-                if (rnd < 0.6) p.innerText = symbol; else if (rnd < 0.8) p.innerText = '✨'; else p.innerText = '💨';
-                p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
-                let angle = Math.random() * Math.PI * 2, dist = Math.random() * 70 + 40; 
-                p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); p.style.setProperty('--rot', (Math.random() * 180 - 90) + 'deg');
-                document.body.appendChild(p);
-                setTimeout(() => p.remove(), 700);
+            if (isStandard) {
+                let shardCount = 12 + Math.floor(Math.random() * 6); 
+                for (let i = 0; i < shardCount; i++) {
+                    let p = document.createElement('div'); p.classList.add('gold-shard');
+                    p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
+                    if (Math.random() > 0.5) p.style.borderRadius = '50%';
+                    if (Math.random() > 0.7) { p.style.width = '16px'; p.style.height = '6px'; }
+                    let angle = Math.random() * Math.PI * 2, dist = Math.random() * 80 + 30; 
+                    p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); p.style.setProperty('--rot', (Math.random() * 360) + 'deg');
+                    document.body.appendChild(p); 
+                    setTimeout(() => p.remove(), 600);
+                }
+            } else {
+                let particleCount = 5 + Math.floor(Math.random() * 4); 
+                for (let i = 0; i < particleCount; i++) {
+                    let p = document.createElement('div'); p.classList.add('thematic-particle');
+                    let rnd = Math.random();
+                    if (rnd < 0.6) p.innerText = symbol; else if (rnd < 0.8) p.innerText = '✨'; else p.innerText = '💨';
+                    p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
+                    let angle = Math.random() * Math.PI * 2, dist = Math.random() * 70 + 40; 
+                    p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); p.style.setProperty('--rot', (Math.random() * 180 - 90) + 'deg');
+                    document.body.appendChild(p);
+                    setTimeout(() => p.remove(), 700);
+                }
             }
         }
 
@@ -577,6 +580,7 @@
             }
         }
 
+        // --- УЛУЧШЕННЫЙ МИКС: ФОРМА СОХРАНЯЕТСЯ, ФИШКИ ДЕЛАЮТ САЛЬТО ---
         function watchAdToShuffle() { 
             if (activeTiles.length === 0) return;
             const ad = document.getElementById('ad-screen'); 
@@ -589,42 +593,42 @@
                     let currentSymbols = activeTiles.map(t => t.symbol); 
                     let pairsPool = getPairsFromSymbols(currentSymbols);
                     let hiddenCount = activeTiles.filter(t => t.isHidden).length;
-                    let attemptMix = 0, preparedTiles = null, newLayout = [];
                     
+                    // БЕРЕМ ТЕКУЩИЕ КООРДИНАТЫ (ЧТОБЫ СОХРАНИТЬ ФОРМУ)
+                    let currentLayout = activeTiles.map(t => ({x: t.x, y: t.y, z: t.z}));
+                    let attemptMix = 0, preparedTiles = null;
+                    
+                    // Пытаемся решить ТОЛЬКО эту форму
                     while (!preparedTiles && attemptMix < 100) {
-                        attemptMix++; newLayout = []; let fX = 0, fY = 0, fZ = 0;
-                        for (let i = 0; i < activeTiles.length; i++) {
-                            newLayout.push({x: fX, y: fY, z: fZ}); fX += 2; 
-                            if (fX > 8) { 
-                                fX = 0; fY += 2; 
-                                if (fY > 8) { 
-                                    fZ += 1; 
-                                    fY = (fZ % 2 === 0) ? 0 : 1; 
-                                    fX = (fZ % 2 === 0) ? 0 : 1; 
-                                } 
-                            }
-                        }
-                        preparedTiles = assignSymbolsSmart(newLayout, pairsPool, Math.random);
+                        attemptMix++;
+                        preparedTiles = assignSymbolsSmart(currentLayout, pairsPool, Math.random);
                     }
 
+                    // Если вдруг алгоритм не справился с текущей сложной формой,
+                    // мы просто перемешиваем символы случайным образом по этим же местам
                     if (!preparedTiles) {
-                        preparedTiles = newLayout.map((pos, i) => ({...pos, symbol: currentSymbols[i]}));
+                        let shuffledSymbols = [...currentSymbols];
+                        for (let i = shuffledSymbols.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [shuffledSymbols[i], shuffledSymbols[j]] = [shuffledSymbols[j], shuffledSymbols[i]];
+                        }
+                        preparedTiles = currentLayout.map((pos, i) => ({...pos, symbol: shuffledSymbols[i]}));
                     }
 
-                    let hideIndices = Array.from({length: newLayout.length}, (_, i) => i);
+                    let hideIndices = Array.from({length: currentLayout.length}, (_, i) => i);
                     for (let i = hideIndices.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [hideIndices[i], hideIndices[j]] = [hideIndices[j], hideIndices[i]]; }
                     let toHide = new Set(hideIndices.slice(0, hiddenCount));
 
+                    // ПРИМЕНЯЕМ СИМВОЛЫ И ДЕЛАЕМ САЛЬТО ФИШКАМ
                     activeTiles.forEach((tile, index) => {
                         let pt = preparedTiles[index]; 
                         tile.symbol = pt.symbol; 
                         tile.el.innerText = pt.symbol; 
                         tile.el.classList.remove('selected');
-                        tile.x = pt.x; tile.y = pt.y; tile.z = pt.z;
                         
-                        tile.el.style.setProperty('--x', tile.x); 
-                        tile.el.style.setProperty('--y', tile.y); 
-                        tile.el.style.setProperty('--z', tile.z);
+                        // Анимация сальто на месте, чтобы было видно, что они перемешались
+                        tile.el.classList.add('flip-anim');
+                        setTimeout(() => tile.el.classList.remove('flip-anim'), 400);
                         
                         if (toHide.has(index)) { tile.isHidden = true; tile.el.classList.add('is-hidden'); } 
                         else { tile.isHidden = false; tile.el.classList.remove('is-hidden'); }
@@ -635,7 +639,7 @@
                     comboCount = 0; 
                     
                     let msg = document.getElementById('message');
-                    if(msg) { msg.innerText = 'Поле перестроено! ✨'; msg.style.color = '#f1c40f'; }
+                    if(msg) { msg.innerText = 'Фишки перемешаны! ✨'; msg.style.color = '#f1c40f'; }
                     let btn = document.getElementById('btn-shuffle');
                     if(btn) btn.classList.remove('btn-pulse');
                     
