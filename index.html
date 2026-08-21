@@ -134,7 +134,7 @@
 
         #game-board { width: 90vw; height: 112.5vw; max-width: 400px; max-height: 500px; position: relative; perspective: 1000px; }
         
-        /* ПЛИТКИ */
+        /* --- ОРИГИНАЛЬНЫЕ ПЛИТКИ --- */
         .tile {
             position: absolute; width: 20%; height: 20%;
             left: calc(var(--x) * 10%); top: calc(var(--y) * 10%); margin-top: calc(var(--z) * -3.5vw); margin-left: calc(var(--z) * -2vw);
@@ -174,34 +174,32 @@
         .flip-anim { animation: flipTileIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes flipTileIn { 0% { transform: translateY(-4vw) scale(1.1) rotateY(-90deg); } 100% { transform: translateY(-4vw) scale(1.1) rotateY(0deg); } }
 
-        /* --- НОВЫЕ СМЫСЛОВЫЕ ЭФФЕКТЫ --- */
+        /* --- СМАРТ-ЧАСТИЦЫ И КОРЗИНА --- */
         .basket-container {
-            position: absolute; font-size: 36px; z-index: 9998;
+            position: absolute; font-size: 32px; z-index: 9998;
             animation: basketPop 1.2s ease-out forwards; pointer-events: none;
-            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.8));
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6));
         }
         @keyframes basketPop {
-            0% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 1; }
-            15% { transform: translate(-50%, -50%) scale(1.3) rotate(-15deg); opacity: 1; }
-            80% { transform: translate(-50%, -50%) scale(1.3) rotate(-15deg); opacity: 1; }
+            0% { transform: translate(-50%, -50%) scale(0) rotate(-10deg); opacity: 0; }
+            15% { transform: translate(-50%, -50%) scale(1.3) rotate(5deg); opacity: 1; }
+            80% { transform: translate(-50%, -50%) scale(1.3) rotate(0deg); opacity: 1; }
             100% { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; }
         }
 
         .smart-particle {
             position: absolute; font-family: 'Noto Color Emoji', sans-serif;
-            pointer-events: none; z-index: 9999;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
-            animation: smartSpill 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+            pointer-events: none; z-index: 9999; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.5));
+            animation: smartSpill 0.9s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
         }
         @keyframes smartSpill {
-            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5) rotate(0deg); }
-            100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.2) rotate(var(--rot)); }
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.3) rotate(0deg); }
+            100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1) rotate(var(--rot)); }
         }
 
         .floating-text { position: absolute; font-family: 'Russo One', sans-serif; font-size: 26px; color: #2ecc71; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 12px rgba(46, 204, 113, 0.9); pointer-events: none; z-index: 9999; animation: floatUpText 1s ease-out forwards; }
         .floating-text.combo { color: #f1c40f; font-size: 34px; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 18px rgba(241, 196, 15, 0.9); }
         @keyframes floatUpText { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 20% { transform: translateY(-20px) scale(1.2); opacity: 1; } 100% { transform: translateY(-60px) scale(1); opacity: 0; } }
-
         .confetti { position: absolute; width: 10px; height: 10px; background-color: #f00; z-index: 2000; animation: fall linear forwards; }
         @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
 
@@ -218,7 +216,6 @@
         #btn-spin { margin-top: 30px; font-size: 22px; padding: 15px 40px; }
         #btn-close-wheel { background: transparent; color: #95a5a6; border: none; font-size: 18px; text-decoration: underline; margin-top: 15px; cursor: pointer; }
 
-        /* Обычные модалки */
         #rules-modal, #ad-screen { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.95); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; }
         #rules-modal h2, #ad-screen h2 { font-family: 'Russo One', sans-serif; font-size: 32px; color: #f1c40f; margin-bottom: 20px; }
         #rules-modal p, #ad-screen p { font-size: 18px; line-height: 1.5; margin-bottom: 30px; max-width: 400px; }
@@ -300,7 +297,7 @@
     </div>
 
     <script>
-        // --- АУДИОСИСТЕМА (АСМР ЗВУКИ) ---
+        // --- АСМР АУДИОСИСТЕМА (Глухой деревянный стук) ---
         const AudioSys = {
             ctx: null, enabled: true,
             init: function() {
@@ -318,39 +315,38 @@
                 osc.start(); osc.stop(this.ctx.currentTime + duration);
             },
             playClick: function(isSelected) {
-                // Легкий клик интерфейса
-                let startFreq = isSelected ? 400 : 300; let endFreq = isSelected ? 100 : 80;
-                this.playOsc('sine', startFreq, endFreq, 0.05, 0.3); 
+                let startFreq = isSelected ? 300 : 200; let endFreq = isSelected ? 80 : 60;
+                this.playOsc('sine', startFreq, endFreq, 0.05, 0.4); 
             },
             playUnlock: function() {
-                this.playOsc('square', 800, 200, 0.1, 0.2); setTimeout(() => this.playOsc('square', 1200, 300, 0.15, 0.2), 50);
+                this.playOsc('square', 600, 200, 0.1, 0.1); setTimeout(() => this.playOsc('square', 800, 300, 0.1, 0.1), 50);
             },
             playMatch: function() {
-                // Тупой, деревянный стук (как костяшки бьются друг о друга)
                 if (!this.enabled || !this.ctx) return;
+                // Двойной бархатный АСМР стук
                 let playTock = (delay, pitchOffset) => {
                     setTimeout(() => {
                         let osc = this.ctx.createOscillator(); let gain = this.ctx.createGain();
-                        osc.type = 'triangle'; // Треугольник дает плотный "деревянный" тон
-                        osc.frequency.setValueAtTime(350 + pitchOffset, this.ctx.currentTime);
-                        osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.06);
+                        osc.type = 'sine'; 
+                        osc.frequency.setValueAtTime(300 + pitchOffset, this.ctx.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(50, this.ctx.currentTime + 0.05);
                         gain.gain.setValueAtTime(0.8, this.ctx.currentTime);
-                        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.05); // Очень быстрое затухание
+                        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.05);
                         osc.connect(gain); gain.connect(this.ctx.destination);
                         osc.start(); osc.stop(this.ctx.currentTime + 0.06);
                     }, delay);
                 };
-                playTock(0, 0); // Первый стук
-                playTock(30, 20); // Второй стук чуть позже и чуть выше (эффект удара)
+                playTock(0, 0); 
+                playTock(40, -20); 
             },
             playWin: function() {
                 let freqs = [392, 493.88, 587.33, 783.99]; 
                 freqs.forEach((f, i) => { setTimeout(() => { this.playOsc('sine', f, f * 0.95, 1.0, 0.3); this.playOsc('triangle', f * 2, f * 1.9, 0.8, 0.1); }, i * 100); });
             },
             playShuffle: function() {
-                for(let i = 0; i < 15; i++) { setTimeout(() => { let f = 200 + Math.random() * 300; this.playOsc('triangle', f, f/2, 0.04, 0.3); }, Math.random() * 400); }
+                for(let i = 0; i < 15; i++) { setTimeout(() => { let f = 150 + Math.random() * 200; this.playOsc('sine', f, f/2, 0.04, 0.3); }, Math.random() * 400); }
             },
-            playWheelTick: function() { this.playOsc('square', 800, 600, 0.05, 0.1); },
+            playWheelTick: function() { this.playOsc('square', 800, 600, 0.05, 0.05); },
             toggle: function() { this.enabled = !this.enabled; const btn = document.getElementById('btn-sound'); if (btn) btn.innerText = this.enabled ? '🔊' : '🔇'; }
         };
 
@@ -375,66 +371,66 @@
         
         // --- 60 ПРЕМИАЛЬНЫХ НАБОРОВ (1200 ПРЕДМЕТОВ) ---
         const themeSets = [
-            ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'], // 0 Food
-            ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'], // 1 Sweets/Drinks
-            ['📱','💻','🖥️','🖨️','🖱️','🕹️','💾','💿','📷','📹','🎥','📺','📻','🎙️','⏱️','⏰','⏳','💡','🔦','🔋'], // 2 Tech
-            ['🦁','🐯','🦒','🦊','🐻','🐼','🐨','🐰','🐷','🦝','🐗','🦓','🦌','🐘','🦏','🦛','🐭','🐹','🐿️','🦔'], // 3 Animals
-            ['🚗','🚕','🚙','🚌','🏎️','🚓','🚑','🚒','🚐','🛻','🚚','🚛','🚜','🏍️','🛵','🦽','🛺','🚲','🛴','🛹'], // 4 Vehicles
-            ['⚽','🏀','🏈','⚾','🎾','🏐','🎱','🏓','🏸','🏒','⛳','🪁','🏹','🎣','🤿','🥊','🥋','🛹','🛼','⛸️'], // 5 Sport
-            ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥒'], // 6 Fruits
-            ['🌲','🌳','🌴','🌵','🌾','🌿','🍀','🍁','🍂','🍃','🌷','🌹','🌻','🌼','🌸','🌺','🪴','🍄','🪷','💐'], // 7 Nature
-            ['🔨','🪓','⛏️','🛠️','🪚','🔧','🪛','🔩','⚙️','🧲','🪜','🧱','🛡️','💣','🧨','🧯','🧭','⚓','🪝','⚖️'], // 8 Tools
-            ['💎','🔮','🪄','🧿','👑','💍','🪙','💰','🪬','⏳','🩸','🧪','🧬','🔭','🔬','🛸','🚀','🛰️','🪐','👽'], // 9 Magic
-            ['🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🦭','🐊','🐸','🐢','🦦','🦪','🐚','🪸'], // 10 Sea
-            ['🦅','🦆','🦉','🦇','🐝','🐛','🦋','🐌','🐞','🐜','🪲','🪳','🕷️','🕸️','🦂','🦟','🪰','🪱','🦜','🦚'], // 11 Bugs/Birds
-            ['👕','👖','👔','👗','👙','👘','💄','💋','🧦','🥾','👟','👞','👢','👠','🩴','🎒','🧳','👓','🕶️','🧣'], // 12 Clothes
-            ['🎸','🎹','🎷','🎺','🎻','🪕','🥁','🪘','🪗','🎧','🎤','🎙️','📻','🎚️','🎛️','🔈','💿','📼','🎼','🎵'], // 13 Music
-            ['🚪','🛏️','🛋️','🪑','🚽','🚿','🛁','🪒','🧴','🧹','🧺','🧻','🧼','🧽','🛒','🪞','🪟','🖼️','🧸','🗑️'], // 14 Home
-            ['🌍','🌞','🌝','🌛','✨','⚡','🔥','🌪️','🌈','☁️','🌤️','⛅','🌥️','🌦️','🌧️','🌨️','🌩️','☔','☂️','❄️'], // 15 Weather
-            ['✏️','✒️','🖋️','🖊️','🖌️','🖍️','📝','💼','📁','📂','🗂️','📅','📆','🗒️','🗓️','📇','📈','📉','📊','📋'], // 16 Office
-            ['📕','📖','📗','📘','📙','📚','📓','📒','📃','📜','📄','📰','🗞️','🔖','🏷️','✉️','📧','📨','📩','📤'], // 17 Books
-            ['📥','📦','📫','📪','📬','📭','📮','🗳️','📌','📍','📎','🖇️','📏','📐','✂️','🗑️','🔒','🔓','🔏','🔐'], // 18 Post
-            ['🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨','🏪','🏫','🏩','💒','🏛️','⛪','🕌'], // 19 Buildings
-            ['🕍','🛕','🕋','⛩️','🛤️','🛣️','🗾','🎑','🏞️','🌅','🌄','🌠','🎇','🎆','🌇','🌆','🏙️','🌃','🌌','🌉'], // 20 Places
-            ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','☺️','😚'], // 21 Smiles
-            ['😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄'], // 22 Smiles 2
-            ['😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳'], // 23 Smiles 3
-            ['👈','👉','☝️','👆','🖕','👇','✌️','🤞','🖖','🤘','🤙','🖐️','✋','👌','👍','👎','✊','👊','🤛','🤜'], // 24 Hands
-            ['🧗','🤺','🏇','⛷️','🏂','🏌️','🏄','🚣','🏊','🤽','🧜','🧚','🧞','🦸','🦹','🧝','🧙','🧟','🧛','👼'], // 25 Fantasy/Sport
-            ['🐮','🐂','🐃','🐄','🐖','🐏','🐑','🐐','🐪','🐫','🦙','🦘','🐎','🐴','🐔','🐓','🐣','🐤','🐥','🐦'], // 26 Farm
-            ['🐧','🦅','🦆','🦢','🦉','🦤','🪶','🦩','🦚','🦜','🐸','🐊','🐢','🦎','🐍','🐲','🐉','🦕','🐳','🐋'], // 27 Exotic
-            ['🔪','🥄','🍴','🍽️','🥣','🥡','🥢','🍶','🥂','🍻','🍺','🍹','🍷','🥃','🍸','🧉','🍾','🧊','🥤','🧋'], // 28 Kitchen
-            ['💈','✂️','🗑️','🛢️','🧴','🧷','🧹','🧺','🧻','🧼','🧽','🚿','🛁','🛀','🪥','🪒','🧴','🧻','🧽','🧼'], // 29 Bath
-            ['🎨','🧵','🪡','🧶','🪢','🛍️','🎒','🩴','👓','🕶️','🧣','🧤','🧥','🧦','👗','👘','🥻','🩱','🩲','🩳'], // 30 Hobby/Cloth
-            ['🎮','🕹️','🎰','🎲','🧩','🧸','🪀','🪅','🪄','🔮','🧿','🪩','🪆','🪁','🎯','🎳','🥏','🏑','🥍','🏏'], // 31 Toys
-            ['🌵','🎄','🌲','🌳','🌴','🪵','🌱','🌿','☘️','🍀','🎍','🪴','🎋','🍃','🍂','🍁','🍄','🌾','💐','🌷'], // 32 Plants
-            ['💉','🩸','💊','🩹','🩺','🩻','🧪','🧫','🧬','🔬','🔭','📡','🌡️','🧹','🗑️','⚖️','🛡️','🗡️','⚔️','💣'], // 33 Sci/Med
-            ['🚂','🚃','🚄','🚅','🚆','🚇','🚈','🚉','🚊','🚝','🚞','🚋','🚌','🚍','🚎','🚐','🚑','🚒','🚓','🚔'], // 34 Transport 2
-            ['🕰️','🧱','🪨','🪵','🛖','🏕️','⛺','🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨'], // 35 Struct
-            ['🍉','🍊','🍋','🍌','🍍','🥭','🍎','🍏','🍐','🍑','🍒','🍓','🫐','🥝','🍅','🫒','🥥','🥑','🍆','🥔'], // 36 Fruits 2
-            ['✈️','🛫','🛬','🛩️','🚁','🛸','🛶','⛵','🚤','🛥️','🛳️','⛴️','🚢','⚓','🚀','🚟','🚠','🚡','🚜','🛶'], // 37 Air/Water
-            ['😺','😸','😹','😻','😼','😽','🙀','😿','😾','🙈','🙉','🙊','🐵','🐒','🦍','🦧','🐶','🐕','🐩','🐺'], // 38 Pets
-            ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝','💟','💌'], // 39 Hearts
-            ['🔈','🔉','🔊','🔇','📢','📣','📯','🔔','🔕','🎙️','🎚️','🎛️','🎤','🎧','📻','🎷','🪗','🎸','🎹','🎺'], // 40 Sound
-            ['👮','🕵️','💂','🥷','👷','🤴','👸','👳','👲','🧕','🤵','👰','🧑‍🚀','🎅','🤶','🦸','🦹','🧙','🧚','🧛'], // 41 Roles
-            ['🥋','🎽','🎣','🤿','🥌','🎯','🪀','🪁','🎱','🔮','🧿','🎮','🕹️','🎰','🎲','🧩','🧸','🪅','🪆','🖼️'], // 42 Play
-            ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓','⛎','🌌','☄️','🪐','🌞','🌝','🌛','🌜'], // 43 Astro
-            ['☢️','☣️','⚠️','🚸','♻️','⚜️','🔱','📛','🔰','⭕','✅','☑️','✔️','❌','❎','〽️','❇️','✳️','💠','🌀'], // 44 Signs
-            ['🔴','🟠','🟡','🟢','🔵','🟣','🟤','⚫','⚪','🟥','🟧','🟨','🟩','🟦','🟪','🟫','⬛','⬜','🔶','🔷'], // 45 Shapes
-            ['🛍️','🛒','🎁','🎈','🎏','🎀','🎊','🎉','🎎','🏮','🎐','🧧','✉️','📩','📨','📧','💌','📥','📤','📦'], // 46 Party/Shop
-            ['🍦','🍧','🍨','🍩','🍪','🎂','🍰','🧁','🥧','🍫','🍬','🍭','🍮','🍯','🍼','🥛','☕','🫖','🍵','🍶'], // 47 Desserts
-            ['🥢','🍽️','🍴','🥄','🔪','🏺','🍷','🍸','🍹','🍺','🍻','🥂','🥃','🥤','🧋','🧃','🧉','🧊','🧂','🥫'], // 48 Dining
-            ['👀','👁️','👅','👄','🧠','🫀','🫁','🦷','🦴','🦵','🦶','👂','🦻','👃','👣','🦾','🦿','🤞','🖖','🤟'], // 49 Body
-            ['🔫','🏹','🗡️','⚔️','💣','🧨','🪓','🔪','🩸','🚬','⚰️','🪦','⚱️','🗿','🔮','📿','🧿','💈','🧲','🧬'], // 50 Items
-            ['🌋','🗻','⛰️','🏔️','🏕️','🏖️','🏜️','🏝️','🏞️','🏟️','🏗️','🧱','🪨','🪵','🛖','🏘️','🏚️','🏠','🏡','🏢'], // 51 Land
-            ['👑','👒','🎩','🎓','🧢','🪖','⛑️','🎒','🧳','💼','👜','👛','👝','👞','👟','🥾','🥿','👠','👡','🩰'], // 52 Bags/Shoes
-            ['⌚','📱','📲','💻','⌨️','🖥️','🖨️','🖱️','🖲️','🕹️','🗜️','💽','💾','💿','📀','📼','📷','📸','📹','🎥'], // 53 Tech 2
-            ['📽️','🎞️','📞','☎️','📟','📠','📺','📻','🎙️','🎚️','🎛️','🧭','⏱️','⏲️','⏰','🕰️','⏳','⌛','📡','🔋'], // 54 Tech 3
-            ['🦇','🦋','🐛','🐜','🐝','🪲','🐞','🦗','🪳','🕷️','🕸️','🦂','🦟','🪰','🪱','🦠','🐾','🐉','🐲','🌵'], // 55 Creepy
-            ['🗽','🗼','🏰','🏯','🏟️','🎡','🎢','🎠','⛲','⛱️','🏖️','🏝️','🏜️','🌋','⛰️','🏔️','🗻','🏕️','⛺','🛖'], // 56 Wonders
-            ['🧯','🛒','🦽','🦼','🛴','🚲','🛵','🏍️','🛺','🚔','🚍','🚘','🚖','🚠','🚡','🚀','🛸','🛰️','🚁','🛶'], // 57 Move
-            ['🪴','🌲','🌳','🌴','🪵','🌵','🌱','🌿','☘️','🍀','🎍','🎋','🍃','🍂','🍁','🍄','🌾','💐','🌷','🌹'], // 58 Greens
-            ['😢','😭','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','😈','👿','💀','☠️','💩','🤡']  // 59 Mood
+            ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'],
+            ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'],
+            ['📱','💻','🖥️','🖨️','🖱️','🕹️','💾','💿','📷','📹','🎥','📺','📻','🎙️','⏱️','⏰','⏳','💡','🔦','🔋'],
+            ['🦁','🐯','🦒','🦊','🐻','🐼','🐨','🐰','🐷','🦝','🐗','🦓','🦌','🐘','🦏','🦛','🐭','🐹','🐿️','🦔'],
+            ['🚗','🚕','🚙','🚌','🏎️','🚓','🚑','🚒','🚐','🛻','🚚','🚛','🚜','🏍️','🛵','🦽','🛺','🚲','🛴','🛹'],
+            ['⚽','🏀','🏈','⚾','🎾','🏐','🎱','🏓','🏸','🏒','⛳','🪁','🏹','🎣','🤿','🥊','🥋','🛹','🛼','⛸️'],
+            ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥒'],
+            ['🌲','🌳','🌴','🌵','🌾','🌿','🍀','🍁','🍂','🍃','🌷','🌹','🌻','🌼','🌸','🌺','🪴','🍄','🪷','💐'],
+            ['🔨','🪓','⛏️','🛠️','🪚','🔧','🪛','🔩','⚙️','🧲','🪜','🧱','🛡️','💣','🧨','🧯','🧭','⚓','🪝','⚖️'],
+            ['💎','🔮','🪄','🧿','👑','💍','🪙','💰','🪬','⏳','🩸','🧪','🧬','🔭','🔬','🛸','🚀','🛰️','🪐','👽'],
+            ['🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🦭','🐊','🐸','🐢','🦦','🦪','🐚','🪸'],
+            ['🦅','🦆','🦉','🦇','🐝','🐛','🦋','🐌','🐞','🐜','🪲','🪳','🕷️','🕸️','🦂','🦟','🪰','🪱','🦜','🦚'],
+            ['👕','👖','👔','👗','👙','👘','💄','💋','🧦','🥾','👟','👞','👢','👠','🩴','🎒','🧳','👓','🕶️','🧣'],
+            ['🎸','🎹','🎷','🎺','🎻','🪕','🥁','🪘','🪗','🎧','🎤','🎙️','📻','🎚️','🎛️','🔈','💿','📼','🎼','🎵'],
+            ['🚪','🛏️','🛋️','🪑','🚽','🚿','🛁','🪒','🧴','🧹','🧺','🧻','🧼','🧽','🛒','🪞','🪟','🖼️','🧸','🗑️'],
+            ['🌍','🌞','🌝','🌛','✨','⚡','🔥','🌪️','🌈','☁️','🌤️','⛅','🌥️','🌦️','🌧️','🌨️','🌩️','☔','☂️','❄️'],
+            ['✏️','✒️','🖋️','🖊️','🖌️','🖍️','📝','💼','📁','📂','🗂️','📅','📆','🗒️','🗓️','📇','📈','📉','📊','📋'],
+            ['📕','📖','📗','📘','📙','📚','📓','📒','📃','📜','📄','📰','🗞️','🔖','🏷️','✉️','📧','📨','📩','📤'],
+            ['📥','📦','📫','📪','📬','📭','📮','🗳️','📌','📍','📎','🖇️','📏','📐','✂️','🗑️','🔒','🔓','🔏','🔐'],
+            ['🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨','🏪','🏫','🏩','💒','🏛️','⛪','🕌'],
+            ['🕍','🛕','🕋','⛩️','🛤️','🛣️','🗾','🎑','🏞️','🌅','🌄','🌠','🎇','🎆','🌇','🌆','🏙️','🌃','🌌','🌉'],
+            ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','☺️','😚'],
+            ['😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄'],
+            ['😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳'],
+            ['👈','👉','☝️','👆','🖕','👇','✌️','🤞','🖖','🤘','🤙','🖐️','✋','👌','👍','👎','✊','👊','🤛','🤜'],
+            ['🧗','🤺','🏇','⛷️','🏂','🏌️','🏄','🚣','🏊','🤽','🧜','🧚','🧞','🦸','🦹','🧝','🧙','🧟','🧛','👼'],
+            ['🐮','🐂','🐃','🐄','🐖','🐏','🐑','🐐','🐪','🐫','🦙','🦘','🐎','🐴','🐔','🐓','🐣','🐤','🐥','🐦'],
+            ['🐧','🦅','🦆','🦢','🦉','🦤','🪶','🦩','🦚','🦜','🐸','🐊','🐢','🦎','🐍','🐲','🐉','🦕','🐳','🐋'],
+            ['🔪','🥄','🍴','🍽️','🥣','🥡','🥢','🍶','🥂','🍻','🍺','🍹','🍷','🥃','🍸','🧉','🍾','🧊','🥤','🧋'],
+            ['💈','✂️','🗑️','🛢️','🧴','🧷','🧹','🧺','🧻','🧼','🧽','🚿','🛁','🛀','🪥','🪒','🧴','🧻','🧽','🧼'],
+            ['🎨','🧵','🪡','🧶','🪢','🛍️','🎒','🩴','👓','🕶️','🧣','🧤','🧥','🧦','👗','👘','🥻','🩱','🩲','🩳'],
+            ['🎮','🕹️','🎰','🎲','🧩','🧸','🪀','🪅','🪄','🔮','🧿','🪩','🪆','🪁','🎯','🎳','🥏','🏑','🥍','🏏'],
+            ['🌵','🎄','🌲','🌳','🌴','🪵','🌱','🌿','☘️','🍀','🎍','🪴','🎋','🍃','🍂','🍁','🍄','🌾','💐','🌷'],
+            ['💉','🩸','💊','🩹','🩺','🩻','🧪','🧫','🧬','🔬','🔭','📡','🌡️','🧹','🗑️','⚖️','🛡️','🗡️','⚔️','💣'],
+            ['🚂','🚃','🚄','🚅','🚆','🚇','🚈','🚉','🚊','🚝','🚞','🚋','🚌','🚍','🚎','🚐','🚑','🚒','🚓','🚔'],
+            ['🕰️','🧱','🪨','🪵','🛖','🏕️','⛺','🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨'],
+            ['🍉','🍊','🍋','🍌','🍍','🥭','🍎','🍏','🍐','🍑','🍒','🍓','🫐','🥝','🍅','🫒','🥥','🥑','🍆','🥔'],
+            ['✈️','🛫','🛬','🛩️','🚁','🛸','🛶','⛵','🚤','🛥️','🛳️','⛴️','🚢','⚓','🚀','🚟','🚠','🚡','🚜','🛶'],
+            ['😺','😸','😹','😻','😼','😽','🙀','😿','😾','🙈','🙉','🙊','🐵','🐒','🦍','🦧','🐶','🐕','🐩','🐺'],
+            ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝','💟','💌'],
+            ['🔈','🔉','🔊','🔇','📢','📣','📯','🔔','🔕','🎙️','🎚️','🎛️','🎤','🎧','📻','🎷','🪗','🎸','🎹','🎺'],
+            ['👮','🕵️','💂','🥷','👷','🤴','👸','👳','👲','🧕','🤵','👰','🧑‍🚀','🎅','🤶','🦸','🦹','🧙','🧚','🧛'],
+            ['🥋','🎽','🎣','🤿','🥌','🎯','🪀','🪁','🎱','🔮','🧿','🎮','🕹️','🎰','🎲','🧩','🧸','🪅','🪆','🖼️'],
+            ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓','⛎','🌌','☄️','🪐','🌞','🌝','🌛','🌜'],
+            ['☢️','☣️','⚠️','🚸','♻️','⚜️','🔱','📛','🔰','⭕','✅','☑️','✔️','❌','❎','〽️','❇️','✳️','💠','🌀'],
+            ['🔴','🟠','🟡','🟢','🔵','🟣','🟤','⚫','⚪','🟥','🟧','🟨','🟩','🟦','🟪','🟫','⬛','⬜','🔶','🔷'],
+            ['🛍️','🛒','🎁','🎈','🎏','🎀','🎊','🎉','🎎','🏮','🎐','🧧','✉️','📩','📨','📧','💌','📥','📤','📦'],
+            ['🍦','🍧','🍨','🍩','🍪','🎂','🍰','🧁','🥧','🍫','🍬','🍭','🍮','🍯','🍼','🥛','☕','🫖','🍵','🍶'],
+            ['🥢','🍽️','🍴','🥄','🔪','🏺','🍷','🍸','🍹','🍺','🍻','🥂','🥃','🥤','🧋','🧃','🧉','🧊','🧂','🥫'],
+            ['👀','👁️','👅','👄','🧠','🫀','🫁','🦷','🦴','🦵','🦶','👂','🦻','👃','👣','🦾','🦿','🤞','🖖','🤟'],
+            ['🔫','🏹','🗡️','⚔️','💣','🧨','🪓','🔪','🩸','🚬','⚰️','🪦','⚱️','🗿','🔮','📿','🧿','💈','🧲','🧬'],
+            ['🌋','🗻','⛰️','🏔️','🏕️','🏖️','🏜️','🏝️','🏞️','🏟️','🏗️','🧱','🪨','🪵','🛖','🏘️','🏚️','🏠','🏡','🏢'],
+            ['👑','👒','🎩','🎓','🧢','🪖','⛑️','🎒','🧳','💼','👜','👛','👝','👞','👟','🥾','🥿','👠','👡','🩰'],
+            ['⌚','📱','📲','💻','⌨️','🖥️','🖨️','🖱️','🖲️','🕹️','🗜️','💽','💾','💿','📀','📼','📷','📸','📹','🎥'],
+            ['📽️','🎞️','📞','☎️','📟','📠','📺','📻','🎙️','🎚️','🎛️','🧭','⏱️','⏲️','⏰','🕰️','⏳','⌛','📡','🔋'],
+            ['🦇','🦋','🐛','🐜','🐝','🪲','🐞','🦗','🪳','🕷️','🕸️','🦂','🦟','🪰','🪱','🦠','🐾','🐉','🐲','🌵'],
+            ['🗽','🗼','🏰','🏯','🏟️','🎡','🎢','🎠','⛲','⛱️','🏖️','🏝️','🏜️','🌋','⛰️','🏔️','🗻','🏕️','⛺','🛖'],
+            ['🧯','🛒','🦽','🦼','🛴','🚲','🛵','🏍️','🛺','🚔','🚍','🚘','🚖','🚠','🚡','🚀','🛸','🛰️','🚁','🛶'],
+            ['🪴','🌲','🌳','🌴','🪵','🌵','🌱','🌿','☘️','🍀','🎍','🎋','🍃','🍂','🍁','🍄','🌾','💐','🌷','🌹'],
+            ['😢','😭','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','😈','👿','💀','☠️','💩','🤡']
         ];
         
         const coverSymbols = ['🔒', '🔐'];
@@ -445,7 +441,6 @@
             { tileBg: 'radial-gradient(circle at 30% 30%, #ffffff 0%, #fdfcfd 40%, #e8e3ec 80%, #dcd1e3 100%)', tileSide: '#9b92a3', tileColor: '#1e242b' }
         ];
 
-        // --- ПРОЦЕДУРНЫЙ ГЕНЕРАТОР НАЗВАНИЙ ГЛАВ ---
         const baseChapters = [
             "Начало пути", "Постижение реальности", "Пробуждение разума", "Тени прошлого", 
             "Врата вечности", "Шепот вселенной", "Лабиринт судьбы", "Зеркало души",
@@ -458,10 +453,8 @@
         function getChapterName(level) {
             let chapter = Math.floor((level - 1) / 10);
             if (chapter < baseChapters.length) return baseChapters[chapter];
-            
             let s = chapter * 99991; 
             function rndC() { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }
-            
             let a = wordsA[Math.floor(rndC() * wordsA.length)];
             let b = wordsB[Math.floor(rndC() * wordsB.length)];
             let c = wordsC[Math.floor(rndC() * wordsC.length)];
@@ -495,7 +488,6 @@
         document.getElementById('btn-close-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'none');
         document.getElementById('btn-menu').addEventListener('click', () => { document.getElementById('game-screen').style.display = 'none'; document.getElementById('main-menu').style.display = 'flex'; updateMenuLevelText(); });
         document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
-        
         document.getElementById('btn-sound').addEventListener('click', () => { AudioSys.init(); AudioSys.toggle(); });
         document.getElementById('btn-hud-prev').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; localStorage.setItem('mahjong_level', currentLevel); initGame(); }});
         document.getElementById('btn-hud-next').addEventListener('click', () => { currentLevel++; localStorage.setItem('mahjong_level', currentLevel); initGame(); });
@@ -565,10 +557,8 @@
             applyMaterial(currentLevel); 
             let baseSymbols = getSymbolsForLevel(currentLevel);
             
-            // ДЕТЕРМИНИРОВАННАЯ ГЕНЕРАЦИЯ (Без Math.random)
             let seed = currentLevel * 13371337, attempt = 0, finalLayout = null;
             function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
-
             let shapeIndex = (currentLevel - 1) % 8; 
             
             while (!finalLayout && attempt < 500) {
@@ -661,69 +651,63 @@
             document.body.appendChild(floatEl); setTimeout(() => floatEl.remove(), 1000);
         }
 
-        // --- УМНЫЕ ЭФФЕКТЫ (SMART BURSTS) ---
-        function getSymbolCategory(sym) {
-            const catFood = [0, 1, 6, 28, 36, 46, 47];
-            const catTech = [2, 16, 50, 52, 53, 54, 57];
-            const catZodiac = [9, 15, 42, 43];
-            const catEmotion = [21, 22, 23, 39, 59];
-            
-            for (let i = 0; i < themeSets.length; i++) {
-                if (themeSets[i].includes(sym)) {
-                    if (catFood.includes(i)) return 'food';
-                    if (catTech.includes(i)) return 'tech';
-                    if (catZodiac.includes(i)) return 'zodiac';
-                    if (catEmotion.includes(i)) return 'emotion';
-                    return 'general';
-                }
-            }
-            return 'general';
-        }
-
+        // --- УМНЫЕ ЭФФЕКТЫ СМЫСЛОВЫХ ЧАСТИЦ ---
         function spawnSmartBurst(element, symbol) {
             let rect = element.getBoundingClientRect(); 
             let centerX = rect.left + window.scrollX + rect.width / 2; 
             let centerY = rect.top + window.scrollY + rect.height / 2;
-            let category = getSymbolCategory(symbol);
             
-            // Если еда - выкидываем корзинку
-            if (category === 'food') {
+            let cat = 'general';
+            if ("🍔🍕🌭🍟🥐🥞🥨🧀🌮🌯🍜🍣🍱🥟🍤🥩🥓🍗🥚🍞🍹🍸🥤🧊🧉🥛☕🍵🧃🍯🍩🍪🍫🍬🍭🧁🍰🍧🍨🍿🍎🍐🍊🍋🍌🍉🍇🍓🍈🍒🍑🥭🍍🥥🥝🍅🍆🥑🥦🥒🍉🍊🍋🍌🍍🥭🍎🍏🍐🍑🍒🍓🫐🥝🍅🫒🥥🥑🍆🥔🍦🍧🍨🍩🍪🎂🍰🧁🥧🍫🍬🍭🍮🍯🍼🥛☕🫖🍵🍶".includes(symbol)) cat = 'food';
+            else if ("📱💻🖥️🖨️🖱️🕹️💾💿📷📹🎥📺📻🎙️⏱️⏰⏳💡🔦🔋⌚📱📲💻⌨️🖥️🖨️🖱️🖲️🕹️🗜️💽💾💿📀📼📷📸📹🎥📽️🎞️📞☎️📟📠📺📻🎙️🎚️🎛️🧭⏱️⏲️⏰🕰️⏳⌛📡🔋".includes(symbol)) cat = 'tech';
+            else if ("♈♉♊♋♌♍♎♏♐♑♒♓⛎🌌☄️🪐🌞🌝🌛🌜🌍🌞🌝🌛✨⚡🔥🌪️🌈☁️🌤️⛅🌥️🌦️🌧️🌨️🌩️☔☂️❄️".includes(symbol)) cat = 'zodiac';
+            else if ("😀😃😄😁😆😅🤣😂🙂🙃😉😊😇🥰😍🤩😘😗☺️😚😙🥲😋😛😜🤪😝🤑🤗🤭🤫🤔🤐🤨😐😑😶😏😒🙄😬🤥😌😔😪🤤😴😷🤒🤕🤢🤮🤧🥵🥶🥴😵🤯🤠🥳😢😭😱😖😣😞😓😩😫🥱😤😡😠🤬😈👿💀☠️💩🤡".includes(symbol)) cat = 'emotion';
+            else if ("🦁🐯🦒🦊🐻🐼🐨🐰🐷🦝🐗🦓🦌🐘🦏🦛🐭🐹🐿️🦔🐙🦑🦐🦞🦀🐡🐠🐟🐬🐳🐋🦈🦭🐊🐸🐢🦦🦪🐚🪸🦅🦆🦉🦇🐝🐛🦋🐌🐞🐜🪲🪳🕷️🕸️🦂🦟🪰🪱🦜🦚🐮🐂🐃🐄🐖🐏🐑🐐🐪🐫🦙🦘🐎🐴🐔🐓🐣🐤🐥🐦🐧🦅🦆🦢🦉🦤🪶🦩🦚🦜🐸🐊🐢🦎🐍🐲🐉🦕🐳🐋😺😸😹😻😼😽🙀😿😾🙈🙉🙊🐵🐒🦍🦧🐶🐕🐩🐺🦇🦋🐛🐜🐝🪲🐞🦗🪳🕷️🕸️🦂🦟🪰🪱🦠🐾🐉🐲🌵".includes(symbol)) cat = 'animal';
+            else if ("🚗🚕🚙🚌🏎️🚓🚑🚒🚐🛻🚚🚛🚜🏍️🛵🦽🛺🚲🛴🛹✈️🛫🛬🛩️🚁🛸🛶⛵🚤🛥️🛳️⛴️🚢⚓🚀🚟🚠🚡🚜🛶🚂🚃🚄🚅🚆🚇🚈🚉🚊🚝🚞🚋🚌🚍🚎🚐🚑🚒🚓🚔".includes(symbol)) cat = 'transport';
+            
+            // Если это еда, создаем корзинку 🧺
+            if (cat === 'food') {
                 let basket = document.createElement('div');
-                basket.classList.add('basket-container');
-                basket.innerText = '🧺';
-                basket.style.left = centerX + 'px';
-                basket.style.top = centerY + 'px';
+                basket.classList.add('basket-container'); basket.innerText = '🧺';
+                basket.style.left = centerX + 'px'; basket.style.top = centerY + 'px';
                 document.body.appendChild(basket);
-                setTimeout(() => basket.remove(), 1200);
+                setTimeout(() => basket.remove(), 1000);
             }
 
-            let particleOptions = [];
-            if (category === 'food') particleOptions = [symbol, '✅', '🟢', '🍎'];
-            else if (category === 'tech') particleOptions = [symbol, '✅', '🔋', '📶'];
-            else if (category === 'zodiac') particleOptions = [symbol, '✨', '🌙', '🌟'];
-            else if (category === 'emotion') particleOptions = [symbol, '❤️', '👍', '😊'];
-            else particleOptions = [symbol, '✅', '🟢', '✨'];
-
+            // Выбор частиц в зависимости от категории
+            let pOpts = [symbol, '✅', '🟢'];
+            if (cat === 'food') pOpts = [symbol, '✅', '🍎', '🥕', '💧'];
+            else if (cat === 'tech') pOpts = [symbol, '✅', '🔋', '📶', '⚙️'];
+            else if (cat === 'zodiac') pOpts = [symbol, '✨', '🌙', '🌟', '☄️'];
+            else if (cat === 'emotion') pOpts = [symbol, '❤️', '👍', '😊', '🔥'];
+            else if (cat === 'animal') pOpts = [symbol, '✅', '🐾', '🌿'];
+            else if (cat === 'transport') pOpts = [symbol, '✅', '💨', '🏁'];
+            
             let particleCount = 4 + Math.floor(Math.random() * 3); 
             for (let i = 0; i < particleCount; i++) {
                 let p = document.createElement('div'); p.classList.add('smart-particle'); 
-                p.innerText = particleOptions[Math.floor(Math.random() * particleOptions.length)];
+                p.innerText = pOpts[Math.floor(Math.random() * pOpts.length)];
                 
-                // Ограничиваем размер (чтобы не было огромным)
+                // Строгий размер частиц 16-24px
                 p.style.fontSize = (16 + Math.random() * 8) + 'px'; 
                 p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
                 
-                // Для еды (из корзинки) стреляем веером вверх
-                let angle = (category === 'food') 
-                    ? (Math.PI + Math.random() * Math.PI) 
-                    : (Math.random() * Math.PI * 2);
-                    
-                let dist = 40 + Math.random() * 60; 
+                let angle, dist;
+                if (cat === 'food') {
+                    // Из корзинки вылетает веером вверх
+                    angle = Math.PI + (Math.random() * Math.PI); 
+                    dist = 40 + Math.random() * 60;
+                } else {
+                    // Обычный радиальный взрыв
+                    angle = Math.random() * Math.PI * 2;
+                    dist = 40 + Math.random() * 60;
+                }
+                
                 p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); 
                 p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); 
                 p.style.setProperty('--rot', (Math.random() * 360) + 'deg');
                 
-                document.body.appendChild(p); setTimeout(() => p.remove(), 800);
+                document.body.appendChild(p); setTimeout(() => p.remove(), 900);
             }
         }
 
@@ -736,7 +720,7 @@
                 t.el.classList.add('selected'); 
                 if (firstTile.symbol === t.symbol) { 
                     let now = Date.now(); if (now - lastMatchTime < COMBO_TIME_LIMIT) comboCount++; else comboCount = 1; lastMatchTime = now;
-                    AudioSys.playMatch(); // Приятный двойной щелчок дерева
+                    AudioSys.playMatch(); // АСМР Стук дерева
                     
                     let earnedPoints = 10 * comboCount; totalScore += earnedPoints; localStorage.setItem('mahjong_score', totalScore); updateScoreDisplay();
                     showFloatingText(t.el, earnedPoints, comboCount > 1);
@@ -769,6 +753,7 @@
             }
         }
 
+        // --- МАТЕМАТИЧЕСКОЕ ИЗБЕЖАНИЕ DEADLOCK ПРИ МИКСЕ ---
         function watchAdToShuffle() { 
             if (activeTiles.length === 0) return;
             const ad = document.getElementById('ad-screen'); if(ad) ad.style.display = 'flex'; 
@@ -780,24 +765,49 @@
                     let counts = {}; currentSymbols.forEach(s => counts[s] = (counts[s] || 0) + 1);
                     for (let s in counts) { for(let i=0; i < Math.floor(counts[s] / 2); i++) pairsPool.push(s); }
                     let hiddenCount = activeTiles.filter(t => t.isHidden).length;
+                    
                     let currentLayout = activeTiles.map(t => ({x: t.x, y: t.y, z: t.z}));
                     let attemptMix = 0, preparedTiles = null;
-                    while (!preparedTiles && attemptMix < 100) { attemptMix++; preparedTiles = assignSymbolsSmart(currentLayout, pairsPool, Math.random); }
-                    if (!preparedTiles) {
-                        let shuffledSymbols = [...currentSymbols];
-                        for (let i = shuffledSymbols.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [shuffledSymbols[i], shuffledSymbols[j]] = [shuffledSymbols[j], shuffledSymbols[i]]; }
-                        preparedTiles = currentLayout.map((pos, i) => ({...pos, symbol: shuffledSymbols[i]}));
+                    
+                    while (!preparedTiles && attemptMix < 100) { 
+                        attemptMix++; 
+                        preparedTiles = assignSymbolsSmart(currentLayout, pairsPool, Math.random); 
                     }
+                    
+                    // ЕСЛИ ГЕОМЕТРИЯ ОКАЗАЛАСЬ МЕРТВОЙ (Например, 2 фишки лежат друг на друге)
+                    // Мы МЕНЯЕМ ФОРМУ, расплющивая ее в 2D ряд, чтобы избежать бесконечного тупика.
+                    if (!preparedTiles) {
+                        currentLayout = [];
+                        let fX = 0, fY = 4;
+                        for (let i = 0; i < activeTiles.length; i++) {
+                            currentLayout.push({x: fX, y: fY, z: 0});
+                            fX += 2; if (fX > 8) { fX = 0; fY += 2; }
+                        }
+                        preparedTiles = assignSymbolsSmart(currentLayout, pairsPool, Math.random);
+                        if (!preparedTiles) {
+                            let shuffledSymbols = [...currentSymbols];
+                            preparedTiles = currentLayout.map((pos, i) => ({...pos, symbol: shuffledSymbols[i]}));
+                        }
+                    }
+
                     let hideIndices = Array.from({length: currentLayout.length}, (_, i) => i);
                     for (let i = hideIndices.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [hideIndices[i], hideIndices[j]] = [hideIndices[j], hideIndices[i]]; }
                     let toHide = new Set(hideIndices.slice(0, hiddenCount));
 
                     activeTiles.forEach((tile, index) => {
-                        let pt = preparedTiles[index]; tile.symbol = pt.symbol; tile.el.innerText = pt.symbol; tile.el.classList.remove('selected');
+                        let pt = preparedTiles[index]; 
+                        
+                        // Применяем новые координаты (Если форма была расплющена)
+                        tile.x = pt.x; tile.y = pt.y; tile.z = pt.z;
+                        tile.el.style.setProperty('--x', tile.x); tile.el.style.setProperty('--y', tile.y); tile.el.style.setProperty('--z', tile.z);
+                        
+                        tile.symbol = pt.symbol; tile.el.innerText = pt.symbol; tile.el.classList.remove('selected');
                         tile.el.classList.add('flip-anim'); setTimeout(() => tile.el.classList.remove('flip-anim'), 400);
+                        
                         if (toHide.has(index)) { tile.isHidden = true; tile.el.classList.add('is-hidden'); tile.coverSymbol = coverSymbols[Math.floor(Math.random() * coverSymbols.length)]; tile.el.setAttribute('data-cover', tile.coverSymbol); } 
                         else { tile.isHidden = false; tile.el.classList.remove('is-hidden'); }
                     });
+                    
                     firstTile = null; updateFreeState(); comboCount = 0; 
                     let msg = document.getElementById('message'); if(msg) { msg.innerText = 'Фишки перемешаны! ✨'; msg.style.color = '#f1c40f'; }
                     let btn = document.getElementById('btn-shuffle'); if(btn) btn.classList.remove('btn-pulse');
