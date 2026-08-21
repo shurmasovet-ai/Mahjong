@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="color-scheme" content="light only">
-    <title>Mahjong Deluxe - Infinity 8888</title>
+    <title>Mahjong Deluxe - Infinity</title>
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -22,6 +22,7 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
+        /* --- ГЛАВНОЕ МЕНЮ --- */
         #main-menu {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             height: 100%; width: 100%; position: absolute; top: 0; left: 0; z-index: 50;
@@ -40,7 +41,7 @@
         }
         
         #main-menu h1 {
-            font-family: 'Russo One', sans-serif; font-size: 48px; margin-bottom: 30px; 
+            font-family: 'Russo One', sans-serif; font-size: 48px; margin-bottom: 20px; 
             background: linear-gradient(180deg, #fff3b0 0%, #f1c40f 50%, #b7950b 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             text-align: center; letter-spacing: 2px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.8)); z-index: 2;
@@ -48,17 +49,21 @@
         
         #level-controls {
             display: flex; align-items: center; justify-content: center; gap: 10px;
-            margin-bottom: 40px; z-index: 2;
+            margin-bottom: 10px; z-index: 2;
         }
 
         #menu-level-badge {
             background: rgba(0, 0, 0, 0.4); border: 2px solid rgba(241, 196, 15, 0.5);
             box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.5);
             border-radius: 20px; padding: 10px 30px; backdrop-filter: blur(5px);
+            display: flex; flex-direction: column; align-items: center;
         }
         #menu-level-text { 
             font-family: 'Russo One', sans-serif; font-size: 24px; color: #2ecc71; 
             text-shadow: 0 2px 5px rgba(0,0,0,1); letter-spacing: 1px; white-space: nowrap;
+        }
+        #menu-chapter-title {
+            font-size: 14px; color: #f1c40f; margin-top: 5px; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,1); text-align: center;
         }
 
         .btn-arrow {
@@ -73,94 +78,79 @@
             color: #4b0d18; border: none; padding: 15px 50px;
             font-family: 'Russo One', sans-serif; font-size: 26px; font-weight: 900; border-radius: 50px; 
             box-shadow: 0 8px 0 #9c7e07, 0 15px 20px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8);
-            cursor: pointer; transition: all 0.1s; touch-action: manipulation; user-select: none; margin-bottom: 25px; 
+            cursor: pointer; transition: all 0.1s; touch-action: manipulation; user-select: none; margin-top: 20px; margin-bottom: 20px; 
             display: flex; justify-content: center; align-items: center; letter-spacing: 2px;
             z-index: 2; width: auto; min-width: 220px;
         }
         .btn-massive:active { transform: translateY(8px) !important; box-shadow: 0 0 0 #9c7e07, 0 5px 10px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8); }
 
+        .btn-wheel {
+            background: linear-gradient(180deg, #9b59b6 0%, #8e44ad 100%);
+            color: white; border: 2px solid #d4af37; padding: 12px 30px; 
+            font-family: 'Russo One', sans-serif; font-size: 18px; border-radius: 30px; 
+            box-shadow: 0 6px 0 #5b2c6f, 0 10px 15px rgba(0,0,0,0.7); margin-bottom: 15px; cursor: pointer; transition: all 0.1s;
+        }
+        .btn-wheel:active { transform: translateY(6px); box-shadow: 0 0 0 #5b2c6f, 0 5px 10px rgba(0,0,0,0.7); }
+
         .btn-menu-small {
             background: transparent; color: #95a5a6; border: 2px solid #95a5a6; padding: 10px 25px; 
-            font-family: sans-serif; font-size: 16px; font-weight: bold; border-radius: 20px; z-index: 2; margin-bottom: 15px; transition: all 0.2s;
+            font-family: sans-serif; font-size: 16px; font-weight: bold; border-radius: 20px; z-index: 2; margin-bottom: 10px; transition: all 0.2s;
         }
         .btn-menu-small:active { background: rgba(255,255,255,0.1); }
 
-        #btn-reset { margin-top: 10px; color: rgba(231, 76, 60, 0.8); text-decoration: underline; cursor: pointer; font-size: 14px; font-weight: bold; z-index: 2; padding: 10px; }
+        #btn-reset { margin-top: 5px; color: rgba(231, 76, 60, 0.8); text-decoration: underline; cursor: pointer; font-size: 14px; font-weight: bold; z-index: 2; padding: 10px; }
 
         /* --- ИГРОВОЙ ЭКРАН --- */
         #game-screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; padding-top: 15px; z-index: 10; position: relative; }
         
         #top-bar { width: 100%; max-width: 500px; padding: 0 15px; display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-        .hud-center { display: flex; flex-direction: column; align-items: center; flex-grow: 1; margin: 0 10px; }
+        .hud-center { display: flex; flex-direction: column; align-items: center; flex-grow: 1; margin: 0 5px; }
         
         .level-switcher { display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-hud-arrow { background: transparent; border: none; color: #fff; font-size: 22px; cursor: pointer; padding: 0 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); transition: transform 0.1s; }
         .btn-hud-arrow:active { transform: scale(0.8); color: #f1c40f; }
 
-        #hud-level { font-family: 'Russo One', sans-serif; font-size: 20px; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.5); padding: 2px 5px; white-space: nowrap; line-height: 1.2; text-align: center; }
+        #hud-level-container { display: flex; flex-direction: column; align-items: center; }
+        #hud-level { font-family: 'Russo One', sans-serif; font-size: 18px; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.8); white-space: nowrap; line-height: 1.1;}
+        #hud-chapter-text { font-size: 10px; color: #a2d9ce; font-weight: bold; text-transform: uppercase; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); margin-bottom: 2px;}
+
         #hud-score { font-family: 'Russo One', sans-serif; font-size: 18px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); margin-top: 2px; }
-        #hud-difficulty { font-size: 12px; font-weight: bold; padding: 3px 8px; border-radius: 10px; margin-top: 4px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); box-shadow: 0 2px 4px rgba(0,0,0,0.5); white-space: nowrap; }
+        #hud-difficulty { font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 10px; margin-top: 4px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); box-shadow: 0 2px 4px rgba(0,0,0,0.5); white-space: nowrap; }
 
         #progress-container { width: 90vw; max-width: 400px; height: 8px; background-color: rgba(0,0,0,0.5); border-radius: 4px; margin-bottom: 5px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.1); }
         #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #ffdf00, #f1c40f, #fff3b0); box-shadow: 0 0 10px rgba(241, 196, 15, 0.8); transition: width 0.4s ease-out; }
 
-        #message { 
-            font-family: 'Russo One', sans-serif; font-size: 20px; height: 26px; 
-            color: #2ecc71; text-align: center; margin-bottom: 10px; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8); z-index: 100;
-        }
+        #message { font-family: 'Russo One', sans-serif; font-size: 20px; height: 26px; color: #2ecc71; text-align: center; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); z-index: 100; }
 
-        .btn-small-top { font-family: sans-serif; font-size: 14px; padding: 8px 12px; border-radius: 15px; background-color: #3498db; color: white; border: none; font-weight: bold; box-shadow: 0 4px 0 #2980b9, 0 5px 10px rgba(0,0,0,0.5); transition: all 0.2s; cursor: pointer; white-space: nowrap; }
+        .btn-small-top { font-family: sans-serif; font-size: 13px; padding: 8px 10px; border-radius: 15px; background-color: #3498db; color: white; border: none; font-weight: bold; box-shadow: 0 4px 0 #2980b9, 0 5px 10px rgba(0,0,0,0.5); transition: all 0.2s; cursor: pointer; white-space: nowrap; margin-bottom: 5px;}
         .btn-small-top:active { transform: translateY(4px); box-shadow: 0 0 0 #2980b9; }
-        
         .btn-mix { background-color: #e67e22; box-shadow: 0 4px 0 #d35400, 0 5px 10px rgba(0,0,0,0.5); }
         .btn-mix:active { box-shadow: 0 0 0 #d35400; }
-        
-        .btn-sound { background-color: #9b59b6; box-shadow: 0 4px 0 #8e44ad, 0 5px 10px rgba(0,0,0,0.5); font-size: 16px; padding: 6px 10px;}
+        .btn-sound { background-color: #9b59b6; box-shadow: 0 4px 0 #8e44ad, 0 5px 10px rgba(0,0,0,0.5); font-size: 14px;}
         .btn-sound:active { box-shadow: 0 0 0 #8e44ad; }
 
-        @keyframes pulseBtnTop { 
-            0% { transform: scale(1); box-shadow: 0 4px 0 #d35400, 0 0 0 0 rgba(231, 76, 60, 0.7); } 
-            50% { transform: scale(1.05); box-shadow: 0 4px 0 #d35400, 0 0 0 10px rgba(231, 76, 60, 0); } 
-            100% { transform: scale(1); box-shadow: 0 4px 0 #d35400, 0 0 0 0 rgba(231, 76, 60, 0); } 
-        }
+        @keyframes pulseBtnTop { 0% { transform: scale(1); box-shadow: 0 4px 0 #d35400, 0 0 0 0 rgba(231, 76, 60, 0.7); } 50% { transform: scale(1.05); box-shadow: 0 4px 0 #d35400, 0 0 0 10px rgba(231, 76, 60, 0); } 100% { transform: scale(1); box-shadow: 0 4px 0 #d35400, 0 0 0 0 rgba(231, 76, 60, 0); } }
         .btn-pulse { animation: pulseBtnTop 1.5s infinite !important; background-color: #e74c3c !important; box-shadow: 0 4px 0 #c0392b !important;}
 
         #game-board { width: 90vw; height: 112.5vw; max-width: 400px; max-height: 500px; position: relative; perspective: 1000px; }
         
+        /* ПЛИТКИ */
         .tile {
             position: absolute; width: 20%; height: 20%;
             left: calc(var(--x) * 10%); top: calc(var(--y) * 10%); margin-top: calc(var(--z) * -3.5vw); margin-left: calc(var(--z) * -2vw);
-            
-            background: var(--tileBg);
-            color: var(--tileColor); 
-            font-size: 14vw; line-height: 1; 
-            
+            background: var(--tileBg); color: var(--tileColor); font-size: 14vw; line-height: 1; 
             text-shadow: 1px 2px 2px rgba(255,255,255,0.9), -1px -2px 4px rgba(0,0,0,0.4); 
-            font-family: 'Noto Color Emoji', sans-serif;
-            display: flex; justify-content: center; align-items: center; 
-            border-radius: 14px; 
-            
-            box-shadow: 
-                inset 3px 3px 6px rgba(255, 255, 255, 1), 
-                inset -4px -5px 8px rgba(0, 0, 0, 0.18), 
-                calc(0.5vw + var(--z) * 0.1vw) calc(0.9vw + var(--z) * 0.2vw) 0px var(--tileSide), 
-                calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(3vw + var(--z) * 0.8vw) rgba(0,0,0,0.65); 
-            
-            border: 1px solid rgba(255,255,255,0.4); 
-
-            backdrop-filter: blur(4px); touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
+            font-family: 'Noto Color Emoji', sans-serif; display: flex; justify-content: center; align-items: center; border-radius: 14px; 
+            box-shadow: inset 3px 3px 6px rgba(255, 255, 255, 1), inset -4px -5px 8px rgba(0, 0, 0, 0.18), calc(0.5vw + var(--z) * 0.1vw) calc(0.9vw + var(--z) * 0.2vw) 0px var(--tileSide), calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(3vw + var(--z) * 0.8vw) rgba(0,0,0,0.65); 
+            border: 1px solid rgba(255,255,255,0.4); backdrop-filter: blur(4px); touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
             transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s, box-shadow 0.2s, top 0.5s ease-in-out, left 0.5s ease-in-out, margin-top 0.5s ease-in-out, margin-left 0.5s ease-in-out; 
             cursor: pointer; transform-style: preserve-3d;
         }
 
         .tile::before {
-            content: '';
-            position: absolute;
-            top: 2%; left: 3%; right: 3%; height: 35%;
+            content: ''; position: absolute; top: 2%; left: 3%; right: 3%; height: 35%;
             background: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 100%);
-            border-radius: 12px 12px 25px 25px / 12px 12px 15px 15px;
-            pointer-events: none;
+            border-radius: 12px 12px 25px 25px / 12px 12px 15px 15px; pointer-events: none;
         }
 
         @media (min-width: 400px) {
@@ -170,74 +160,45 @@
 
         .tile.blocked { filter: brightness(0.65) contrast(1.1) saturate(0.85); cursor: not-allowed; }
         .tile.blocked::before { opacity: 0.2; }
-
-        .tile.selected { 
-            border-color: #fff !important; 
-            box-shadow: 
-                inset 3px 3px 8px rgba(255, 255, 255, 1), 
-                inset -3px -4px 6px rgba(0, 0, 0, 0.1),
-                calc(0.5vw + var(--z) * 0.1vw) calc(2vw + var(--z) * 0.2vw) 0px var(--tileSide),
-                0 20px 40px rgba(0,0,0,0.9) !important; 
-            transform: translateY(-5vw) scale(1.1); 
-            z-index: 999 !important; 
-            filter: brightness(1.15) drop-shadow(0 0 12px rgba(241, 196, 15, 0.8));
-        }
+        .tile.selected { border-color: #fff !important; box-shadow: inset 3px 3px 8px rgba(255, 255, 255, 1), inset -3px -4px 6px rgba(0, 0, 0, 0.1), calc(0.5vw + var(--z) * 0.1vw) calc(2vw + var(--z) * 0.2vw) 0px var(--tileSide), 0 20px 40px rgba(0,0,0,0.9) !important; transform: translateY(-5vw) scale(1.1); z-index: 999 !important; filter: brightness(1.15) drop-shadow(0 0 12px rgba(241, 196, 15, 0.8)); }
         .tile.matched { opacity: 0; pointer-events: none; transform: scale(1.6); filter: brightness(2.5); }
         
         .tile.is-hidden { 
-            background: radial-gradient(circle at 30% 30%, #c41e3a 0%, #800020 50%, #4a0e17 100%) !important; 
-            border-top: 1px solid #ff7a91 !important;
-            border-left: 1px solid #ff7a91 !important;
-            border-bottom: 1px solid #240108 !important;
-            border-right: 1px solid #240108 !important;
-            --tileSide: #3b050f !important;
-            
-            box-shadow: 
-                inset 3px 3px 8px rgba(255, 120, 120, 0.6), 
-                inset -4px -5px 8px rgba(0, 0, 0, 0.6),
-                calc(0.5vw + var(--z) * 0.1vw) calc(0.9vw + var(--z) * 0.2vw) 0px var(--tileSide),
-                calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(3vw + var(--z) * 0.8vw) rgba(0,0,0,0.7) !important;
-                
+            background: radial-gradient(circle at 30% 30%, #c41e3a 0%, #800020 50%, #4a0e17 100%) !important; border-top: 1px solid #ff7a91 !important; border-left: 1px solid #ff7a91 !important; border-bottom: 1px solid #240108 !important; border-right: 1px solid #240108 !important; --tileSide: #3b050f !important;
+            box-shadow: inset 3px 3px 8px rgba(255, 120, 120, 0.6), inset -4px -5px 8px rgba(0, 0, 0, 0.6), calc(0.5vw + var(--z) * 0.1vw) calc(0.9vw + var(--z) * 0.2vw) 0px var(--tileSide), calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(3vw + var(--z) * 0.8vw) rgba(0,0,0,0.7) !important;
             color: transparent !important; text-shadow: none !important; 
         }
-        .tile.is-hidden::after { 
-            content: attr(data-cover); 
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            font-size: 10vw; color: initial;
-            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.8));
-        }
-        @media (min-width: 400px) {
-            .tile.is-hidden::after { font-size: 40px; }
-        }
+        .tile.is-hidden::after { content: attr(data-cover); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10vw; color: initial; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.8)); }
+        @media (min-width: 400px) { .tile.is-hidden::after { font-size: 40px; } }
 
         .flip-anim { animation: flipTileIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes flipTileIn { 0% { transform: translateY(-4vw) scale(1.1) rotateY(-90deg); } 100% { transform: translateY(-4vw) scale(1.1) rotateY(0deg); } }
 
-        .gold-shard {
-            position: absolute; width: 12px; height: 12px;
-            background: linear-gradient(135deg, #ffdf00, #d4ac0d);
-            box-shadow: 0 0 10px rgba(241, 196, 15, 1);
-            pointer-events: none; z-index: 9999;
-            animation: shatterAnim 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
-        }
-        .thematic-particle {
-            position: absolute; font-family: 'Noto Color Emoji', sans-serif; font-size: 26px;
-            pointer-events: none; z-index: 9999;
-            filter: drop-shadow(0 0 5px rgba(241, 196, 15, 0.9)) drop-shadow(0 5px 12px rgba(0,0,0,0.6));
-            animation: shatterAnim 0.7s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
-        }
-        @keyframes shatterAnim {
-            0% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
-            100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.3) rotate(var(--rot)); }
-        }
+        .gold-shard { position: absolute; width: 12px; height: 12px; background: linear-gradient(135deg, #ffdf00, #d4ac0d); box-shadow: 0 0 10px rgba(241, 196, 15, 1); pointer-events: none; z-index: 9999; animation: shatterAnim 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards; }
+        .thematic-particle { position: absolute; font-family: 'Noto Color Emoji', sans-serif; font-size: 26px; pointer-events: none; z-index: 9999; filter: drop-shadow(0 0 5px rgba(241, 196, 15, 0.9)) drop-shadow(0 5px 12px rgba(0,0,0,0.6)); animation: shatterAnim 0.7s cubic-bezier(0.1, 0.8, 0.3, 1) forwards; }
+        @keyframes shatterAnim { 0% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); } 100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.3) rotate(var(--rot)); } }
 
         .floating-text { position: absolute; font-family: 'Russo One', sans-serif; font-size: 26px; color: #2ecc71; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 12px rgba(46, 204, 113, 0.9); pointer-events: none; z-index: 9999; animation: floatUpText 1s ease-out forwards; }
         .floating-text.combo { color: #f1c40f; font-size: 34px; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 18px rgba(241, 196, 15, 0.9); }
         @keyframes floatUpText { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 20% { transform: translateY(-20px) scale(1.2); opacity: 1; } 100% { transform: translateY(-60px) scale(1); opacity: 0; } }
-
         .confetti { position: absolute; width: 10px; height: 10px; background-color: #f00; z-index: 2000; animation: fall linear forwards; }
         @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
 
+        /* --- КОЛЕСО ФОРТУНЫ --- */
+        #wheel-modal { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.95); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; }
+        #wheel-modal h2 { font-family: 'Russo One', sans-serif; font-size: 32px; color: #f1c40f; margin-bottom: 20px; text-shadow: 0 5px 10px rgba(0,0,0,1); cursor: pointer;}
+        
+        .wheel-container { position: relative; width: 300px; height: 300px; border-radius: 50%; border: 6px solid #d4af37; overflow: hidden; box-shadow: 0 0 30px rgba(241, 196, 15, 0.5), inset 0 0 20px rgba(0,0,0,0.8); background: #222; }
+        .wheel-spinner { width: 100%; height: 100%; position: relative; border-radius: 50%; transition: transform 4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .wheel-slice { position: absolute; top: 0; left: 0; width: 100%; height: 100%; clip-path: polygon(50% 50%, 100% 0, 100% 50%); transform-origin: 50% 50%; }
+        .wheel-text { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); font-family: 'Russo One', sans-serif; font-size: 18px; color: white; text-shadow: 1px 1px 3px black; z-index: 2;}
+        .wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid #fff; z-index: 10; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.8)); }
+        .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background: radial-gradient(circle, #fff, #d4af37); border-radius: 50%; z-index: 5; box-shadow: 0 0 10px black;}
+        
+        #btn-spin { margin-top: 30px; font-size: 22px; padding: 15px 40px; }
+        #btn-close-wheel { background: transparent; color: #95a5a6; border: none; font-size: 18px; text-decoration: underline; margin-top: 15px; cursor: pointer; }
+
+        /* Обычные модалки */
         #rules-modal, #ad-screen { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.95); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; }
         #rules-modal h2, #ad-screen h2 { font-family: 'Russo One', sans-serif; font-size: 32px; color: #f1c40f; margin-bottom: 20px; }
         #rules-modal p, #ad-screen p { font-size: 18px; line-height: 1.5; margin-bottom: 30px; max-width: 400px; }
@@ -253,13 +214,34 @@
         
         <div id="level-controls">
             <button id="btn-prev-level" class="btn-arrow">◀</button>
-            <div id="menu-level-badge"><div id="menu-level-text">УРОВЕНЬ 1</div></div>
+            <div id="menu-level-badge">
+                <div id="menu-level-text">УРОВЕНЬ 1</div>
+                <div id="menu-chapter-title">Начало пути</div>
+            </div>
             <button id="btn-next-level" class="btn-arrow">▶</button>
         </div>
         
         <button id="btn-play" class="btn-massive">▶ ИГРАТЬ</button>
-        <button id="btn-rules" class="btn-menu-small">Как играть?</button>
+        <button id="btn-open-wheel" class="btn-wheel">🎁 Ежедневный бонус</button>
+        
+        <div>
+            <button id="btn-rules" class="btn-menu-small">Как играть?</button>
+        </div>
         <div id="btn-reset">Сбросить весь прогресс</div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО КОЛЕСА -->
+    <div id="wheel-modal">
+        <h2 id="wheel-cheat-reset">Колесо Фортуны</h2>
+        <div class="wheel-container">
+            <div class="wheel-pointer"></div>
+            <div class="wheel-center"></div>
+            <div class="wheel-spinner" id="wheel-spinner">
+                <!-- Сектора генерируются в JS -->
+            </div>
+        </div>
+        <button id="btn-spin" class="btn-massive">КРУТИТЬ</button>
+        <button id="btn-close-wheel">Закрыть</button>
     </div>
 
     <div id="rules-modal">
@@ -271,14 +253,17 @@
 
     <div id="game-screen">
         <div id="top-bar">
-            <div>
+            <div style="display: flex; flex-direction: column;">
                 <button id="btn-menu" class="btn-small-top">🏠 Меню</button>
                 <button id="btn-sound" class="btn-small-top btn-sound">🔊</button>
             </div>
             <div class="hud-center">
                 <div class="level-switcher">
                     <button id="btn-hud-prev" class="btn-hud-arrow">◀</button>
-                    <div id="hud-level">Ур. 1</div>
+                    <div id="hud-level-container">
+                        <div id="hud-level">Ур. 1</div>
+                        <div id="hud-chapter-text">Начало пути</div>
+                    </div>
                     <button id="btn-hud-next" class="btn-hud-arrow">▶</button>
                 </div>
                 <div id="hud-score">🏆 0</div>
@@ -307,10 +292,8 @@
             },
             playOsc: function(type, freq, dropFreq, duration, vol) {
                 if (!this.enabled || !this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+                osc.type = type; osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
                 if (dropFreq) osc.frequency.exponentialRampToValueAtTime(dropFreq, this.ctx.currentTime + duration);
                 gain.gain.setValueAtTime(vol, this.ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
@@ -319,50 +302,34 @@
             },
             playClick: function(isSelected) {
                 let startFreq = isSelected ? 600 : 400; let endFreq = isSelected ? 100 : 80;
-                this.playOsc('sine', startFreq, endFreq, 0.05, 0.5);
-                this.playOsc('triangle', startFreq * 1.5, endFreq, 0.05, 0.3);
+                this.playOsc('sine', startFreq, endFreq, 0.05, 0.5); this.playOsc('triangle', startFreq * 1.5, endFreq, 0.05, 0.3);
             },
             playUnlock: function() {
-                this.playOsc('square', 800, 200, 0.1, 0.2);
-                setTimeout(() => this.playOsc('square', 1200, 300, 0.15, 0.2), 50);
+                this.playOsc('square', 800, 200, 0.1, 0.2); setTimeout(() => this.playOsc('square', 1200, 300, 0.15, 0.2), 50);
             },
             playMatch: function(comboCount) {
-                let baseFreq = 392; 
-                let pentatonicSteps = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24]; 
+                let baseFreq = 392; let pentatonicSteps = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24]; 
                 let stepIndex = Math.min(comboCount - 1, pentatonicSteps.length - 1);
                 let freq = baseFreq * Math.pow(1.059463, pentatonicSteps[stepIndex]);
-                this.playOsc('sine', freq, freq * 0.9, 0.6, 0.4);
-                this.playOsc('triangle', freq * 2, freq * 1.8, 0.4, 0.15); 
+                this.playOsc('sine', freq, freq * 0.9, 0.6, 0.4); this.playOsc('triangle', freq * 2, freq * 1.8, 0.4, 0.15); 
             },
             playWin: function() {
                 let freqs = [392, 493.88, 587.33, 783.99]; 
-                freqs.forEach((f, i) => {
-                    setTimeout(() => {
-                        this.playOsc('sine', f, f * 0.95, 1.0, 0.3);
-                        this.playOsc('triangle', f * 2, f * 1.9, 0.8, 0.1);
-                    }, i * 100);
-                });
+                freqs.forEach((f, i) => { setTimeout(() => { this.playOsc('sine', f, f * 0.95, 1.0, 0.3); this.playOsc('triangle', f * 2, f * 1.9, 0.8, 0.1); }, i * 100); });
             },
             playShuffle: function() {
-                for(let i = 0; i < 15; i++) {
-                    setTimeout(() => { let f = 300 + Math.random() * 400; this.playOsc('sine', f, f/2, 0.04, 0.2); }, Math.random() * 400);
-                }
+                for(let i = 0; i < 15; i++) { setTimeout(() => { let f = 300 + Math.random() * 400; this.playOsc('sine', f, f/2, 0.04, 0.2); }, Math.random() * 400); }
             },
-            toggle: function() {
-                this.enabled = !this.enabled;
-                const btn = document.getElementById('btn-sound');
-                if (btn) btn.innerText = this.enabled ? '🔊' : '🔇';
-            }
+            playWheelTick: function() { this.playOsc('square', 800, 600, 0.05, 0.1); },
+            toggle: function() { this.enabled = !this.enabled; const btn = document.getElementById('btn-sound'); if (btn) btn.innerText = this.enabled ? '🔊' : '🔇'; }
         };
 
         function createParticles() {
-            const container = document.getElementById('particles-container');
-            container.innerHTML = '';
+            const container = document.getElementById('particles-container'); container.innerHTML = '';
             for(let i=0; i<30; i++) {
                 let p = document.createElement('div'); p.classList.add('particle');
                 let size = Math.random() * 4 + 2; p.style.width = size + 'px'; p.style.height = size + 'px';
-                p.style.left = Math.random() * 100 + 'vw';
-                p.style.animationDuration = (Math.random() * 10 + 10) + 's'; p.style.animationDelay = (Math.random() * 10) + 's';
+                p.style.left = Math.random() * 100 + 'vw'; p.style.animationDuration = (Math.random() * 10 + 10) + 's'; p.style.animationDelay = (Math.random() * 10) + 's';
                 container.appendChild(p);
             }
         }
@@ -376,7 +343,7 @@
             let savedScore = localStorage.getItem('mahjong_score'); if (savedScore) totalScore = parseInt(savedScore);
         } catch(e){}
         
-        // --- 60 ПРЕМИАЛЬНЫХ НАБОРОВ (1200 ПРЕДМЕТОВ) - МАКСИМАЛЬНЫЙ ЛИМИТ ---
+        // --- 60 ПРЕМИАЛЬНЫХ НАБОРОВ (1200 ПРЕДМЕТОВ) ---
         const themeSets = [
             ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'],
             ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'],
@@ -444,36 +411,48 @@
         const coverSymbols = ['🔒', '🔐'];
 
         const materials = [
-            { 
-                tileBg: 'radial-gradient(circle at 30% 30%, #ffffff 0%, #f7ecd5 40%, #e0c89b 100%)', 
-                tileSide: '#b89d70', 
-                tileColor: '#2b1d0f', 
-            },
-            { 
-                tileBg: 'radial-gradient(circle at 30% 30%, #f0fff4 0%, #c4e8cf 50%, #82ab91 100%)', 
-                tileSide: '#689679', 
-                tileColor: '#1a3320', 
-            },
-            { 
-                tileBg: 'radial-gradient(circle at 30% 30%, #ffffff 0%, #fdfcfd 40%, #e8e3ec 80%, #dcd1e3 100%)', 
-                tileSide: '#9b92a3', 
-                tileColor: '#1e242b', 
-            }
+            { tileBg: 'radial-gradient(circle at 30% 30%, #ffffff 0%, #f7ecd5 40%, #e0c89b 100%)', tileSide: '#b89d70', tileColor: '#2b1d0f' },
+            { tileBg: 'radial-gradient(circle at 30% 30%, #f0fff4 0%, #c4e8cf 50%, #82ab91 100%)', tileSide: '#689679', tileColor: '#1a3320' },
+            { tileBg: 'radial-gradient(circle at 30% 30%, #ffffff 0%, #fdfcfd 40%, #e8e3ec 80%, #dcd1e3 100%)', tileSide: '#9b92a3', tileColor: '#1e242b' }
         ];
+
+        // --- ПРОЦЕДУРНЫЙ ГЕНЕРАТОР НАЗВАНИЙ ГЛАВ ---
+        const baseChapters = [
+            "Начало пути", "Постижение реальности", "Пробуждение разума", "Тени прошлого", 
+            "Врата вечности", "Шепот вселенной", "Лабиринт судьбы", "Зеркало души",
+            "Тропа просветления", "Горизонт событий"
+        ];
+        const wordsA = ["Эра", "Эхо", "Лабиринт", "Храм", "Свет", "Осколки", "Путь", "Сны", "Венец", "Пепел", "Секрет", "Корона", "Рубеж"];
+        const wordsB = ["Древних", "Забытых", "Скрытых", "Вечных", "Падших", "Небесных", "Темных", "Истинных", "Мертвых", "Святых", "Слепых", "Тайных"];
+        const wordsC = ["Богов", "Духов", "Иллюзий", "Миров", "Звезд", "Времен", "Королей", "Теней", "Истин", "Чудес", "Создателей", "Снов"];
+
+        function getChapterName(level) {
+            let chapter = Math.floor((level - 1) / 10);
+            if (chapter < baseChapters.length) return baseChapters[chapter];
+            
+            let s = chapter * 99991; // Сид для главы
+            function rndC() { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }
+            
+            let a = wordsA[Math.floor(rndC() * wordsA.length)];
+            let b = wordsB[Math.floor(rndC() * wordsB.length)];
+            let c = wordsC[Math.floor(rndC() * wordsC.length)];
+            return a + " " + b + " " + c;
+        }
 
         let activeTiles = [], firstTile = null;
 
         function updateMenuLevelText() { 
             document.getElementById('menu-level-text').innerText = 'УРОВЕНЬ ' + currentLevel; 
             document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
+            let chapterTitle = getChapterName(currentLevel);
+            document.getElementById('menu-chapter-title').innerText = chapterTitle;
+            document.getElementById('hud-chapter-text').innerText = chapterTitle;
         }
         updateMenuLevelText(); updateScoreDisplay();
         
         document.getElementById('btn-play').addEventListener('click', () => { 
-            AudioSys.init(); 
-            document.getElementById('main-menu').style.display = 'none'; 
-            document.getElementById('game-screen').style.display = 'flex'; 
-            initGame(); 
+            AudioSys.init(); document.getElementById('main-menu').style.display = 'none'; 
+            document.getElementById('game-screen').style.display = 'flex'; initGame(); 
         });
         document.getElementById('btn-prev-level').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; localStorage.setItem('mahjong_level', currentLevel); updateMenuLevelText(); }});
         document.getElementById('btn-next-level').addEventListener('click', () => { currentLevel++; localStorage.setItem('mahjong_level', currentLevel); updateMenuLevelText(); });
@@ -488,27 +467,15 @@
         document.getElementById('btn-menu').addEventListener('click', () => { document.getElementById('game-screen').style.display = 'none'; document.getElementById('main-menu').style.display = 'flex'; updateMenuLevelText(); });
         document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
         
-        document.getElementById('btn-sound').addEventListener('click', () => {
-            AudioSys.init();
-            AudioSys.toggle();
-        });
-
-        document.getElementById('btn-hud-prev').addEventListener('click', () => { 
-            if(currentLevel > 1) { currentLevel--; localStorage.setItem('mahjong_level', currentLevel); initGame(); }
-        });
-        document.getElementById('btn-hud-next').addEventListener('click', () => { 
-            currentLevel++; localStorage.setItem('mahjong_level', currentLevel); initGame(); 
-        });
+        document.getElementById('btn-sound').addEventListener('click', () => { AudioSys.init(); AudioSys.toggle(); });
+        document.getElementById('btn-hud-prev').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; localStorage.setItem('mahjong_level', currentLevel); initGame(); }});
+        document.getElementById('btn-hud-next').addEventListener('click', () => { currentLevel++; localStorage.setItem('mahjong_level', currentLevel); initGame(); });
 
         function updateScoreDisplay() { document.getElementById('hud-score').innerText = '🏆 ' + totalScore; }
         
         function applyMaterial(level) {
-            let root = document.documentElement; 
-            let matIndex = (level - 1) % materials.length; 
-            let mat = materials[matIndex];
-            root.style.setProperty('--tileBg', mat.tileBg); 
-            root.style.setProperty('--tileSide', mat.tileSide); 
-            root.style.setProperty('--tileColor', mat.tileColor); 
+            let root = document.documentElement; let matIndex = (level - 1) % materials.length; let mat = materials[matIndex];
+            root.style.setProperty('--tileBg', mat.tileBg); root.style.setProperty('--tileSide', mat.tileSide); root.style.setProperty('--tileColor', mat.tileColor); 
         }
 
         function getDifficultyParams(level) {
@@ -519,7 +486,7 @@
             else return { text: "🔴 ЭКСПЕРТ", color: "#e74c3c", maxLayers: 5, density: 0.95 };
         }
         
-        // Математически строгий и детерминированный выбор символов для уровня (Никакого Math.random)
+        // Математически строгий и детерминированный выбор символов
         function getSymbolsForLevel(level) {
             let s = level * 12345;
             function localRnd() { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }
@@ -529,12 +496,6 @@
             return [...themeSets[t1].slice(0, 7), ...themeSets[t2].slice(7, 14), ...themeSets[t3].slice(14, 20)];
         }
         
-        function getPairsFromSymbols(symbolsArray) {
-            let counts = {}; symbolsArray.forEach(s => counts[s] = (counts[s] || 0) + 1);
-            let pairsPool = []; for (let s in counts) { for(let i=0; i < Math.floor(counts[s] / 2); i++) pairsPool.push(s); }
-            return pairsPool;
-        }
-
         function assignSymbolsSmart(layout, pairsPool, customRnd) {
             let unassigned = layout.map(pos => ({...pos, symbol: null}));
             let symbolPool = [...pairsPool];
@@ -574,13 +535,10 @@
             let diffBadge = document.getElementById('hud-difficulty'); diffBadge.innerText = diff.text; diffBadge.style.backgroundColor = diff.color; diffBadge.style.color = (diff.color === "#f1c40f") ? "#000" : "#fff"; 
             
             applyMaterial(currentLevel); 
-            
             let baseSymbols = getSymbolsForLevel(currentLevel);
             
-            // СТРОГАЯ ДЕТЕРМИНИРОВАННАЯ ГЕНЕРАЦИЯ (Без единого Math.random)
             let seed = currentLevel * 13371337, attempt = 0, finalLayout = null;
             function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
-
             let shapeIndex = (currentLevel - 1) % 8; 
             
             while (!finalLayout && attempt < 500) {
@@ -591,9 +549,7 @@
                     for (let y = shrink; y <= maxRows - shrink; y += 2) {
                         for (let x = shrink; x <= maxCols - shrink; x += 2) {
                             let isSupported = (z === 0) || grid[`${x-1},${y-1},${z-1}`] || grid[`${x+1},${y-1},${z-1}`] || grid[`${x-1},${y+1},${z-1}`] || grid[`${x+1},${y+1},${z-1}`] || grid[`${x},${y},${z-1}`];
-                            
-                            let isMasked = true;
-                            let cx = x - 4, cy = y - 4; 
+                            let isMasked = true; let cx = x - 4, cy = y - 4; 
                             switch(shapeIndex) {
                                 case 0: break; 
                                 case 1: if (Math.abs(cx) <= 2 && Math.abs(cy) <= 2 && z < 2) isMasked = false; break; 
@@ -604,10 +560,7 @@
                                 case 6: if (Math.abs(cx) <= 1) isMasked = false; break; 
                                 case 7: if (Math.abs(cx) === Math.abs(cy) && z === 0) isMasked = false; break; 
                             }
-                            
-                            if (isSupported && isMasked && rnd() < diff.density) { 
-                                layout.push({x, y, z}); grid[`${x},${y},${z}`] = true; 
-                            }
+                            if (isSupported && isMasked && rnd() < diff.density) { layout.push({x, y, z}); grid[`${x},${y},${z}`] = true; }
                         }
                     }
                 }
@@ -618,23 +571,10 @@
             }
 
             if (!finalLayout) {
-                console.warn("Сложная 3D-форма не удалась, генерируем плоский страховочный уровень.");
-                let fallbackLayout = [];
-                let maxTiles = Math.min(40, Math.max(8, currentLevel * 2));
-                if (maxTiles % 2 !== 0) maxTiles++; 
-                
+                let fallbackLayout = []; let maxTiles = Math.min(40, Math.max(8, currentLevel * 2)); if (maxTiles % 2 !== 0) maxTiles++; 
                 let fX = 0, fY = 0;
-                for (let i = 0; i < maxTiles; i++) {
-                    fallbackLayout.push({x: fX, y: fY, z: 0});
-                    fX += 2;
-                    if (fX > 8) { fX = 0; fY += 2; }
-                }
-                
-                let fallbackPool = [];
-                for(let i = 0; i < maxTiles / 2; i++) {
-                    fallbackPool.push(baseSymbols[Math.floor(rnd() * baseSymbols.length)]);
-                }
-                
+                for (let i = 0; i < maxTiles; i++) { fallbackLayout.push({x: fX, y: fY, z: 0}); fX += 2; if (fX > 8) { fX = 0; fY += 2; } }
+                let fallbackPool = []; for(let i = 0; i < maxTiles / 2; i++) { fallbackPool.push(baseSymbols[Math.floor(rnd() * baseSymbols.length)]); }
                 let prepared = assignSymbolsSmart(fallbackLayout, fallbackPool, rnd);
                 finalLayout = prepared || fallbackLayout.map((pos, i) => ({...pos, symbol: fallbackPool[Math.floor(i/2)]}));
             }
@@ -642,11 +582,7 @@
             if ((currentLevel % 10 === 7) || (currentLevel % 10 === 8)) {
                 let hideCount = (finalLayout.length >= 30) ? 6 : 4;
                 let hideIndices = Array.from({length: finalLayout.length}, (_, i) => i);
-                // Идеально строгий шаффл через rnd()
-                for (let i = hideIndices.length - 1; i > 0; i--) { 
-                    const j = Math.floor(rnd() * (i + 1)); 
-                    [hideIndices[i], hideIndices[j]] = [hideIndices[j], hideIndices[i]]; 
-                }
+                for (let i = hideIndices.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [hideIndices[i], hideIndices[j]] = [hideIndices[j], hideIndices[i]]; }
                 for(let i=0; i<hideCount; i++) {
                     finalLayout[hideIndices[i]].isHidden = true;
                     finalLayout[hideIndices[i]].coverSymbol = coverSymbols[Math.floor(rnd() * coverSymbols.length)];
@@ -657,12 +593,7 @@
             finalLayout.forEach((obj) => {
                 const el = document.createElement('div'); el.classList.add('tile'); el.innerText = obj.symbol;
                 el.style.setProperty('--x', obj.x); el.style.setProperty('--y', obj.y); el.style.setProperty('--z', obj.z); el.style.zIndex = (obj.z * 100) + obj.y;
-                
-                if (obj.isHidden) { 
-                    el.classList.add('is-hidden'); 
-                    el.setAttribute('data-cover', obj.coverSymbol);
-                }
-                
+                if (obj.isHidden) { el.classList.add('is-hidden'); el.setAttribute('data-cover', obj.coverSymbol); }
                 obj.el = el; el.addEventListener('click', (e) => handleTileClick(obj, e));
                 board.appendChild(el); activeTiles.push(obj);
             });
@@ -689,112 +620,64 @@
             let freeTiles = activeTiles.filter(t => t.isFree), symbolsSet = new Set(), hasMoves = false;
             for (let t of freeTiles) { if (symbolsSet.has(t.symbol)) { hasMoves = true; break; } symbolsSet.add(t.symbol); }
             let btnShuffle = document.getElementById('btn-shuffle');
-            if (!hasMoves) { 
-                document.getElementById('message').innerText = 'НЕТ ХОДОВ! Нажмите Микс ➔'; 
-                document.getElementById('message').style.color = '#e74c3c'; 
-                btnShuffle.classList.add('btn-pulse'); 
-            } else { 
-                document.getElementById('message').innerHTML = ''; 
-                btnShuffle.classList.remove('btn-pulse'); 
-            }
+            if (!hasMoves) { document.getElementById('message').innerText = 'НЕТ ХОДОВ! Нажмите Микс ➔'; document.getElementById('message').style.color = '#e74c3c'; btnShuffle.classList.add('btn-pulse'); } 
+            else { document.getElementById('message').innerHTML = ''; btnShuffle.classList.remove('btn-pulse'); }
         }
 
         function showFloatingText(element, points, isCombo) {
-            let rect = element.getBoundingClientRect();
-            let floatEl = document.createElement('div'); floatEl.classList.add('floating-text');
-            if(isCombo) floatEl.classList.add('combo');
-            floatEl.innerText = isCombo ? `+${points} КОМБО!` : `+${points}`;
-            
-            floatEl.style.left = (rect.left + window.scrollX + rect.width / 4) + 'px'; 
-            floatEl.style.top = (rect.top + window.scrollY - 30) + 'px';
-            document.body.appendChild(floatEl); 
-            setTimeout(() => floatEl.remove(), 1000);
+            let rect = element.getBoundingClientRect(); let floatEl = document.createElement('div'); floatEl.classList.add('floating-text');
+            if(isCombo) floatEl.classList.add('combo'); floatEl.innerText = isCombo ? `+${points} КОМБО!` : `+${points}`;
+            floatEl.style.left = (rect.left + window.scrollX + rect.width / 4) + 'px'; floatEl.style.top = (rect.top + window.scrollY - 30) + 'px';
+            document.body.appendChild(floatEl); setTimeout(() => floatEl.remove(), 1000);
         }
 
         function spawnSymbolBurst(element, symbol) {
-            let rect = element.getBoundingClientRect();
-            let centerX = rect.left + window.scrollX + rect.width / 2;
-            let centerY = rect.top + window.scrollY + rect.height / 2;
-            
+            let rect = element.getBoundingClientRect(); let centerX = rect.left + window.scrollX + rect.width / 2; let centerY = rect.top + window.scrollY + rect.height / 2;
             let isStandard = standardSymbols.includes(symbol);
-            
             let shardCount = 4 + Math.floor(Math.random() * 3); 
             for (let i = 0; i < shardCount; i++) {
-                let p = document.createElement('div'); p.classList.add('gold-shard');
-                p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
-                if (Math.random() > 0.5) p.style.borderRadius = '50%';
-                if (Math.random() > 0.7) { p.style.width = '16px'; p.style.height = '6px'; }
+                let p = document.createElement('div'); p.classList.add('gold-shard'); p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
+                if (Math.random() > 0.5) p.style.borderRadius = '50%'; if (Math.random() > 0.7) { p.style.width = '16px'; p.style.height = '6px'; }
                 let angle = Math.random() * Math.PI * 2, dist = Math.random() * 80 + 30; 
                 p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); p.style.setProperty('--rot', (Math.random() * 360) + 'deg');
-                document.body.appendChild(p); 
-                setTimeout(() => p.remove(), 600);
+                document.body.appendChild(p); setTimeout(() => p.remove(), 600);
             }
-            
             let particleCount = 4 + Math.floor(Math.random() * 3); 
             for (let i = 0; i < particleCount; i++) {
-                let p = document.createElement('div'); p.classList.add('thematic-particle');
-                let rnd = Math.random();
+                let p = document.createElement('div'); p.classList.add('thematic-particle'); let rnd = Math.random();
                 if (rnd < 0.6) p.innerText = symbol; else if (rnd < 0.8) p.innerText = '✨'; else p.innerText = '💨';
                 p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
                 let angle = Math.random() * Math.PI * 2, dist = Math.random() * 70 + 40; 
                 p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px'); p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px'); p.style.setProperty('--rot', (Math.random() * 180 - 90) + 'deg');
-                document.body.appendChild(p);
-                setTimeout(() => p.remove(), 700);
+                document.body.appendChild(p); setTimeout(() => p.remove(), 700);
             }
         }
 
         function handleTileClick(t, event) { 
             if (!t.isFree) return;
-            
-            if (t.isHidden) {
-                AudioSys.playUnlock(); 
-                t.isHidden = false; 
-                t.el.classList.remove('is-hidden'); 
-                t.el.classList.add('flip-anim');
-                setTimeout(() => t.el.classList.remove('flip-anim'), 400);
-                return; 
-            }
-            
+            if (t.isHidden) { AudioSys.playUnlock(); t.isHidden = false; t.el.classList.remove('is-hidden'); t.el.classList.add('flip-anim'); setTimeout(() => t.el.classList.remove('flip-anim'), 400); return; }
             if (!firstTile) { 
-                AudioSys.playClick(true); 
-                t.el.classList.add('selected'); firstTile = t; 
+                AudioSys.playClick(true); t.el.classList.add('selected'); firstTile = t; 
             } else if (firstTile !== t) { 
                 t.el.classList.add('selected'); 
                 if (firstTile.symbol === t.symbol) { 
-                    
-                    let now = Date.now();
-                    if (now - lastMatchTime < COMBO_TIME_LIMIT) comboCount++; else comboCount = 1;
-                    lastMatchTime = now;
-                    
+                    let now = Date.now(); if (now - lastMatchTime < COMBO_TIME_LIMIT) comboCount++; else comboCount = 1; lastMatchTime = now;
                     AudioSys.playMatch(comboCount); 
-                    
-                    let earnedPoints = 10 * comboCount; totalScore += earnedPoints;
-                    localStorage.setItem('mahjong_score', totalScore); updateScoreDisplay();
+                    let earnedPoints = 10 * comboCount; totalScore += earnedPoints; localStorage.setItem('mahjong_score', totalScore); updateScoreDisplay();
                     showFloatingText(t.el, earnedPoints, comboCount > 1);
-
-                    spawnSymbolBurst(firstTile.el, firstTile.symbol);
-                    spawnSymbolBurst(t.el, t.symbol);
-
+                    spawnSymbolBurst(firstTile.el, firstTile.symbol); spawnSymbolBurst(t.el, t.symbol);
                     activeTiles = activeTiles.filter(x => x !== firstTile && x !== t); 
                     t.el.classList.add('matched'); firstTile.el.classList.add('matched'); firstTile = null; 
-                    
                     updateFreeState(); updateProgressBar();
-                    
                     if (activeTiles.length === 0) {
-                        AudioSys.playWin(); 
-                        currentLevel++; localStorage.setItem('mahjong_level', currentLevel);
+                        AudioSys.playWin(); currentLevel++; localStorage.setItem('mahjong_level', currentLevel);
                         document.getElementById('message').innerHTML = '🎉 УРОВЕНЬ ПРОЙДЕН!'; document.getElementById('message').style.color = '#f1c40f';
                         shootConfetti(); setTimeout(() => { initGame(); }, 2500); 
                     }
                 } else { 
-                    AudioSys.playClick(false); 
-                    let t1 = firstTile, t2 = t; firstTile = null;
-                    setTimeout(() => { t1.el.classList.remove('selected'); t2.el.classList.remove('selected'); }, 300); 
+                    AudioSys.playClick(false); let t1 = firstTile, t2 = t; firstTile = null; setTimeout(() => { t1.el.classList.remove('selected'); t2.el.classList.remove('selected'); }, 300); 
                 } 
-            } else { 
-                AudioSys.playClick(false); 
-                t.el.classList.remove('selected'); firstTile = null; 
-            }
+            } else { AudioSys.playClick(false); t.el.classList.remove('selected'); firstTile = null; }
         }
 
         function shootConfetti() {
@@ -809,74 +692,155 @@
 
         function watchAdToShuffle() { 
             if (activeTiles.length === 0) return;
-            const ad = document.getElementById('ad-screen'); 
-            if(ad) ad.style.display = 'flex'; 
-            
+            const ad = document.getElementById('ad-screen'); if(ad) ad.style.display = 'flex'; 
             setTimeout(() => { 
                 if(ad) ad.style.display = 'none'; 
-                
                 try {
                     AudioSys.playShuffle(); 
-                    
-                    let currentSymbols = activeTiles.map(t => t.symbol); 
-                    let pairsPool = getPairsFromSymbols(currentSymbols);
+                    let currentSymbols = activeTiles.map(t => t.symbol); let pairsPool = [];
+                    let counts = {}; currentSymbols.forEach(s => counts[s] = (counts[s] || 0) + 1);
+                    for (let s in counts) { for(let i=0; i < Math.floor(counts[s] / 2); i++) pairsPool.push(s); }
                     let hiddenCount = activeTiles.filter(t => t.isHidden).length;
-                    
                     let currentLayout = activeTiles.map(t => ({x: t.x, y: t.y, z: t.z}));
                     let attemptMix = 0, preparedTiles = null;
-                    
-                    while (!preparedTiles && attemptMix < 100) {
-                        attemptMix++;
-                        preparedTiles = assignSymbolsSmart(currentLayout, pairsPool, Math.random);
-                    }
-
+                    while (!preparedTiles && attemptMix < 100) { attemptMix++; preparedTiles = assignSymbolsSmart(currentLayout, pairsPool, Math.random); }
                     if (!preparedTiles) {
                         let shuffledSymbols = [...currentSymbols];
-                        for (let i = shuffledSymbols.length - 1; i > 0; i--) {
-                            const j = Math.floor(Math.random() * (i + 1));
-                            [shuffledSymbols[i], shuffledSymbols[j]] = [shuffledSymbols[j], shuffledSymbols[i]];
-                        }
+                        for (let i = shuffledSymbols.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [shuffledSymbols[i], shuffledSymbols[j]] = [shuffledSymbols[j], shuffledSymbols[i]]; }
                         preparedTiles = currentLayout.map((pos, i) => ({...pos, symbol: shuffledSymbols[i]}));
                     }
-
                     let hideIndices = Array.from({length: currentLayout.length}, (_, i) => i);
                     for (let i = hideIndices.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [hideIndices[i], hideIndices[j]] = [hideIndices[j], hideIndices[i]]; }
                     let toHide = new Set(hideIndices.slice(0, hiddenCount));
 
                     activeTiles.forEach((tile, index) => {
-                        let pt = preparedTiles[index]; 
-                        tile.symbol = pt.symbol; 
-                        tile.el.innerText = pt.symbol; 
-                        tile.el.classList.remove('selected');
-                        
-                        tile.el.classList.add('flip-anim');
-                        setTimeout(() => tile.el.classList.remove('flip-anim'), 400);
-                        
-                        if (toHide.has(index)) { 
-                            tile.isHidden = true; 
-                            tile.el.classList.add('is-hidden'); 
-                            tile.coverSymbol = coverSymbols[Math.floor(Math.random() * coverSymbols.length)];
-                            tile.el.setAttribute('data-cover', tile.coverSymbol);
-                        } else { 
-                            tile.isHidden = false; 
-                            tile.el.classList.remove('is-hidden'); 
-                        }
+                        let pt = preparedTiles[index]; tile.symbol = pt.symbol; tile.el.innerText = pt.symbol; tile.el.classList.remove('selected');
+                        tile.el.classList.add('flip-anim'); setTimeout(() => tile.el.classList.remove('flip-anim'), 400);
+                        if (toHide.has(index)) { tile.isHidden = true; tile.el.classList.add('is-hidden'); tile.coverSymbol = coverSymbols[Math.floor(Math.random() * coverSymbols.length)]; tile.el.setAttribute('data-cover', tile.coverSymbol); } 
+                        else { tile.isHidden = false; tile.el.classList.remove('is-hidden'); }
                     });
-
-                    firstTile = null; 
-                    updateFreeState(); 
-                    comboCount = 0; 
-                    
-                    let msg = document.getElementById('message');
-                    if(msg) { msg.innerText = 'Фишки перемешаны! ✨'; msg.style.color = '#f1c40f'; }
-                    let btn = document.getElementById('btn-shuffle');
-                    if(btn) btn.classList.remove('btn-pulse');
-                    
-                } catch(e) {
-                    console.error("Ошибка микса:", e);
-                }
+                    firstTile = null; updateFreeState(); comboCount = 0; 
+                    let msg = document.getElementById('message'); if(msg) { msg.innerText = 'Фишки перемешаны! ✨'; msg.style.color = '#f1c40f'; }
+                    let btn = document.getElementById('btn-shuffle'); if(btn) btn.classList.remove('btn-pulse');
+                } catch(e) { console.error("Ошибка микса:", e); }
             }, 1000); 
         }
+
+        // --- ЛОГИКА КОЛЕСА ФОРТУНЫ ---
+        const wheelModal = document.getElementById('wheel-modal');
+        const wheelSpinner = document.getElementById('wheel-spinner');
+        const btnOpenWheel = document.getElementById('btn-open-wheel');
+        const btnSpin = document.getElementById('btn-spin');
+        const btnCloseWheel = document.getElementById('btn-close-wheel');
+        
+        const wheelPrizes = [
+            { text: "+1000", val: 1000, color: "#e74c3c" },
+            { text: "+5000", val: 5000, color: "#f1c40f" },
+            { text: "+500", val: 500, color: "#3498db" },
+            { text: "+2000", val: 2000, color: "#2ecc71" },
+            { text: "ДЖЕКПОТ", val: 15000, color: "#9b59b6" },
+            { text: "+750", val: 750, color: "#e67e22" }
+        ];
+
+        // Генерируем CSS-колесо
+        let conicGradient = [];
+        let sliceAngle = 360 / wheelPrizes.length;
+        wheelPrizes.forEach((prize, i) => {
+            let start = i * sliceAngle;
+            let end = (i + 1) * sliceAngle;
+            conicGradient.push(`${prize.color} ${start}deg ${end}deg`);
+            
+            let textEl = document.createElement('div');
+            textEl.className = 'wheel-text';
+            textEl.innerText = prize.text;
+            // Вращаем текст так, чтобы он был по центру сектора
+            textEl.style.transform = `translateX(-50%) rotate(${start + sliceAngle/2}deg)`;
+            textEl.style.transformOrigin = `50% 150px`; // 150px - радиус колеса
+            wheelSpinner.appendChild(textEl);
+        });
+        wheelSpinner.style.background = `conic-gradient(${conicGradient.join(', ')})`;
+
+        let isSpinning = false;
+
+        btnOpenWheel.addEventListener('click', () => {
+            AudioSys.init();
+            wheelModal.style.display = 'flex';
+            checkWheelTimer();
+        });
+
+        btnCloseWheel.addEventListener('click', () => {
+            if(!isSpinning) wheelModal.style.display = 'none';
+        });
+
+        // Секретный сброс таймера для тестирования
+        document.getElementById('wheel-cheat-reset').addEventListener('click', () => {
+            localStorage.removeItem('mahjong_last_spin');
+            checkWheelTimer();
+            alert("Таймер колеса сброшен для тестирования!");
+        });
+
+        function checkWheelTimer() {
+            let lastSpin = localStorage.getItem('mahjong_last_spin');
+            if (lastSpin && Date.now() - parseInt(lastSpin) < 86400000) {
+                let timeLeft = 86400000 - (Date.now() - parseInt(lastSpin));
+                let hours = Math.floor(timeLeft / (1000 * 60 * 60));
+                let mins = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                btnSpin.innerText = `ОЖИДАНИЕ (${hours}ч ${mins}м)`;
+                btnSpin.style.background = "gray";
+                btnSpin.style.boxShadow = "none";
+                btnSpin.disabled = true;
+            } else {
+                btnSpin.innerText = "КРУТИТЬ";
+                btnSpin.style.background = "linear-gradient(180deg, #ffdf00 0%, #f1c40f 50%, #d4ac0d 100%)";
+                btnSpin.style.boxShadow = "0 8px 0 #9c7e07, 0 15px 20px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8)";
+                btnSpin.disabled = false;
+            }
+        }
+
+        btnSpin.addEventListener('click', () => {
+            if(isSpinning || btnSpin.disabled) return;
+            isSpinning = true;
+            btnSpin.innerText = "ВРАЩЕНИЕ...";
+            AudioSys.playShuffle();
+
+            let prizeIndex = Math.floor(Math.random() * wheelPrizes.length);
+            
+            // Чтобы стрелка указала на нужный сектор (сектора рисуются по часовой стрелке от 0 градусов = 12 часов)
+            // При вращении само колесо крутится, поэтому нужно вычислять обратный угол.
+            let targetSliceAngle = (prizeIndex * sliceAngle) + (sliceAngle / 2);
+            let rotateAngle = 360 * 5 + (360 - targetSliceAngle); // 5 полных оборотов + точный угол
+
+            wheelSpinner.style.transform = `rotate(${rotateAngle}deg)`;
+
+            // Звуки "тиков" при вращении (имитация)
+            let ticks = 0;
+            let tickInterval = setInterval(() => {
+                AudioSys.playWheelTick();
+                ticks++;
+                if(ticks > 25) clearInterval(tickInterval);
+            }, 150);
+
+            setTimeout(() => {
+                AudioSys.playWin();
+                let wonPrize = wheelPrizes[prizeIndex];
+                
+                // Начисляем очки
+                totalScore += wonPrize.val;
+                localStorage.setItem('mahjong_score', totalScore);
+                localStorage.setItem('mahjong_last_spin', Date.now().toString());
+                updateScoreDisplay();
+                
+                alert(`ПОЗДРАВЛЯЕМ! Вы выиграли ${wonPrize.text}`);
+                
+                isSpinning = false;
+                wheelSpinner.style.transition = 'none';
+                wheelSpinner.style.transform = `rotate(${360 - targetSliceAngle}deg)`; // Сбрасываем обороты
+                setTimeout(() => wheelSpinner.style.transition = 'transform 4s cubic-bezier(0.175, 0.885, 0.32, 1.275)', 50);
+                
+                checkWheelTimer();
+            }, 4000);
+        });
+
     </script>
 </body>
 </html>
