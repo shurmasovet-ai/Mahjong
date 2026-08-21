@@ -144,7 +144,6 @@
         .tile.selected { border-color: #f1c40f !important; box-shadow: 0 0 20px #f1c40f, 0 10px 20px rgba(0,0,0,0.9) !important; transform: translateY(-3vw) scale(1.08); z-index: 999 !important; }
         .tile.matched { opacity: 0; pointer-events: none; transform: scale(1.5); filter: brightness(2); }
         
-        /* --- НОВЫЙ ДИЗАЙН ЗАКРЫТЫХ ФИШЕК (ЗАМКИ) --- */
         .tile.is-hidden { 
             background: linear-gradient(135deg, #800020, #4a0e17) !important; 
             border-color: #d4af37 !important; 
@@ -310,8 +309,6 @@
         ];
         
         const standardSymbols = "📱💻🖥️🖨️🖱️🕹️💾💿📷📹🎥📺📻🎙️⏱️⏰⏳💡🔦🔋🔨🪓⛏️🛠️🪚🔧🪛🔩⚙️🧲🪜🧱🛡️💣🧨🧯🧭⚓🪝⚖️💎🔮🪄🧿👑💍🪙💰🪬⏳🩸🧪🧬🔭🔬🛸🚀🛰️🪐👽";
-        
-        // --- ОБНОВЛЕННЫЙ МАССИВ ЗАМКОВ ДЛЯ СКРЫТЫХ ФИШЕК ---
         const coverSymbols = ['🔒', '🔐'];
 
         const materials = [
@@ -411,6 +408,9 @@
             let baseSymbols = getSymbolsForLevel(currentLevel);
             let seed = currentLevel * 13371337, attempt = 0, finalLayout = null;
 
+            // --- ШАБЛОНЫ ФОРМ (ГИБРИДНАЯ ГЕНЕРАЦИЯ) ---
+            let shapeIndex = (currentLevel - 1) % 8; // 8 базовых масок
+            
             while (!finalLayout && attempt < 500) {
                 attempt++; function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
                 let layout = [], grid = {}, maxCols = 8, maxRows = 8;
@@ -419,7 +419,23 @@
                     for (let y = shrink; y <= maxRows - shrink; y += 2) {
                         for (let x = shrink; x <= maxCols - shrink; x += 2) {
                             let isSupported = (z === 0) || grid[`${x-1},${y-1},${z-1}`] || grid[`${x+1},${y-1},${z-1}`] || grid[`${x-1},${y+1},${z-1}`] || grid[`${x+1},${y+1},${z-1}`] || grid[`${x},${y},${z-1}`];
-                            if (isSupported && rnd() < diff.density) { layout.push({x, y, z}); grid[`${x},${y},${z}`] = true; }
+                            
+                            let isMasked = true;
+                            let cx = x - 4, cy = y - 4; // Центр поля
+                            switch(shapeIndex) {
+                                case 0: break; // Пирамида (По умолчанию)
+                                case 1: if (Math.abs(cx) <= 2 && Math.abs(cy) <= 2 && z < 2) isMasked = false; break; // Арена
+                                case 2: if (Math.abs(cx) > 2 && Math.abs(cy) > 2) isMasked = false; break; // Крест
+                                case 3: if (Math.abs(cx) <= 1 || Math.abs(cy) <= 1) isMasked = false; break; // 4 Башни
+                                case 4: if (Math.abs(cx) + Math.abs(cy) > 5) isMasked = false; break; // Ромб
+                                case 5: if (Math.abs(cy) <= 1) isMasked = false; break; // Две горизонтальные реки
+                                case 6: if (Math.abs(cx) <= 1) isMasked = false; break; // Две вертикальные колонны
+                                case 7: if (Math.abs(cx) === Math.abs(cy) && z === 0) isMasked = false; break; // Лабиринт (X-вырез)
+                            }
+                            
+                            if (isSupported && isMasked && rnd() < diff.density) { 
+                                layout.push({x, y, z}); grid[`${x},${y},${z}`] = true; 
+                            }
                         }
                     }
                 }
