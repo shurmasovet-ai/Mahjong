@@ -9,9 +9,10 @@
     <style>
         :root { 
             color-scheme: light; 
-            --tileBg: #e8dcc8; --tileBorder: #d4c2aa;
-            --tileColor: #1a2a3a; --bgImg: none;
-            --shadow: 0 5px 10px rgba(0,0,0,0.6), inset 0 0 12px rgba(180, 140, 100, 0.4);
+            /* Дефолтные переменные для инициализации */
+            --tileBg: linear-gradient(135deg, #fffaeb 0%, #e6d3af 100%); 
+            --tileSide: #b89d70;
+            --tileColor: #2b1d0f; 
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -126,28 +127,92 @@
 
         #game-board { width: 90vw; height: 112.5vw; max-width: 400px; max-height: 500px; position: relative; perspective: 1000px; }
         
+        /* --- НОВЫЙ СОЧНЫЙ И БЛЕСТЯЩИЙ ДИЗАЙН ПЛИТОК --- */
         .tile {
             position: absolute; width: 20%; height: 20%;
             left: calc(var(--x) * 10%); top: calc(var(--y) * 10%); margin-top: calc(var(--z) * -3.5vw); margin-left: calc(var(--z) * -2vw);
-            background-color: var(--tileBg); background-image: var(--bgImg); background-size: 14px 14px; background-position: 0 0, 7px 7px;
-            color: var(--tileColor); font-size: 14vw; line-height: 1; text-shadow: 2px 3px 4px rgba(0,0,0,0.4); font-family: 'Noto Color Emoji', sans-serif;
-            display: flex; justify-content: center; align-items: center; border-radius: 10px; border: 2px solid var(--tileBorder);
-            box-shadow: var(--shadow), calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(2vw + var(--z) * 0.8vw) rgba(0,0,0,0.85);
+            
+            background: var(--tileBg); /* Градиентный сочный фон */
+            color: var(--tileColor); 
+            font-size: 14vw; line-height: 1; 
+            
+            /* Эмодзи вдавлены внутрь за счет контрастной тени */
+            text-shadow: -1px -1px 0 rgba(255,255,255,0.4), 2px 4px 5px rgba(0,0,0,0.5); 
+            font-family: 'Noto Color Emoji', sans-serif;
+            display: flex; justify-content: center; align-items: center; 
+            border-radius: 12px; 
+            
+            /* 1. Блик сверху-слева (inset)
+               2. Тень снизу-справа (inset)
+               3. ФИЗИЧЕСКАЯ ГРАНЬ (толщина плитки цвета tileSide)
+               4. Падающая тень на стол */
+            box-shadow: 
+                inset 2px 2px 4px rgba(255, 255, 255, 0.9), 
+                inset -3px -4px 6px rgba(0, 0, 0, 0.15),
+                calc(0.4vw + var(--z) * 0.1vw) calc(0.8vw + var(--z) * 0.2vw) 0px var(--tileSide),
+                calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(2.5vw + var(--z) * 0.8vw) rgba(0,0,0,0.6);
+            
+            /* Микро-бордюры для эффекта полировки */
+            border-top: 1px solid rgba(255,255,255,0.8);
+            border-left: 1px solid rgba(255,255,255,0.6);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            border-right: 1px solid rgba(0,0,0,0.1);
+
             backdrop-filter: blur(4px); touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
             transition: transform 0.2s, filter 0.2s, box-shadow 0.2s, top 0.5s ease-in-out, left 0.5s ease-in-out, margin-top 0.5s ease-in-out, margin-left 0.5s ease-in-out; cursor: pointer; transform-style: preserve-3d;
         }
-        @media (min-width: 400px) {
-            .tile { font-size: 56px; border-radius: 14px; margin-top: calc(var(--z) * -14px); margin-left: calc(var(--z) * -8px); }
+
+        /* ГЛЯНЦЕВЫЙ БЛИК НА ВЕРХНЕЙ ПОЛОВИНЕ ПЛИТКИ */
+        .tile::before {
+            content: '';
+            position: absolute;
+            top: 2%; left: 2%; right: 2%; height: 40%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 100%);
+            border-radius: 10px 10px 20px 20px / 10px 10px 10px 10px;
+            pointer-events: none;
         }
 
-        .tile.blocked { filter: brightness(0.5); cursor: not-allowed; }
-        .tile.selected { border-color: #f1c40f !important; box-shadow: 0 0 20px #f1c40f, 0 10px 20px rgba(0,0,0,0.9) !important; transform: translateY(-3vw) scale(1.08); z-index: 999 !important; }
+        @media (min-width: 400px) {
+            .tile { font-size: 56px; border-radius: 14px; margin-top: calc(var(--z) * -14px); margin-left: calc(var(--z) * -8px); }
+            .tile::before { border-radius: 12px 12px 20px 20px / 12px 12px 10px 10px; }
+        }
+
+        /* Заблокированные плитки (В тени) */
+        .tile.blocked { 
+            filter: brightness(0.65) contrast(1.1) saturate(0.9); 
+            cursor: not-allowed; 
+        }
+        .tile.blocked::before { opacity: 0.3; } /* Блик тускнеет в тени */
+
+        /* Выделенная плитка поднимается и светится */
+        .tile.selected { 
+            border-color: #fff !important; 
+            box-shadow: 
+                inset 2px 2px 6px rgba(255, 255, 255, 1), 
+                inset -3px -4px 6px rgba(0, 0, 0, 0.1),
+                calc(0.4vw + var(--z) * 0.1vw) calc(1.5vw + var(--z) * 0.2vw) 0px var(--tileSide),
+                0 15px 30px rgba(0,0,0,0.8) !important; 
+            transform: translateY(-4vw) scale(1.08); 
+            z-index: 999 !important; 
+            filter: brightness(1.1) drop-shadow(0 0 8px rgba(241, 196, 15, 0.6));
+        }
         .tile.matched { opacity: 0; pointer-events: none; transform: scale(1.5); filter: brightness(2); }
         
+        /* ЗАКРЫТЫЕ ФИШКИ-СЮРПРИЗЫ С ЗАМКОМ */
         .tile.is-hidden { 
-            background: linear-gradient(135deg, #800020, #4a0e17) !important; 
-            border-color: #d4af37 !important; 
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.6) !important;
+            background: linear-gradient(135deg, #a60f2b, #610515) !important; 
+            border-top: 1px solid #ff4d6d !important;
+            border-left: 1px solid #ff4d6d !important;
+            border-bottom: 1px solid #30020a !important;
+            border-right: 1px solid #30020a !important;
+            --tileSide: #4a0611 !important; /* Боковая грань становится красной */
+            
+            box-shadow: 
+                inset 2px 2px 5px rgba(255, 100, 100, 0.5), 
+                inset -3px -4px 6px rgba(0, 0, 0, 0.4),
+                calc(0.4vw + var(--z) * 0.1vw) calc(0.8vw + var(--z) * 0.2vw) 0px var(--tileSide),
+                calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(2.5vw + var(--z) * 0.8vw) rgba(0,0,0,0.6) !important;
+                
             color: transparent !important; text-shadow: none !important; 
         }
         .tile.is-hidden::after { 
@@ -311,9 +376,26 @@
         const standardSymbols = "📱💻🖥️🖨️🖱️🕹️💾💿📷📹🎥📺📻🎙️⏱️⏰⏳💡🔦🔋🔨🪓⛏️🛠️🪚🔧🪛🔩⚙️🧲🪜🧱🛡️💣🧨🧯🧭⚓🪝⚖️💎🔮🪄🧿👑💍🪙💰🪬⏳🩸🧪🧬🔭🔬🛸🚀🛰️🪐👽";
         const coverSymbols = ['🔒', '🔐'];
 
+        // --- ОБНОВЛЕННЫЕ ПРЕМИУМ-МАТЕРИАЛЫ С ЦВЕТОМ ТОРЦОВ ---
         const materials = [
-            { tileBg: '#f3e5ab', tileBorder: '#d2b48c', tileColor: '#3e2723', bgImg: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(139, 69, 19, 0.2)' },
-            { tileBg: '#e8dcc8', tileBorder: '#d4c2aa', tileColor: '#2b1d0f', bgImg: 'linear-gradient(135deg, rgba(255,255,255,0.4) 0%, transparent 100%)', shadow: '0 5px 10px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.05)' }
+            { 
+                // Премиальная слоновая кость (Классика)
+                tileBg: 'linear-gradient(135deg, #fffaeb 0%, #e6d3af 100%)', 
+                tileSide: '#b89d70', 
+                tileColor: '#2b1d0f', 
+            },
+            { 
+                // Нефрит (Роскошный зеленый камень)
+                tileBg: 'linear-gradient(135deg, #dcf0e2 0%, #a3c9b1 100%)', 
+                tileSide: '#789e87', 
+                tileColor: '#1a3320', 
+            },
+            { 
+                // Жемчуг (Белый мраморный перелив)
+                tileBg: 'linear-gradient(135deg, #ffffff 0%, #d8dde3 100%)', 
+                tileSide: '#a1abb5', 
+                tileColor: '#1e242b', 
+            }
         ];
 
         let activeTiles = [], firstTile = null;
@@ -346,10 +428,16 @@
         });
 
         function updateScoreDisplay() { document.getElementById('hud-score').innerText = '🏆 ' + totalScore; }
+        
         function applyMaterial(level) {
-            let root = document.documentElement; let matIndex = (level - 1) % materials.length; let mat = materials[matIndex];
-            root.style.setProperty('--tileBg', mat.tileBg); root.style.setProperty('--tileBorder', mat.tileBorder); root.style.setProperty('--tileColor', mat.tileColor); root.style.setProperty('--bgImg', mat.bgImg); root.style.setProperty('--shadow', mat.shadow);
+            let root = document.documentElement; 
+            let matIndex = (level - 1) % materials.length; 
+            let mat = materials[matIndex];
+            root.style.setProperty('--tileBg', mat.tileBg); 
+            root.style.setProperty('--tileSide', mat.tileSide); 
+            root.style.setProperty('--tileColor', mat.tileColor); 
         }
+
         function getDifficultyParams(level) {
             let cyclePos = (level - 1) % 10;
             if (cyclePos >= 0 && cyclePos <= 2) return { text: "🟢 Легко", color: "#2ecc71", maxLayers: 2, density: 0.55 };
@@ -404,12 +492,13 @@
             
             let diff = getDifficultyParams(currentLevel);
             let diffBadge = document.getElementById('hud-difficulty'); diffBadge.innerText = diff.text; diffBadge.style.backgroundColor = diff.color; diffBadge.style.color = (diff.color === "#f1c40f") ? "#000" : "#fff"; 
+            
             applyMaterial(currentLevel); 
+            
             let baseSymbols = getSymbolsForLevel(currentLevel);
             let seed = currentLevel * 13371337, attempt = 0, finalLayout = null;
 
-            // --- ШАБЛОНЫ ФОРМ (ГИБРИДНАЯ ГЕНЕРАЦИЯ) ---
-            let shapeIndex = (currentLevel - 1) % 8; // 8 базовых масок
+            let shapeIndex = (currentLevel - 1) % 8; 
             
             while (!finalLayout && attempt < 500) {
                 attempt++; function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
@@ -421,16 +510,16 @@
                             let isSupported = (z === 0) || grid[`${x-1},${y-1},${z-1}`] || grid[`${x+1},${y-1},${z-1}`] || grid[`${x-1},${y+1},${z-1}`] || grid[`${x+1},${y+1},${z-1}`] || grid[`${x},${y},${z-1}`];
                             
                             let isMasked = true;
-                            let cx = x - 4, cy = y - 4; // Центр поля
+                            let cx = x - 4, cy = y - 4; 
                             switch(shapeIndex) {
-                                case 0: break; // Пирамида (По умолчанию)
-                                case 1: if (Math.abs(cx) <= 2 && Math.abs(cy) <= 2 && z < 2) isMasked = false; break; // Арена
-                                case 2: if (Math.abs(cx) > 2 && Math.abs(cy) > 2) isMasked = false; break; // Крест
-                                case 3: if (Math.abs(cx) <= 1 || Math.abs(cy) <= 1) isMasked = false; break; // 4 Башни
-                                case 4: if (Math.abs(cx) + Math.abs(cy) > 5) isMasked = false; break; // Ромб
-                                case 5: if (Math.abs(cy) <= 1) isMasked = false; break; // Две горизонтальные реки
-                                case 6: if (Math.abs(cx) <= 1) isMasked = false; break; // Две вертикальные колонны
-                                case 7: if (Math.abs(cx) === Math.abs(cy) && z === 0) isMasked = false; break; // Лабиринт (X-вырез)
+                                case 0: break; 
+                                case 1: if (Math.abs(cx) <= 2 && Math.abs(cy) <= 2 && z < 2) isMasked = false; break; 
+                                case 2: if (Math.abs(cx) > 2 && Math.abs(cy) > 2) isMasked = false; break; 
+                                case 3: if (Math.abs(cx) <= 1 || Math.abs(cy) <= 1) isMasked = false; break; 
+                                case 4: if (Math.abs(cx) + Math.abs(cy) > 5) isMasked = false; break; 
+                                case 5: if (Math.abs(cy) <= 1) isMasked = false; break; 
+                                case 6: if (Math.abs(cx) <= 1) isMasked = false; break; 
+                                case 7: if (Math.abs(cx) === Math.abs(cy) && z === 0) isMasked = false; break; 
                             }
                             
                             if (isSupported && isMasked && rnd() < diff.density) { 
