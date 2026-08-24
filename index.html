@@ -144,7 +144,7 @@
             border: 1px solid rgba(255,255,255,0.4); backdrop-filter: blur(4px); touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
             transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s, box-shadow 0.2s, top 0.5s ease-in-out, left 0.5s ease-in-out, margin-top 0.5s ease-in-out, margin-left 0.5s ease-in-out; 
             cursor: pointer; transform-style: preserve-3d;
-            pointer-events: auto; /* Абсолютная гарантия кликабельности */
+            pointer-events: auto;
         }
 
         .tile::before {
@@ -162,7 +162,6 @@
         .tile.blocked::before { opacity: 0.2; }
         .tile.selected { border-color: #fff !important; box-shadow: inset 3px 3px 8px rgba(255, 255, 255, 1), inset -3px -4px 6px rgba(0, 0, 0, 0.1), calc(0.5vw + var(--z) * 0.1vw) calc(2vw + var(--z) * 0.2vw) 0px var(--tileSide), 0 20px 40px rgba(0,0,0,0.9) !important; transform: translateY(-5vw) scale(1.1); z-index: 999 !important; filter: brightness(1.15) drop-shadow(0 0 12px rgba(241, 196, 15, 0.8)); }
         
-        /* Исправление проблемы с перекрытием невидимых фишек */
         .tile.matched { opacity: 0; pointer-events: none !important; transform: scale(1.6); filter: brightness(2.5); }
         
         .tile.hinted { animation: hintGlow 1s infinite alternate; }
@@ -340,7 +339,7 @@
                     let AContext = window.AudioContext || window.webkitAudioContext;
                     if (AContext && !this.ctx) this.ctx = new AContext();
                     if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
-                } catch(e) { this.enabled = false; } // Защита от зависаний на старых устройствах
+                } catch(e) { this.enabled = false; }
             },
             playOsc: function(type, freq, dropFreq, duration, vol) {
                 try {
@@ -391,7 +390,6 @@
         }
         createParticles();
 
-        // Абсолютно все глобальные переменные на месте
         let currentLevel = 1, totalScore = 0, comboCount = 0, lastMatchTime = 0, totalTilesForLevel = 0;
         let activeTiles = [], firstTile = null; 
         let matchHistory = [];
@@ -533,7 +531,6 @@
         function getSymbolsForLevel(level) {
             let s = level * 12345; function localRnd() { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }
             let t1 = Math.floor(localRnd() * themeSets.length); let t2 = Math.floor(localRnd() * themeSets.length); let t3 = Math.floor(localRnd() * themeSets.length);
-            // Каждый themeSet гарантированно имеет 20 символов. 7 + 7 + 6 = ровно 20 уникальных символов на уровень.
             return [...themeSets[t1].slice(0, 7), ...themeSets[t2].slice(7, 14), ...themeSets[t3].slice(14, 20)];
         }
         
@@ -698,6 +695,7 @@
             document.getElementById('no-moves-modal').style.display = 'none';
         });
 
+        // --- ДОБАВЛЕНА ПОТЕРЯННАЯ РАНЕЕ ФУНКЦИЯ ПОБЕДЫ ---
         function levelComplete() {
             AudioSys.playWin(); 
             currentLevel++; localStorage.setItem('mahjong_level', currentLevel);
@@ -707,7 +705,13 @@
             const praiseEl = document.getElementById('level-complete-praise');
             const textEl = document.getElementById('level-complete-text');
             
-            const praiseWords = ["ВЕЛИКОЛЕПНО!", "БЛЕСТЯЩЕ!", "ГЕНИАЛЬНО!", "ИДЕАЛЬНО!", "ПРЕВОСХОДНО!", "МАСТЕРСКИ!", "ПОТРЯСАЮЩЕ!", "БЕЗУПРЕЧНО!"];
+            // Расширенный список похвалы
+            const praiseWords = [
+                "ВЕЛИКОЛЕПНО!", "БЛЕСТЯЩЕ!", "ГЕНИАЛЬНО!", "ИДЕАЛЬНО!", 
+                "ПРЕВОСХОДНО!", "МАСТЕРСКИ!", "ПОТРЯСАЮЩЕ!", "БЕЗУПРЕЧНО!",
+                "НЕВЕРОЯТНО!", "ТАЛАНТЛИВО!", "ВОСХИТИТЕЛЬНО!", "ФЕНОМЕНАЛЬНО!",
+                "ГРАНДИОЗНО!", "БЕСПОДОБНО!", "ШИКАРНО!", "ИСКУСНО!", "ТРИУМФ!"
+            ];
             praiseEl.innerText = praiseWords[Math.floor(Math.random() * praiseWords.length)];
             
             overlay.style.animation = 'none'; praiseEl.style.animation = 'none'; textEl.style.animation = 'none';
@@ -723,7 +727,7 @@
                 overlay.style.animation = 'overlayFadeOut 0.4s ease-in forwards';
                 setTimeout(() => {
                     overlay.style.display = 'none';
-                    initGame(); 
+                    initGame(); // <-- ЗАГРУЗКА НОВОГО УРОВНЯ
                 }, 400);
             }, 3000); 
         }
@@ -797,7 +801,6 @@
             finger.style.top = (rect.top + window.scrollY + rect.height / 2) + 'px';
         }
 
-        // --- АБСОЛЮТНО НАДЕЖНАЯ ЛОГИКА КЛИКОВ И УДАЛЕНИЯ ---
         function handleTileClick(t, event) { 
             if (isGameLocked) return;
             if (tutorialMode) { if (t !== tutorialPair[0] && t !== tutorialPair[1]) return; }
@@ -844,10 +847,8 @@
                     showFloatingText(t.el, earnedPoints, comboCount > 1);
                     spawnSmartBurst(firstTile.el, firstTile.symbol); spawnSmartBurst(t.el, t.symbol);
                     
-                    // Блокируем фишки от повторных нажатий
                     t.el.classList.add('matched'); firstTile.el.classList.add('matched'); 
                     
-                    // Жестко очищаем DOM от невидимых фишек (Они больше не перекроют другие фишки)
                     let t1 = firstTile, t2 = t;
                     setTimeout(() => {
                         if (t1 && t1.el) t1.el.style.display = 'none';
@@ -957,7 +958,7 @@
                 if (matchHistory.length === 0) return;
                 let pair = matchHistory.pop(); 
                 pair[0].el.classList.remove('matched', 'selected'); pair[1].el.classList.remove('matched', 'selected');
-                pair[0].el.style.display = 'flex'; pair[1].el.style.display = 'flex'; // Возвращаем удаленные из DOM элементы обратно
+                pair[0].el.style.display = 'flex'; pair[1].el.style.display = 'flex';
                 activeTiles.push(pair[0], pair[1]); comboCount = 0; updateFreeState(); updateProgressBar();
             });
         });
