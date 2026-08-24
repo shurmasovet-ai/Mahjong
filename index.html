@@ -203,7 +203,7 @@
         .b-cost { font-size: 11px; font-family: 'Russo One', sans-serif; color: #f1c40f; margin-top: 2px; text-shadow: 1px 1px 2px #000; }
         .b-lock { position: absolute; top: -8px; right: -8px; background: #e74c3c; font-size: 10px; padding: 2px 5px; border-radius: 10px; font-weight: bold; border: 1px solid white;}
 
-        /* --- КОЛЕСО ФОРТУНЫ --- */
+        /* --- МОДАЛЬНЫЕ ОКНА --- */
         #wheel-modal { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.95); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; }
         #wheel-modal h2 { font-family: 'Russo One', sans-serif; font-size: 32px; color: #f1c40f; margin-bottom: 20px; text-shadow: 0 5px 10px rgba(0,0,0,1); cursor: pointer;}
         .wheel-container { position: relative; width: 300px; height: 300px; border-radius: 50%; border: 6px solid #d4af37; overflow: hidden; box-shadow: 0 0 30px rgba(241, 196, 15, 0.5), inset 0 0 20px rgba(0,0,0,0.8); background: #222; }
@@ -219,6 +219,13 @@
         #rules-modal h2, #ad-screen h2 { font-family: 'Russo One', sans-serif; font-size: 32px; color: #f1c40f; margin-bottom: 20px; }
         #rules-modal p, #ad-screen p { font-size: 18px; line-height: 1.5; margin-bottom: 30px; max-width: 400px; }
         .loader { border: 6px solid #f3f3f3; border-top: 6px solid #e67e22; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        
+        /* --- ТАБЛИЧКА "НЕТ ХОДОВ" --- */
+        #no-moves-modal { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.85); z-index: 9500; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; backdrop-filter: blur(3px); }
+        #no-moves-modal h2 { font-family: 'Russo One', sans-serif; font-size: 36px; color: #e74c3c; margin-bottom: 10px; text-shadow: 0 5px 10px rgba(0,0,0,1); }
+        #no-moves-modal p { font-size: 16px; margin-bottom: 30px; color: #bdc3c7; max-width: 300px; line-height: 1.4;}
+        #btn-close-no-moves { background: transparent; color: #95a5a6; border: none; font-size: 16px; text-decoration: underline; margin-top: 20px; cursor: pointer; }
+
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -261,6 +268,14 @@
         <p>Находите пары одинаковых фишек, чтобы очистить поле.</p>
         <p>Фишка активна, если на ней <b>ничего не лежит</b>, и она <b>свободна слева ИЛИ справа</b>.</p>
         <button id="btn-close-rules" class="btn-massive" style="font-size:20px; padding:10px 30px; min-width:auto;">ПОНЯТНО</button>
+    </div>
+
+    <!-- ТАБЛИЧКА НЕТ ХОДОВ -->
+    <div id="no-moves-modal">
+        <h2>НЕТ ХОДОВ!</h2>
+        <p>На столе больше нет доступных пар. Перемешайте фишки или воспользуйтесь бустером.</p>
+        <button id="btn-modal-shuffle" class="btn-massive" style="font-size:22px; padding:15px 40px; margin-bottom:0;">🎥 МИКС</button>
+        <button id="btn-close-no-moves">Я использую бустер</button>
     </div>
 
     <div id="game-screen">
@@ -359,13 +374,12 @@
         }
         createParticles();
 
-        // --- ВОССТАНОВЛЕННАЯ СТРОКА С ГЛОБАЛЬНЫМИ ПЕРЕМЕННЫМИ ---
         let currentLevel = 1, totalScore = 0, comboCount = 0, lastMatchTime = 0, totalTilesForLevel = 0;
-        let activeTiles = [], firstTile = null; // <- ВОТ ОНА, СПАСИТЕЛЬНИЦА
+        let activeTiles = [], firstTile = null; 
         let matchHistory = [];
         let tutorialMode = false;
         let tutorialPair = [];
-        let isGameLocked = false; 
+        let isGameLocked = false; // Глобальный блокиратор стола
         const COMBO_TIME_LIMIT = 4000; 
 
         try { 
@@ -633,25 +647,51 @@
             let symbolsSet = new Set();
             
             for (let t of freeTiles) {
-                if (t.isHidden) { hasMoves = true; break; }
-                if (symbolsSet.has(t.symbol)) { hasMoves = true; break; } 
+                // Если есть закрытая фишка (замок), это всегда доступный ход (мы можем кликнуть на нее, чтобы открыть)
+                if (t.isHidden) { 
+                    hasMoves = true; 
+                    break; 
+                }
+                if (symbolsSet.has(t.symbol)) { 
+                    hasMoves = true; 
+                    break; 
+                } 
                 symbolsSet.add(t.symbol); 
             }
 
             let btnShuffle = document.getElementById('btn-shuffle');
             if (!hasMoves) { 
-                isGameLocked = true; 
-                if (firstTile) { firstTile.el.classList.remove('selected'); firstTile = null; }
+                isGameLocked = true; // ГЛОБАЛЬНАЯ БЛОКИРОВКА СТОЛА
+                if (firstTile) { 
+                    firstTile.el.classList.remove('selected'); 
+                    firstTile = null; 
+                }
                 document.getElementById('message').innerText = 'НЕТ ХОДОВ! Нажмите Микс ➔'; 
                 document.getElementById('message').style.color = '#e74c3c'; 
                 btnShuffle.classList.add('btn-pulse'); 
+                
+                // ПОКАЗЫВАЕМ ТАБЛИЧКУ
+                document.getElementById('no-moves-modal').style.display = 'flex';
+                
             } else { 
                 isGameLocked = false; 
                 document.getElementById('message').innerHTML = ''; 
                 btnShuffle.classList.remove('btn-pulse'); 
+                
+                // ПРЯЧЕМ ТАБЛИЧКУ (на случай, если она была открыта)
+                document.getElementById('no-moves-modal').style.display = 'none';
             }
             updateBoostersUI();
         }
+
+        // Кнопки внутри модального окна "Нет ходов"
+        document.getElementById('btn-modal-shuffle').addEventListener('click', () => {
+            document.getElementById('no-moves-modal').style.display = 'none';
+            watchAdToShuffle();
+        });
+        document.getElementById('btn-close-no-moves').addEventListener('click', () => {
+            document.getElementById('no-moves-modal').style.display = 'none';
+        });
 
         function showFloatingText(element, points, isCombo) {
             let rect = element.getBoundingClientRect(); let floatEl = document.createElement('div'); floatEl.classList.add('floating-text');
@@ -723,13 +763,16 @@
         }
 
         function handleTileClick(t, event) { 
+            // Блокировка стола, если ходов нет
             if (isGameLocked) return;
+
             if (tutorialMode) { if (t !== tutorialPair[0] && t !== tutorialPair[1]) return; }
             if (!t.isFree) return;
             
             if (t.isHidden) { 
                 AudioSys.playUnlock(); t.isHidden = false; t.el.classList.remove('is-hidden'); t.el.classList.add('flip-anim'); setTimeout(() => t.el.classList.remove('flip-anim'), 400); 
-                updateFreeState(); return; 
+                updateFreeState(); 
+                return; 
             }
 
             if (!firstTile) { 
@@ -828,6 +871,7 @@
             }, 1000); 
         }
 
+        // --- ПАНЕЛЬ БУСТЕРОВ ---
         function updateBoostersUI() {
             document.querySelectorAll('.booster').forEach(btn => {
                 let unlockLvl = parseInt(btn.getAttribute('data-unlock')); let cost = parseInt(btn.getAttribute('data-cost')); let lockTag = btn.querySelector('.b-lock');
@@ -839,6 +883,7 @@
                     else {
                         btn.classList.remove('disabled');
                         if (btn.id === 'bst-undo' && matchHistory.length === 0) btn.classList.add('disabled');
+                        // Подсказка недоступна, если нет пар, и игра заблокирована (тупик)
                         if (btn.id === 'bst-hint' && getAvailablePairs().length === 0) btn.classList.add('disabled');
                     }
                 }
@@ -846,7 +891,8 @@
         }
 
         function buyBooster(btnId, cost, action) {
-            if (tutorialMode || isGameLocked) return;
+            // Бустеры заблокированы только во время обучения! В тупике бустеры работают.
+            if (tutorialMode) return;
             let btn = document.getElementById(btnId);
             if (btn.classList.contains('locked') || btn.classList.contains('disabled')) { AudioSys.playError(); let scoreEl = document.getElementById('hud-score'); scoreEl.style.color = '#e74c3c'; setTimeout(() => scoreEl.style.color = '#fff', 300); return; }
             totalScore -= cost; localStorage.setItem('mahjong_score', totalScore); updateScoreDisplay(); AudioSys.playBooster(); action();
@@ -907,6 +953,7 @@
             });
         });
 
+        // --- ЛОГИКА КОЛЕСА ФОРТУНЫ ---
         const wheelModal = document.getElementById('wheel-modal'); const wheelSpinner = document.getElementById('wheel-spinner'); const btnOpenWheel = document.getElementById('btn-open-wheel'); const btnSpin = document.getElementById('btn-spin'); const btnCloseWheel = document.getElementById('btn-close-wheel');
         const wheelPrizes = [ { text: "+1000", val: 1000, color: "#e74c3c" }, { text: "+5000", val: 5000, color: "#f1c40f" }, { text: "+500", val: 500, color: "#3498db" }, { text: "+2000", val: 2000, color: "#2ecc71" }, { text: "ДЖЕКПОТ", val: 15000, color: "#9b59b6" }, { text: "+750", val: 750, color: "#e67e22" } ];
         let conicGradient = []; let sliceAngle = 360 / wheelPrizes.length;
