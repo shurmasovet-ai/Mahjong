@@ -175,46 +175,19 @@
         .flip-anim { animation: flipTileIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes flipTileIn { 0% { transform: translateY(-4vw) scale(1.1) rotateY(-90deg); } 100% { transform: translateY(-4vw) scale(1.1) rotateY(0deg); } }
 
-        /* --- КРАСИВАЯ КОРЗИНА (CSS) И ФОНТАН ЧАСТИЦ --- */
-        .css-basket-wrap {
-            position: absolute; z-index: 9998;
-            animation: popBasket 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            pointer-events: none; transform-origin: bottom center;
-        }
-        .css-basket {
-            width: 60px; height: 40px; position: relative;
-            background: repeating-linear-gradient(45deg, #c08b5c, #c08b5c 6px, #a87343 6px, #a87343 12px);
-            border-radius: 5px 5px 20px 20px;
-            border: 3px solid #4a2c17; border-top: 6px solid #4a2c17;
-            box-shadow: 0 10px 15px rgba(0,0,0,0.6), inset 0 -5px 10px rgba(0,0,0,0.5);
-        }
-        .css-basket::before {
-            content: ''; position: absolute;
-            top: -24px; left: 8px; width: 38px; height: 24px;
-            border: 5px solid #a87343; border-bottom: none;
-            border-radius: 20px 20px 0 0;
-            box-shadow: inset 0 2px 2px rgba(255,255,255,0.3);
-        }
-        @keyframes popBasket {
-            0% { transform: translate(-50%, -50%) scale(0) rotate(-15deg); opacity: 0; }
-            15% { transform: translate(-50%, -50%) scale(1.1) rotate(5deg); opacity: 1; }
-            30% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
-            80% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
-            100% { transform: translate(-50%, -30%) scale(0.5) rotate(0deg); opacity: 0; }
-        }
+        /* --- СИСТЕМА ОБУЧЕНИЯ (TUTORIAL) --- */
+        #tutorial-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.75); z-index: 9000; pointer-events: none; transition: opacity 0.3s; }
+        #tutorial-finger { display: none; position: absolute; font-size: 60px; z-index: 9002; pointer-events: none; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8)); animation: poke 0.8s infinite alternate cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        @keyframes poke { 0% { transform: translate(-20%, 20%) scale(1); } 100% { transform: translate(-20%, -10%) scale(0.9); } }
+        .tutorial-highlight { z-index: 9001 !important; box-shadow: 0 0 35px #f1c40f, inset 3px 3px 6px rgba(255, 255, 255, 1), inset -4px -5px 8px rgba(0, 0, 0, 0.18) !important; filter: brightness(1.2); }
 
-        .smart-particle {
-            position: absolute; font-family: 'Noto Color Emoji', sans-serif;
-            pointer-events: none; z-index: 9999; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
-            animation: fountainSpill 1s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
-        }
-        @keyframes fountainSpill {
-            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.2) rotate(0deg); }
-            30% { opacity: 1; transform: translate(calc(-50% + var(--tx)*0.5), calc(-50% + var(--up-y))) scale(1.3) rotate(var(--rot1)); }
-            80% { opacity: 1; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty)*0.8)) scale(1) rotate(var(--rot2)); }
-            100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.5) rotate(var(--rot2)); }
-        }
-
+        /* --- СМАРТ-ЧАСТИЦЫ И КОРЗИНА --- */
+        .css-basket-wrap { position: absolute; z-index: 9998; animation: popBasket 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; pointer-events: none; transform-origin: bottom center; }
+        .css-basket { width: 60px; height: 40px; position: relative; background: repeating-linear-gradient(45deg, #c08b5c, #c08b5c 6px, #a87343 6px, #a87343 12px); border-radius: 5px 5px 20px 20px; border: 3px solid #4a2c17; border-top: 6px solid #4a2c17; box-shadow: 0 10px 15px rgba(0,0,0,0.6), inset 0 -5px 10px rgba(0,0,0,0.5); }
+        .css-basket::before { content: ''; position: absolute; top: -24px; left: 8px; width: 38px; height: 24px; border: 5px solid #a87343; border-bottom: none; border-radius: 20px 20px 0 0; box-shadow: inset 0 2px 2px rgba(255,255,255,0.3); }
+        @keyframes popBasket { 0% { transform: translate(-50%, -50%) scale(0) rotate(-15deg); opacity: 0; } 15% { transform: translate(-50%, -50%) scale(1.1) rotate(5deg); opacity: 1; } 30% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(-50%, -30%) scale(0.5) rotate(0deg); opacity: 0; } }
+        .smart-particle { position: absolute; font-family: 'Noto Color Emoji', sans-serif; pointer-events: none; z-index: 9999; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6)); animation: fountainSpill 1s cubic-bezier(0.2, 0.8, 0.3, 1) forwards; }
+        @keyframes fountainSpill { 0% { opacity: 1; transform: translate(-50%, -50%) scale(0.2) rotate(0deg); } 30% { opacity: 1; transform: translate(calc(-50% + var(--tx)*0.5), calc(-50% + var(--up-y))) scale(1.3) rotate(var(--rot1)); } 80% { opacity: 1; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty)*0.8)) scale(1) rotate(var(--rot2)); } 100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.5) rotate(var(--rot2)); } }
         .floating-text { position: absolute; font-family: 'Russo One', sans-serif; font-size: 26px; color: #2ecc71; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 12px rgba(46, 204, 113, 0.9); pointer-events: none; z-index: 9999; animation: floatUpText 1s ease-out forwards; }
         .floating-text.combo { color: #f1c40f; font-size: 34px; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 18px rgba(241, 196, 15, 0.9); }
         @keyframes floatUpText { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 20% { transform: translateY(-20px) scale(1.2); opacity: 1; } 100% { transform: translateY(-60px) scale(1); opacity: 0; } }
@@ -250,6 +223,10 @@
     </style>
 </head>
 <body>
+
+    <!-- ОВЕРЛЕЙ ОБУЧЕНИЯ -->
+    <div id="tutorial-overlay"></div>
+    <div id="tutorial-finger">👆</div>
 
     <div id="main-menu">
         <div id="particles-container"></div>
@@ -311,7 +288,6 @@
         <div id="message"></div>
         <div id="game-board"></div>
 
-        <!-- ИСПРАВЛЕННЫЙ БУСТЕР ПОДСКАЗКИ С ЛУПОЙ ВМЕСТО ПУСТОГО КВАДРАТА -->
         <div id="boosters-bar">
             <button class="booster" id="bst-hint" data-unlock="2" data-cost="50">🔍<div class="b-cost">50</div><div class="b-lock">Ур.2</div></button>
             <button class="booster" id="bst-undo" data-unlock="4" data-cost="100">↩️<div class="b-cost">100</div><div class="b-lock">Ур.4</div></button>
@@ -385,6 +361,8 @@
 
         let currentLevel = 1, totalScore = 0, comboCount = 0, lastMatchTime = 0, totalTilesForLevel = 0;
         let matchHistory = [];
+        let tutorialMode = false;
+        let tutorialPair = [];
         const COMBO_TIME_LIMIT = 4000; 
 
         try { 
@@ -477,8 +455,6 @@
             return `ГЛАВА ${chapterNum}: ${title}`;
         }
 
-        let activeTiles = [], firstTile = null;
-
         function updateMenuLevelText() { 
             document.getElementById('menu-level-text').innerText = 'УРОВЕНЬ ' + currentLevel; 
             document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
@@ -492,7 +468,7 @@
         document.getElementById('btn-prev-level').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; localStorage.setItem('mahjong_level', currentLevel); updateMenuLevelText(); updateBoostersUI(); }});
         document.getElementById('btn-next-level').addEventListener('click', () => { currentLevel++; localStorage.setItem('mahjong_level', currentLevel); updateMenuLevelText(); updateBoostersUI(); });
         document.getElementById('btn-reset').addEventListener('click', () => {
-            if (confirm('Начать с 1 уровня? Весь прогресс будет удален.')) { currentLevel = 1; totalScore = 0; localStorage.setItem('mahjong_level', 1); localStorage.setItem('mahjong_score', 0); updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI(); }
+            if (confirm('Начать с 1 уровня? Весь прогресс будет удален.')) { currentLevel = 1; totalScore = 0; localStorage.setItem('mahjong_level', 1); localStorage.setItem('mahjong_score', 0); localStorage.removeItem('mahjong_tutorial_done'); updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI(); }
         });
         document.getElementById('btn-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'flex');
         document.getElementById('btn-close-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'none');
@@ -625,6 +601,11 @@
                 board.appendChild(el); activeTiles.push(obj);
             });
             updateFreeState(); updateProgressBar();
+
+            // --- ЗАПУСК ИНТЕРАКТИВНОГО ОБУЧЕНИЯ (TUTORIAL) ---
+            if (currentLevel === 1 && !localStorage.getItem('mahjong_tutorial_done')) {
+                setTimeout(startTutorial, 600);
+            }
         }
 
         function updateFreeState() {
@@ -659,6 +640,7 @@
             document.body.appendChild(floatEl); setTimeout(() => floatEl.remove(), 1000);
         }
 
+        // --- УМНЫЕ СМЫСЛОВЫЕ ЭФФЕКТЫ ---
         function getSymbolCategory(sym) {
             const catFood = [0, 1, 6, 28, 36, 47, 48]; const catTech = [2, 16, 53, 54];
             const catZodiac = [9, 15, 43]; const catEmotion = [21, 22, 23, 39, 59];
@@ -699,14 +681,60 @@
             }
         }
 
+        // --- ЛОГИКА ТУТОРИАЛА ---
+        function startTutorial() {
+            let pairs = getAvailablePairs();
+            if (pairs.length === 0) return;
+            tutorialPair = pairs[0];
+            tutorialMode = true;
+            
+            document.getElementById('tutorial-overlay').style.display = 'block';
+            tutorialPair[0].el.classList.add('tutorial-highlight');
+            tutorialPair[1].el.classList.add('tutorial-highlight');
+            
+            let finger = document.getElementById('tutorial-finger');
+            finger.style.display = 'block';
+            positionFingerOnTile(tutorialPair[0]);
+        }
+
+        function positionFingerOnTile(tileObj) {
+            let finger = document.getElementById('tutorial-finger');
+            let rect = tileObj.el.getBoundingClientRect();
+            finger.style.left = (rect.left + window.scrollX + rect.width / 2) + 'px';
+            finger.style.top = (rect.top + window.scrollY + rect.height / 2) + 'px';
+        }
+
         function handleTileClick(t, event) { 
+            // Защита от мисскликов в режиме обучения
+            if (tutorialMode) {
+                if (t !== tutorialPair[0] && t !== tutorialPair[1]) return;
+            }
+
             if (!t.isFree) return;
             if (t.isHidden) { AudioSys.playUnlock(); t.isHidden = false; t.el.classList.remove('is-hidden'); t.el.classList.add('flip-anim'); setTimeout(() => t.el.classList.remove('flip-anim'), 400); return; }
             if (!firstTile) { 
                 AudioSys.playClick(true); t.el.classList.add('selected'); firstTile = t; 
+                
+                // Туториал: перенос пальца на вторую фишку
+                if (tutorialMode) {
+                    let nextTile = (t === tutorialPair[0]) ? tutorialPair[1] : tutorialPair[0];
+                    positionFingerOnTile(nextTile);
+                }
+
             } else if (firstTile !== t) { 
                 t.el.classList.add('selected'); 
                 if (firstTile.symbol === t.symbol) { 
+                    
+                    // Туториал пройден!
+                    if (tutorialMode) {
+                        tutorialMode = false;
+                        document.getElementById('tutorial-overlay').style.display = 'none';
+                        document.getElementById('tutorial-finger').style.display = 'none';
+                        tutorialPair[0].el.classList.remove('tutorial-highlight');
+                        tutorialPair[1].el.classList.remove('tutorial-highlight');
+                        localStorage.setItem('mahjong_tutorial_done', 'true');
+                    }
+
                     let now = Date.now(); if (now - lastMatchTime < COMBO_TIME_LIMIT) comboCount++; else comboCount = 1; lastMatchTime = now;
                     AudioSys.playMatch(); 
                     
@@ -726,8 +754,13 @@
                     }
                 } else { 
                     AudioSys.playClick(false); let t1 = firstTile, t2 = t; firstTile = null; setTimeout(() => { t1.el.classList.remove('selected'); t2.el.classList.remove('selected'); }, 300); 
+                    // Возвращаем палец обратно, если игрок ошибся в туториале (хотя это почти невозможно)
+                    if (tutorialMode) positionFingerOnTile(tutorialPair[0].isFree ? tutorialPair[0] : tutorialPair[1]);
                 } 
-            } else { AudioSys.playClick(false); t.el.classList.remove('selected'); firstTile = null; }
+            } else { 
+                AudioSys.playClick(false); t.el.classList.remove('selected'); firstTile = null; 
+                if (tutorialMode) positionFingerOnTile(tutorialPair[0].isFree ? tutorialPair[0] : tutorialPair[1]);
+            }
         }
 
         function shootConfetti() {
@@ -741,7 +774,7 @@
         }
 
         function watchAdToShuffle() { 
-            if (activeTiles.length === 0) return;
+            if (activeTiles.length === 0 || tutorialMode) return;
             const ad = document.getElementById('ad-screen'); if(ad) ad.style.display = 'flex'; 
             setTimeout(() => { 
                 if(ad) ad.style.display = 'none'; 
@@ -801,6 +834,7 @@
         }
 
         function buyBooster(btnId, cost, action) {
+            if (tutorialMode) return;
             let btn = document.getElementById(btnId);
             if (btn.classList.contains('locked') || btn.classList.contains('disabled')) { AudioSys.playError(); let scoreEl = document.getElementById('hud-score'); scoreEl.style.color = '#e74c3c'; setTimeout(() => scoreEl.style.color = '#fff', 300); return; }
             totalScore -= cost; localStorage.setItem('mahjong_score', totalScore); updateScoreDisplay(); AudioSys.playBooster(); action();
