@@ -144,6 +144,7 @@
             border: 1px solid rgba(255,255,255,0.4); backdrop-filter: blur(4px); touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
             transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s, box-shadow 0.2s, top 0.5s ease-in-out, left 0.5s ease-in-out, margin-top 0.5s ease-in-out, margin-left 0.5s ease-in-out; 
             cursor: pointer; transform-style: preserve-3d;
+            pointer-events: auto; /* Абсолютная гарантия кликабельности */
         }
 
         .tile::before {
@@ -161,8 +162,8 @@
         .tile.blocked::before { opacity: 0.2; }
         .tile.selected { border-color: #fff !important; box-shadow: inset 3px 3px 8px rgba(255, 255, 255, 1), inset -3px -4px 6px rgba(0, 0, 0, 0.1), calc(0.5vw + var(--z) * 0.1vw) calc(2vw + var(--z) * 0.2vw) 0px var(--tileSide), 0 20px 40px rgba(0,0,0,0.9) !important; transform: translateY(-5vw) scale(1.1); z-index: 999 !important; filter: brightness(1.15) drop-shadow(0 0 12px rgba(241, 196, 15, 0.8)); }
         
-        /* Исправление ошибки с перекрытием невидимых фишек */
-        .tile.matched { opacity: 0; pointer-events: none; transform: scale(1.6); filter: brightness(2.5); }
+        /* Исправление проблемы с перекрытием невидимых фишек */
+        .tile.matched { opacity: 0; pointer-events: none !important; transform: scale(1.6); filter: brightness(2.5); }
         
         .tile.hinted { animation: hintGlow 1s infinite alternate; }
         @keyframes hintGlow { 0% { filter: brightness(1) drop-shadow(0 0 0px #3498db); } 100% { filter: brightness(1.3) drop-shadow(0 0 20px #3498db); } }
@@ -331,45 +332,47 @@
     </div>
 
     <script>
-        // --- АСМР АУДИОСИСТЕМА ---
+        // --- АСМР АУДИОСИСТЕМА (Сверхнадежная защита от ошибок браузера) ---
         const AudioSys = {
             ctx: null, enabled: true,
             init: function() {
-                if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                if (this.ctx.state === 'suspended') this.ctx.resume();
+                try {
+                    let AContext = window.AudioContext || window.webkitAudioContext;
+                    if (AContext && !this.ctx) this.ctx = new AContext();
+                    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+                } catch(e) { this.enabled = false; } // Защита от зависаний на старых устройствах
             },
             playOsc: function(type, freq, dropFreq, duration, vol) {
-                if (!this.enabled || !this.ctx) return;
-                const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
-                osc.type = type; osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-                if (dropFreq) osc.frequency.exponentialRampToValueAtTime(dropFreq, this.ctx.currentTime + duration);
-                gain.gain.setValueAtTime(vol, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
-                osc.connect(gain); gain.connect(this.ctx.destination);
-                osc.start(); osc.stop(this.ctx.currentTime + duration);
+                try {
+                    if (!this.enabled || !this.ctx) return;
+                    const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
+                    osc.type = type; osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    if (dropFreq) osc.frequency.exponentialRampToValueAtTime(dropFreq, this.ctx.currentTime + duration);
+                    gain.gain.setValueAtTime(vol, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+                    osc.connect(gain); gain.connect(this.ctx.destination);
+                    osc.start(); osc.stop(this.ctx.currentTime + duration);
+                } catch(e) {}
             },
-            playClick: function(isSelected) {
-                let startFreq = isSelected ? 300 : 200; let endFreq = isSelected ? 80 : 60;
-                this.playOsc('sine', startFreq, endFreq, 0.05, 0.4); 
-            },
+            playClick: function(isSelected) { let startFreq = isSelected ? 300 : 200; let endFreq = isSelected ? 80 : 60; this.playOsc('sine', startFreq, endFreq, 0.05, 0.4); },
             playUnlock: function() { this.playOsc('square', 600, 200, 0.1, 0.1); setTimeout(() => this.playOsc('square', 800, 300, 0.1, 0.1), 50); },
             playMatch: function() {
-                if (!this.enabled || !this.ctx) return;
-                let playTock = (delay, freq) => {
-                    setTimeout(() => {
-                        let osc = this.ctx.createOscillator(); let gain = this.ctx.createGain();
-                        osc.type = 'sine'; osc.frequency.setValueAtTime(freq, this.ctx.currentTime); 
-                        osc.frequency.exponentialRampToValueAtTime(freq * 0.2, this.ctx.currentTime + 0.04);
-                        gain.gain.setValueAtTime(0.7, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.04);
-                        osc.connect(gain); gain.connect(this.ctx.destination);
-                        osc.start(); osc.stop(this.ctx.currentTime + 0.05);
-                    }, delay);
-                };
-                playTock(0, 250); playTock(35, 300); 
+                try {
+                    if (!this.enabled || !this.ctx) return;
+                    let playTock = (delay, freq) => {
+                        setTimeout(() => {
+                            if (!this.ctx) return;
+                            let osc = this.ctx.createOscillator(); let gain = this.ctx.createGain();
+                            osc.type = 'sine'; osc.frequency.setValueAtTime(freq, this.ctx.currentTime); 
+                            osc.frequency.exponentialRampToValueAtTime(freq * 0.2, this.ctx.currentTime + 0.04);
+                            gain.gain.setValueAtTime(0.7, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.04);
+                            osc.connect(gain); gain.connect(this.ctx.destination);
+                            osc.start(); osc.stop(this.ctx.currentTime + 0.05);
+                        }, delay);
+                    };
+                    playTock(0, 250); playTock(35, 300); 
+                } catch(e) {}
             },
-            playWin: function() {
-                let freqs = [392, 493.88, 587.33, 783.99]; 
-                freqs.forEach((f, i) => { setTimeout(() => { this.playOsc('sine', f, f * 0.95, 1.0, 0.3); this.playOsc('triangle', f * 2, f * 1.9, 0.8, 0.1); }, i * 100); });
-            },
+            playWin: function() { let freqs = [392, 493.88, 587.33, 783.99]; freqs.forEach((f, i) => { setTimeout(() => { this.playOsc('sine', f, f * 0.95, 1.0, 0.3); this.playOsc('triangle', f * 2, f * 1.9, 0.8, 0.1); }, i * 100); }); },
             playShuffle: function() { for(let i = 0; i < 15; i++) { setTimeout(() => { let f = 150 + Math.random() * 200; this.playOsc('sine', f, f/2, 0.04, 0.3); }, Math.random() * 400); } },
             playWheelTick: function() { this.playOsc('square', 800, 600, 0.05, 0.05); },
             playBooster: function() { this.playOsc('triangle', 800, 200, 0.2, 0.3); },
@@ -388,6 +391,7 @@
         }
         createParticles();
 
+        // Абсолютно все глобальные переменные на месте
         let currentLevel = 1, totalScore = 0, comboCount = 0, lastMatchTime = 0, totalTilesForLevel = 0;
         let activeTiles = [], firstTile = null; 
         let matchHistory = [];
@@ -401,7 +405,7 @@
             let savedScore = localStorage.getItem('mahjong_score'); if (savedScore) totalScore = parseInt(savedScore);
         } catch(e){}
         
-        // --- 60 ИДЕАЛЬНО ВЫВЕРЕННЫХ НАБОРОВ (1200 ПРЕДМЕТОВ) ---
+        // --- 60 ИДЕАЛЬНО ВЫВЕРЕННЫХ НАБОРОВ (СТРОГО ПО 20 ПРЕДМЕТОВ) ---
         const themeSets = [
             ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'],
             ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'],
@@ -529,6 +533,7 @@
         function getSymbolsForLevel(level) {
             let s = level * 12345; function localRnd() { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }
             let t1 = Math.floor(localRnd() * themeSets.length); let t2 = Math.floor(localRnd() * themeSets.length); let t3 = Math.floor(localRnd() * themeSets.length);
+            // Каждый themeSet гарантированно имеет 20 символов. 7 + 7 + 6 = ровно 20 уникальных символов на уровень.
             return [...themeSets[t1].slice(0, 7), ...themeSets[t2].slice(7, 14), ...themeSets[t3].slice(14, 20)];
         }
         
@@ -732,8 +737,8 @@
 
         function getSymbolCategory(sym) {
             const catFood = [0, 1, 6, 28, 36, 47, 48]; const catTech = [2, 16, 53, 54];
-            const catZodiac = [9, 15, 43]; const catEmotion = [21, 22, 23, 39, 59];
-            const catAnimal = [3, 10, 11, 26, 27, 38, 55]; const catTransport = [4, 34, 37, 57];
+            const catZodiac = [9, 15, 43]; const catEmotion = [21, 22, 23, 39];
+            const catAnimal = [3, 10, 11, 26, 27, 38, 55, 59]; const catTransport = [4, 34, 37, 57];
             for (let i = 0; i < themeSets.length; i++) {
                 if (themeSets[i].includes(sym)) {
                     if (catFood.includes(i)) return 'food'; if (catTech.includes(i)) return 'tech';
@@ -792,6 +797,7 @@
             finger.style.top = (rect.top + window.scrollY + rect.height / 2) + 'px';
         }
 
+        // --- АБСОЛЮТНО НАДЕЖНАЯ ЛОГИКА КЛИКОВ И УДАЛЕНИЯ ---
         function handleTileClick(t, event) { 
             if (isGameLocked) return;
             if (tutorialMode) { if (t !== tutorialPair[0] && t !== tutorialPair[1]) return; }
@@ -800,18 +806,21 @@
             let justUnlocked = false;
 
             if (t.isHidden) { 
-                AudioSys.playUnlock(); 
                 t.isHidden = false; 
                 t.el.classList.remove('is-hidden'); 
                 t.el.classList.add('flip-anim'); 
-                setTimeout(() => t.el.classList.remove('flip-anim'), 400); 
+                setTimeout(() => { if(t.el) t.el.classList.remove('flip-anim'); }, 400); 
                 updateFreeState(); 
                 justUnlocked = true;
+                AudioSys.playUnlock(); 
             }
 
             if (!firstTile) { 
+                t.el.classList.add('selected'); 
+                firstTile = t; 
+                
                 if (!justUnlocked) AudioSys.playClick(true); 
-                t.el.classList.add('selected'); firstTile = t; 
+                
                 if (tutorialMode) {
                     let nextTile = (t === tutorialPair[0]) ? tutorialPair[1] : tutorialPair[0];
                     positionFingerOnTile(nextTile);
@@ -834,19 +843,18 @@
                     let earnedPoints = 10 * comboCount; totalScore += earnedPoints; localStorage.setItem('mahjong_score', totalScore); updateScoreDisplay();
                     showFloatingText(t.el, earnedPoints, comboCount > 1);
                     spawnSmartBurst(firstTile.el, firstTile.symbol); spawnSmartBurst(t.el, t.symbol);
-                    activeTiles = activeTiles.filter(x => x !== firstTile && x !== t); 
                     
-                    if (justUnlocked) t.el.classList.remove('flip-anim');
-
+                    // Блокируем фишки от повторных нажатий
                     t.el.classList.add('matched'); firstTile.el.classList.add('matched'); 
                     
-                    // Полная и безопасная очистка DOM для исключения багов с кликами
+                    // Жестко очищаем DOM от невидимых фишек (Они больше не перекроют другие фишки)
                     let t1 = firstTile, t2 = t;
                     setTimeout(() => {
                         if (t1 && t1.el) t1.el.style.display = 'none';
                         if (t2 && t2.el) t2.el.style.display = 'none';
                     }, 300);
 
+                    activeTiles = activeTiles.filter(x => x !== firstTile && x !== t); 
                     firstTile = null; 
                     updateFreeState(); updateProgressBar();
                     
@@ -908,7 +916,6 @@
             }, 1000); 
         }
 
-        // --- ПАНЕЛЬ БУСТЕРОВ ---
         function updateBoostersUI() {
             document.querySelectorAll('.booster').forEach(btn => {
                 let unlockLvl = parseInt(btn.getAttribute('data-unlock')); let cost = parseInt(btn.getAttribute('data-cost')); let lockTag = btn.querySelector('.b-lock');
@@ -933,6 +940,11 @@
             totalScore -= cost; localStorage.setItem('mahjong_score', totalScore); updateScoreDisplay(); AudioSys.playBooster(); action();
         }
 
+        function getAvailablePairs() {
+            let freeTiles = activeTiles.filter(t => t.isFree && !t.isHidden); let pairs = [];
+            for (let i = 0; i < freeTiles.length; i++) { for (let j = i + 1; j < freeTiles.length; j++) { if (freeTiles[i].symbol === freeTiles[j].symbol) pairs.push([freeTiles[i], freeTiles[j]]); } } return pairs;
+        }
+
         document.getElementById('bst-hint').addEventListener('click', () => {
             buyBooster('bst-hint', 50, () => {
                 let pairs = getAvailablePairs();
@@ -943,8 +955,9 @@
         document.getElementById('bst-undo').addEventListener('click', () => {
             buyBooster('bst-undo', 100, () => {
                 if (matchHistory.length === 0) return;
-                let pair = matchHistory.pop(); pair[0].el.classList.remove('matched', 'selected'); pair[1].el.classList.remove('matched', 'selected');
-                pair[0].el.style.display = 'flex'; pair[1].el.style.display = 'flex'; // Возвращаем видимость в DOM
+                let pair = matchHistory.pop(); 
+                pair[0].el.classList.remove('matched', 'selected'); pair[1].el.classList.remove('matched', 'selected');
+                pair[0].el.style.display = 'flex'; pair[1].el.style.display = 'flex'; // Возвращаем удаленные из DOM элементы обратно
                 activeTiles.push(pair[0], pair[1]); comboCount = 0; updateFreeState(); updateProgressBar();
             });
         });
@@ -963,9 +976,7 @@
                     }
                 });
                 matchHistory = []; updateFreeState(); updateProgressBar();
-                if (activeTiles.length === 0) {
-                    levelComplete();
-                }
+                if (activeTiles.length === 0) { levelComplete(); }
             });
         });
 
@@ -980,9 +991,7 @@
                     setTimeout(() => { if(t.el) t.el.style.display = 'none'; }, 300);
                 });
                 activeTiles = activeTiles.filter(t => t.symbol !== randomTile.symbol); matchHistory = []; updateFreeState(); updateProgressBar();
-                if (activeTiles.length === 0) {
-                    levelComplete();
-                }
+                if (activeTiles.length === 0) { levelComplete(); }
             });
         });
 
