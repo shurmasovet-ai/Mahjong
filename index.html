@@ -160,7 +160,10 @@
         .tile.blocked { filter: brightness(0.65) contrast(1.1) saturate(0.85); cursor: not-allowed; }
         .tile.blocked::before { opacity: 0.2; }
         .tile.selected { border-color: #fff !important; box-shadow: inset 3px 3px 8px rgba(255, 255, 255, 1), inset -3px -4px 6px rgba(0, 0, 0, 0.1), calc(0.5vw + var(--z) * 0.1vw) calc(2vw + var(--z) * 0.2vw) 0px var(--tileSide), 0 20px 40px rgba(0,0,0,0.9) !important; transform: translateY(-5vw) scale(1.1); z-index: 999 !important; filter: brightness(1.15) drop-shadow(0 0 12px rgba(241, 196, 15, 0.8)); }
+        
+        /* Исправление ошибки с перекрытием невидимых фишек */
         .tile.matched { opacity: 0; pointer-events: none; transform: scale(1.6); filter: brightness(2.5); }
+        
         .tile.hinted { animation: hintGlow 1s infinite alternate; }
         @keyframes hintGlow { 0% { filter: brightness(1) drop-shadow(0 0 0px #3498db); } 100% { filter: brightness(1.3) drop-shadow(0 0 20px #3498db); } }
         
@@ -239,11 +242,9 @@
 </head>
 <body>
 
-    <!-- ОВЕРЛЕЙ ОБУЧЕНИЯ -->
     <div id="tutorial-overlay"></div>
     <div id="tutorial-finger">👆</div>
 
-    <!-- ОВЕРЛЕЙ ПОБЕДЫ С ПОХВАЛОЙ -->
     <div id="level-complete-overlay">
         <h2 id="level-complete-praise">ВЕЛИКОЛЕПНО!</h2>
         <p id="level-complete-text">УРОВЕНЬ ПРОЙДЕН</p>
@@ -256,7 +257,7 @@
             <button id="btn-prev-level" class="btn-arrow">◀</button>
             <div id="menu-level-badge">
                 <div id="menu-level-text">УРОВЕНЬ 1</div>
-                <div id="menu-chapter-title">ГЛАВА 1: Начало пути</div>
+                <div id="menu-chapter-title">ГЛАВА 1: Светлая роща</div>
             </div>
             <button id="btn-next-level" class="btn-arrow">▶</button>
         </div>
@@ -284,7 +285,6 @@
         <button id="btn-close-rules" class="btn-massive" style="font-size:20px; padding:10px 30px; min-width:auto;">ПОНЯТНО</button>
     </div>
 
-    <!-- ТАБЛИЧКА НЕТ ХОДОВ -->
     <div id="no-moves-modal">
         <h2>НЕТ ХОДОВ!</h2>
         <p>На столе больше нет доступных пар. Перемешайте фишки или воспользуйтесь бустером.</p>
@@ -303,7 +303,7 @@
                     <button id="btn-hud-prev" class="btn-hud-arrow">◀</button>
                     <div id="hud-level-container">
                         <div id="hud-level">Ур. 1</div>
-                        <div id="hud-chapter-text">ГЛАВА 1: Начало пути</div>
+                        <div id="hud-chapter-text">ГЛАВА 1: Светлая роща</div>
                     </div>
                     <button id="btn-hud-next" class="btn-hud-arrow">▶</button>
                 </div>
@@ -401,7 +401,7 @@
             let savedScore = localStorage.getItem('mahjong_score'); if (savedScore) totalScore = parseInt(savedScore);
         } catch(e){}
         
-        // --- 60 ИДЕАЛЬНО ЧИСТЫХ И СВЕТЛЫХ НАБОРОВ (1200 ПРЕДМЕТОВ) ---
+        // --- 60 ИДЕАЛЬНО ВЫВЕРЕННЫХ НАБОРОВ (1200 ПРЕДМЕТОВ) ---
         const themeSets = [
             ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'],
             ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'],
@@ -432,7 +432,7 @@
             ['🐮','🐂','🐃','🐄','🐖','🐏','🐑','🐐','🐪','🐫','🦙','🦘','🐎','🐴','🐔','🐓','🐣','🐤','🐥','🐦'],
             ['🐧','🦅','🦆','🦢','🦉','🦤','🪶','🦩','🦚','🦜','🐸','🐊','🐢','🦎','🐍','🐲','🐉','🦕','🐳','🐋'],
             ['🥣','🥄','🍴','🍽️','🥣','🥡','🥢','🍶','🥂','🍻','🍺','🍹','🍷','🥃','🍸','🧉','🍾','🧊','🥤','🧋'],
-            ['💈','✂️','🗑️','🛢️','🧴','🧷','🧹','🧺','🧻','🧼','🧽','🚿','🛁','🛀','🪥','🪒','🧴','🧻','🧽','🧼'],
+            ['💈','✂️','🗑️','🛢️','🧴','🧷','🧹','🧺','🧻','🧼','🧽','🚿','🛁','🛀','🪥','🪒','🪞','🚽','🪠','🧯'],
             ['🎨','🧵','🪡','🧶','🪢','🛍️','🎒','🩴','👓','🕶️','🧣','🧤','🧥','🧦','👗','👘','🥻','🩱','🩲','🩳'],
             ['🎮','🕹️','🎰','🎲','🧩','🧸','🪀','🪅','🪄','🔮','🧿','🪩','🪆','🪁','🎯','🎳','🥏','🏑','🥍','🏏'],
             ['🌵','🎄','🌲','🌳','🌴','🪵','🌱','🌿','☘️','🍀','🎍','🪴','🎋','🍃','🍂','🍁','🍄','🌾','💐','🌷'],
@@ -440,7 +440,7 @@
             ['🚂','🚃','🚄','🚅','🚆','🚇','🚈','🚉','🚊','🚝','🚞','🚋','🚌','🚍','🚎','🚐','🚑','🚒','🚓','🚔'],
             ['🕰️','🧱','🪨','🪵','🛖','🏕️','⛺','🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨'],
             ['🍉','🍊','🍋','🍌','🍍','🥭','🍎','🍏','🍐','🍑','🍒','🍓','🫐','🥝','🍅','🫒','🥥','🥑','🍆','🥔'],
-            ['✈️','🛫','🛬','🛩️','🚁','🛸','🛶','⛵','🚤','🛥️','🛳️','⛴️','🚢','⚓','🚀','🚟','🚠','🚡','🚜','🛶'],
+            ['✈️','🛫','🛬','🛩️','🚁','🛸','🛶','⛵','🚤','🛥️','🛳️','⛴️','🚢','⚓','🚀','🚟','🚠','🚡','🚜','🛺'],
             ['😺','😸','😹','😻','😼','😽','🙀','😿','😾','🙈','🙉','🙊','🐵','🐒','🦍','🦧','🐶','🐕','🐩','🐺'],
             ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💖','❣️','💕','💞','💓','💗','💖','💘','💝','💟','💌'],
             ['🔈','🔉','🔊','🔇','📢','📣','📯','🔔','🔕','🎙️','🎚️','🎛️','🎤','🎧','📻','🎷','🪗','🎸','🎹','🎺'],
@@ -483,7 +483,7 @@
             else {
                 let s = (chapterIndex * 2654435761) % 4294967296; function rndC() { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }
                 let a = wordsA[Math.floor(rndC() * wordsA.length)]; let b = wordsB[Math.floor(rndC() * wordsB.length)]; let c = wordsC[Math.floor(rndC() * wordsC.length)];
-                title = a + " " + b + " " + c; // Грамматика: Сказ Забытых Предков
+                title = a + " " + b + " " + c;
             }
             return `ГЛАВА ${chapterNum}: ${title}`;
         }
@@ -732,8 +732,8 @@
 
         function getSymbolCategory(sym) {
             const catFood = [0, 1, 6, 28, 36, 47, 48]; const catTech = [2, 16, 53, 54];
-            const catZodiac = [9, 15, 43]; const catEmotion = [21, 22, 23, 39];
-            const catAnimal = [3, 10, 11, 26, 27, 38, 55, 59]; const catTransport = [4, 34, 37, 57];
+            const catZodiac = [9, 15, 43]; const catEmotion = [21, 22, 23, 39, 59];
+            const catAnimal = [3, 10, 11, 26, 27, 38, 55]; const catTransport = [4, 34, 37, 57];
             for (let i = 0; i < themeSets.length; i++) {
                 if (themeSets[i].includes(sym)) {
                     if (catFood.includes(i)) return 'food'; if (catTech.includes(i)) return 'tech';
@@ -838,29 +838,30 @@
                     
                     if (justUnlocked) t.el.classList.remove('flip-anim');
 
-                    t.el.classList.add('matched'); firstTile.el.classList.add('matched'); firstTile = null; 
+                    t.el.classList.add('matched'); firstTile.el.classList.add('matched'); 
+                    
+                    // Полная и безопасная очистка DOM для исключения багов с кликами
+                    let t1 = firstTile, t2 = t;
+                    setTimeout(() => {
+                        if (t1 && t1.el) t1.el.style.display = 'none';
+                        if (t2 && t2.el) t2.el.style.display = 'none';
+                    }, 300);
+
+                    firstTile = null; 
                     updateFreeState(); updateProgressBar();
                     
                     if (activeTiles.length === 0) {
                         levelComplete();
                     }
                 } else { 
-                    AudioSys.playClick(false); let t1 = firstTile, t2 = t; firstTile = null; setTimeout(() => { t1.el.classList.remove('selected'); t2.el.classList.remove('selected'); }, 300); 
+                    AudioSys.playClick(false); 
+                    let t1 = firstTile, t2 = t; firstTile = null; 
+                    setTimeout(() => { t1.el.classList.remove('selected'); t2.el.classList.remove('selected'); }, 300); 
                     if (tutorialMode) positionFingerOnTile(tutorialPair[0].isFree ? tutorialPair[0] : tutorialPair[1]);
                 } 
             } else { 
                 AudioSys.playClick(false); t.el.classList.remove('selected'); firstTile = null; 
                 if (tutorialMode) positionFingerOnTile(tutorialPair[0].isFree ? tutorialPair[0] : tutorialPair[1]);
-            }
-        }
-
-        function shootConfetti() {
-            const colors = ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6'];
-            for(let i = 0; i < 60; i++) {
-                let conf = document.createElement('div'); conf.classList.add('confetti');
-                conf.style.left = Math.random() * 100 + 'vw'; conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                conf.style.animationDuration = (Math.random() * 2 + 2) + 's'; conf.style.animationDelay = (Math.random() * 0.5) + 's';
-                document.body.appendChild(conf); setTimeout(() => conf.remove(), 5000);
             }
         }
 
@@ -907,6 +908,7 @@
             }, 1000); 
         }
 
+        // --- ПАНЕЛЬ БУСТЕРОВ ---
         function updateBoostersUI() {
             document.querySelectorAll('.booster').forEach(btn => {
                 let unlockLvl = parseInt(btn.getAttribute('data-unlock')); let cost = parseInt(btn.getAttribute('data-cost')); let lockTag = btn.querySelector('.b-lock');
@@ -942,6 +944,7 @@
             buyBooster('bst-undo', 100, () => {
                 if (matchHistory.length === 0) return;
                 let pair = matchHistory.pop(); pair[0].el.classList.remove('matched', 'selected'); pair[1].el.classList.remove('matched', 'selected');
+                pair[0].el.style.display = 'flex'; pair[1].el.style.display = 'flex'; // Возвращаем видимость в DOM
                 activeTiles.push(pair[0], pair[1]); comboCount = 0; updateFreeState(); updateProgressBar();
             });
         });
@@ -954,6 +957,8 @@
                     if (activeTiles.includes(pair[0]) && activeTiles.includes(pair[1])) {
                         spawnSmartBurst(pair[0].el, pair[0].symbol); spawnSmartBurst(pair[1].el, pair[1].symbol);
                         pair[0].el.classList.add('matched'); pair[1].el.classList.add('matched');
+                        let t1 = pair[0], t2 = pair[1];
+                        setTimeout(() => { if(t1.el) t1.el.style.display = 'none'; if(t2.el) t2.el.style.display = 'none'; }, 300);
                         activeTiles = activeTiles.filter(x => x !== pair[0] && x !== pair[1]); destroyed++;
                     }
                 });
@@ -969,7 +974,11 @@
                 if (activeTiles.length === 0) return;
                 let randomTile = activeTiles[Math.floor(Math.random() * activeTiles.length)];
                 let targets = activeTiles.filter(t => t.symbol === randomTile.symbol);
-                targets.forEach(t => { spawnSmartBurst(t.el, t.symbol); t.el.classList.add('matched'); });
+                targets.forEach(t => { 
+                    spawnSmartBurst(t.el, t.symbol); 
+                    t.el.classList.add('matched'); 
+                    setTimeout(() => { if(t.el) t.el.style.display = 'none'; }, 300);
+                });
                 activeTiles = activeTiles.filter(t => t.symbol !== randomTile.symbol); matchHistory = []; updateFreeState(); updateProgressBar();
                 if (activeTiles.length === 0) {
                     levelComplete();
