@@ -363,6 +363,7 @@
         let matchHistory = [];
         let tutorialMode = false;
         let tutorialPair = [];
+        let isGameLocked = false; // Глобальный блокиратор стола
         const COMBO_TIME_LIMIT = 4000; 
 
         try { 
@@ -532,7 +533,7 @@
         function initGame() {
             const board = document.getElementById('game-board'); board.innerHTML = ''; activeTiles = []; firstTile = null; matchHistory = [];
             document.getElementById('message').innerHTML = ''; document.getElementById('btn-shuffle').classList.remove('btn-pulse'); document.getElementById('progress-bar').style.width = '0%';
-            comboCount = 0; updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI();
+            comboCount = 0; isGameLocked = false; updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI();
             
             let diff = getDifficultyParams(currentLevel);
             let diffBadge = document.getElementById('hud-difficulty'); diffBadge.innerText = diff.text; diffBadge.style.backgroundColor = diff.color; diffBadge.style.color = (diff.color === "#f1c40f") ? "#000" : "#fff"; 
@@ -602,7 +603,6 @@
             });
             updateFreeState(); updateProgressBar();
 
-            // --- ЗАПУСК ИНТЕРАКТИВНОГО ОБУЧЕНИЯ (TUTORIAL) ---
             if (currentLevel === 1 && !localStorage.getItem('mahjong_tutorial_done')) {
                 setTimeout(startTutorial, 600);
             }
@@ -625,11 +625,40 @@
 
         function checkGameState() {
             if (activeTiles.length === 0) return;
-            let freeTiles = activeTiles.filter(t => t.isFree), symbolsSet = new Set(), hasMoves = false;
-            for (let t of freeTiles) { if (symbolsSet.has(t.symbol)) { hasMoves = true; break; } symbolsSet.add(t.symbol); }
+            
+            let freeTiles = activeTiles.filter(t => t.isFree);
+            let hasMoves = false;
+            let symbolsSet = new Set();
+            
+            for (let t of freeTiles) {
+                // Если есть закрытая фишка-замок, то это 100% доступный ход (ее можно открыть)
+                if (t.isHidden) {
+                    hasMoves = true;
+                    break;
+                }
+                // Ищем пару среди открытых фишек
+                if (symbolsSet.has(t.symbol)) { 
+                    hasMoves = true; 
+                    break; 
+                } 
+                symbolsSet.add(t.symbol); 
+            }
+
             let btnShuffle = document.getElementById('btn-shuffle');
-            if (!hasMoves) { document.getElementById('message').innerText = 'НЕТ ХОДОВ! Нажмите Микс ➔'; document.getElementById('message').style.color = '#e74c3c'; btnShuffle.classList.add('btn-pulse'); } 
-            else { document.getElementById('message').innerHTML = ''; btnShuffle.classList.remove('btn-pulse'); }
+            if (!hasMoves) { 
+                isGameLocked = true; // ГЛОБАЛЬНАЯ БЛОКИРОВКА КЛИКОВ
+                if (firstTile) {
+                    firstTile.el.classList.remove('selected');
+                    firstTile = null;
+                }
+                document.getElementById('message').innerText = 'НЕТ ХОДОВ! Нажмите Микс ➔'; 
+                document.getElementById('message').style.color = '#e74c3c'; 
+                btnShuffle.classList.add('btn-pulse'); 
+            } else { 
+                isGameLocked = false; // РАЗБЛОКИРОВКА СТОЛА
+                document.getElementById('message').innerHTML = ''; 
+                btnShuffle.classList.remove('btn-pulse'); 
+            }
             updateBoostersUI();
         }
 
@@ -705,17 +734,25 @@
         }
 
         function handleTileClick(t, event) { 
+            // Защита от кликов при тупике
+            if (isGameLocked) return;
+
             // Защита от мисскликов в режиме обучения
             if (tutorialMode) {
                 if (t !== tutorialPair[0] && t !== tutorialPair[1]) return;
             }
 
             if (!t.isFree) return;
-            if (t.isHidden) { AudioSys.playUnlock(); t.isHidden = false; t.el.classList.remove('is-hidden'); t.el.classList.add('flip-anim'); setTimeout(() => t.el.classList.remove('flip-anim'), 400); return; }
+            
+            // Открытие замка
+            if (t.isHidden) { 
+                AudioSys.playUnlock(); t.isHidden = false; t.el.classList.remove('is-hidden'); t.el.classList.add('flip-anim'); setTimeout(() => t.el.classList.remove('flip-anim'), 400); 
+                updateFreeState(); // Пересчитываем наличие ходов сразу после вскрытия
+                return; 
+            }
+
             if (!firstTile) { 
                 AudioSys.playClick(true); t.el.classList.add('selected'); firstTile = t; 
-                
-                // Туториал: перенос пальца на вторую фишку
                 if (tutorialMode) {
                     let nextTile = (t === tutorialPair[0]) ? tutorialPair[1] : tutorialPair[0];
                     positionFingerOnTile(nextTile);
@@ -725,7 +762,6 @@
                 t.el.classList.add('selected'); 
                 if (firstTile.symbol === t.symbol) { 
                     
-                    // Туториал пройден!
                     if (tutorialMode) {
                         tutorialMode = false;
                         document.getElementById('tutorial-overlay').style.display = 'none';
@@ -754,7 +790,6 @@
                     }
                 } else { 
                     AudioSys.playClick(false); let t1 = firstTile, t2 = t; firstTile = null; setTimeout(() => { t1.el.classList.remove('selected'); t2.el.classList.remove('selected'); }, 300); 
-                    // Возвращаем палец обратно, если игрок ошибся в туториале (хотя это почти невозможно)
                     if (tutorialMode) positionFingerOnTile(tutorialPair[0].isFree ? tutorialPair[0] : tutorialPair[1]);
                 } 
             } else { 
@@ -788,6 +823,7 @@
                     let currentLayout = activeTiles.map(t => ({x: t.x, y: t.y, z: t.z}));
                     let attemptMix = 0, preparedTiles = null;
                     while (!preparedTiles && attemptMix < 100) { attemptMix++; preparedTiles = assignSymbolsSmart(currentLayout, pairsPool, Math.random); }
+                    
                     if (!preparedTiles) {
                         currentLayout = []; let fX = 0, fY = 4;
                         for (let i = 0; i < activeTiles.length; i++) { currentLayout.push({x: fX, y: fY, z: 0}); fX += 2; if (fX > 8) { fX = 0; fY += 2; } }
