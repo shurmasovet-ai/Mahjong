@@ -359,11 +359,13 @@
         }
         createParticles();
 
+        // --- ВОССТАНОВЛЕННАЯ СТРОКА С ГЛОБАЛЬНЫМИ ПЕРЕМЕННЫМИ ---
         let currentLevel = 1, totalScore = 0, comboCount = 0, lastMatchTime = 0, totalTilesForLevel = 0;
+        let activeTiles = [], firstTile = null; // <- ВОТ ОНА, СПАСИТЕЛЬНИЦА
         let matchHistory = [];
         let tutorialMode = false;
         let tutorialPair = [];
-        let isGameLocked = false; // Глобальный блокиратор стола
+        let isGameLocked = false; 
         const COMBO_TIME_LIMIT = 4000; 
 
         try { 
@@ -631,31 +633,20 @@
             let symbolsSet = new Set();
             
             for (let t of freeTiles) {
-                // Если есть закрытая фишка-замок, то это 100% доступный ход (ее можно открыть)
-                if (t.isHidden) {
-                    hasMoves = true;
-                    break;
-                }
-                // Ищем пару среди открытых фишек
-                if (symbolsSet.has(t.symbol)) { 
-                    hasMoves = true; 
-                    break; 
-                } 
+                if (t.isHidden) { hasMoves = true; break; }
+                if (symbolsSet.has(t.symbol)) { hasMoves = true; break; } 
                 symbolsSet.add(t.symbol); 
             }
 
             let btnShuffle = document.getElementById('btn-shuffle');
             if (!hasMoves) { 
-                isGameLocked = true; // ГЛОБАЛЬНАЯ БЛОКИРОВКА КЛИКОВ
-                if (firstTile) {
-                    firstTile.el.classList.remove('selected');
-                    firstTile = null;
-                }
+                isGameLocked = true; 
+                if (firstTile) { firstTile.el.classList.remove('selected'); firstTile = null; }
                 document.getElementById('message').innerText = 'НЕТ ХОДОВ! Нажмите Микс ➔'; 
                 document.getElementById('message').style.color = '#e74c3c'; 
                 btnShuffle.classList.add('btn-pulse'); 
             } else { 
-                isGameLocked = false; // РАЗБЛОКИРОВКА СТОЛА
+                isGameLocked = false; 
                 document.getElementById('message').innerHTML = ''; 
                 btnShuffle.classList.remove('btn-pulse'); 
             }
@@ -669,7 +660,6 @@
             document.body.appendChild(floatEl); setTimeout(() => floatEl.remove(), 1000);
         }
 
-        // --- УМНЫЕ СМЫСЛОВЫЕ ЭФФЕКТЫ ---
         function getSymbolCategory(sym) {
             const catFood = [0, 1, 6, 28, 36, 47, 48]; const catTech = [2, 16, 53, 54];
             const catZodiac = [9, 15, 43]; const catEmotion = [21, 22, 23, 39, 59];
@@ -710,7 +700,6 @@
             }
         }
 
-        // --- ЛОГИКА ТУТОРИАЛА ---
         function startTutorial() {
             let pairs = getAvailablePairs();
             if (pairs.length === 0) return;
@@ -734,21 +723,13 @@
         }
 
         function handleTileClick(t, event) { 
-            // Защита от кликов при тупике
             if (isGameLocked) return;
-
-            // Защита от мисскликов в режиме обучения
-            if (tutorialMode) {
-                if (t !== tutorialPair[0] && t !== tutorialPair[1]) return;
-            }
-
+            if (tutorialMode) { if (t !== tutorialPair[0] && t !== tutorialPair[1]) return; }
             if (!t.isFree) return;
             
-            // Открытие замка
             if (t.isHidden) { 
                 AudioSys.playUnlock(); t.isHidden = false; t.el.classList.remove('is-hidden'); t.el.classList.add('flip-anim'); setTimeout(() => t.el.classList.remove('flip-anim'), 400); 
-                updateFreeState(); // Пересчитываем наличие ходов сразу после вскрытия
-                return; 
+                updateFreeState(); return; 
             }
 
             if (!firstTile) { 
@@ -757,17 +738,13 @@
                     let nextTile = (t === tutorialPair[0]) ? tutorialPair[1] : tutorialPair[0];
                     positionFingerOnTile(nextTile);
                 }
-
             } else if (firstTile !== t) { 
                 t.el.classList.add('selected'); 
                 if (firstTile.symbol === t.symbol) { 
                     
                     if (tutorialMode) {
-                        tutorialMode = false;
-                        document.getElementById('tutorial-overlay').style.display = 'none';
-                        document.getElementById('tutorial-finger').style.display = 'none';
-                        tutorialPair[0].el.classList.remove('tutorial-highlight');
-                        tutorialPair[1].el.classList.remove('tutorial-highlight');
+                        tutorialMode = false; document.getElementById('tutorial-overlay').style.display = 'none'; document.getElementById('tutorial-finger').style.display = 'none';
+                        tutorialPair[0].el.classList.remove('tutorial-highlight'); tutorialPair[1].el.classList.remove('tutorial-highlight');
                         localStorage.setItem('mahjong_tutorial_done', 'true');
                     }
 
@@ -851,7 +828,6 @@
             }, 1000); 
         }
 
-        // --- ПАНЕЛЬ БУСТЕРОВ ---
         function updateBoostersUI() {
             document.querySelectorAll('.booster').forEach(btn => {
                 let unlockLvl = parseInt(btn.getAttribute('data-unlock')); let cost = parseInt(btn.getAttribute('data-cost')); let lockTag = btn.querySelector('.b-lock');
@@ -870,7 +846,7 @@
         }
 
         function buyBooster(btnId, cost, action) {
-            if (tutorialMode) return;
+            if (tutorialMode || isGameLocked) return;
             let btn = document.getElementById(btnId);
             if (btn.classList.contains('locked') || btn.classList.contains('disabled')) { AudioSys.playError(); let scoreEl = document.getElementById('hud-score'); scoreEl.style.color = '#e74c3c'; setTimeout(() => scoreEl.style.color = '#fff', 300); return; }
             totalScore -= cost; localStorage.setItem('mahjong_score', totalScore); updateScoreDisplay(); AudioSys.playBooster(); action();
@@ -931,7 +907,6 @@
             });
         });
 
-        // --- ЛОГИКА КОЛЕСА ФОРТУНЫ ---
         const wheelModal = document.getElementById('wheel-modal'); const wheelSpinner = document.getElementById('wheel-spinner'); const btnOpenWheel = document.getElementById('btn-open-wheel'); const btnSpin = document.getElementById('btn-spin'); const btnCloseWheel = document.getElementById('btn-close-wheel');
         const wheelPrizes = [ { text: "+1000", val: 1000, color: "#e74c3c" }, { text: "+5000", val: 5000, color: "#f1c40f" }, { text: "+500", val: 500, color: "#3498db" }, { text: "+2000", val: 2000, color: "#2ecc71" }, { text: "ДЖЕКПОТ", val: 15000, color: "#9b59b6" }, { text: "+750", val: 750, color: "#e67e22" } ];
         let conicGradient = []; let sliceAngle = 360 / wheelPrizes.length;
