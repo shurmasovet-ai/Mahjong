@@ -229,10 +229,18 @@
         #no-moves-modal p { font-size: 16px; margin-bottom: 30px; color: #bdc3c7; max-width: 300px; line-height: 1.4;}
         #btn-close-no-moves { background: transparent; color: #95a5a6; border: none; font-size: 16px; text-decoration: underline; margin-top: 20px; cursor: pointer; }
 
-        /* --- РОСКОШНЫЙ ЭКРАН ПОХВАЛЫ (ПОБЕДА) --- */
+        /* --- РОСКОШНЫЙ ЭКРАН ПОХВАЛЫ (ЧИСТЫЙ CSS) --- */
         #level-complete-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 15000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        
+        #level-complete-overlay.active { display: flex; animation: overlayFadeIn 0.3s ease-out forwards; }
+        #level-complete-overlay.fade-out { animation: overlayFadeOut 0.4s ease-in forwards; }
+        
         #level-complete-praise { font-family: 'Russo One', sans-serif; font-size: 42px; background: linear-gradient(180deg, #fff3b0 0%, #f1c40f 50%, #d4ac0d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; letter-spacing: 3px; filter: drop-shadow(0 5px 15px rgba(241,196,15,0.5)) drop-shadow(0 0 30px rgba(241,196,15,0.3)); margin-bottom: 10px; opacity: 0; transform: scale(0.5); }
+        #level-complete-overlay.active #level-complete-praise { animation: praisePop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s forwards; }
+        
         #level-complete-text { font-family: 'Russo One', sans-serif; font-size: 22px; color: #fff; letter-spacing: 2px; text-shadow: 0 2px 4px #000; opacity: 0; }
+        #level-complete-overlay.active #level-complete-text { animation: textFadeIn 0.5s ease-out 0.8s forwards; }
+        
         @keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes overlayFadeOut { from { opacity: 1; } to { opacity: 0; } }
         @keyframes textFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -331,7 +339,7 @@
     </div>
 
     <script>
-        // --- АСМР АУДИОСИСТЕМА (Сверхнадежная защита от ошибок браузера) ---
+        // --- АСМР АУДИОСИСТЕМА ---
         const AudioSys = {
             ctx: null, enabled: true,
             init: function() {
@@ -695,39 +703,38 @@
             document.getElementById('no-moves-modal').style.display = 'none';
         });
 
-        // --- ДОБАВЛЕНА ПОТЕРЯННАЯ РАНЕЕ ФУНКЦИЯ ПОБЕДЫ ---
+        // --- БЕЗОТКАЗНАЯ ФУНКЦИЯ ПОБЕДЫ ---
         function levelComplete() {
             AudioSys.playWin(); 
-            currentLevel++; localStorage.setItem('mahjong_level', currentLevel);
+            currentLevel++; 
+            localStorage.setItem('mahjong_level', currentLevel);
             shootConfetti();
             
             const overlay = document.getElementById('level-complete-overlay');
             const praiseEl = document.getElementById('level-complete-praise');
-            const textEl = document.getElementById('level-complete-text');
             
-            // Расширенный список похвалы
             const praiseWords = [
                 "ВЕЛИКОЛЕПНО!", "БЛЕСТЯЩЕ!", "ГЕНИАЛЬНО!", "ИДЕАЛЬНО!", 
                 "ПРЕВОСХОДНО!", "МАСТЕРСКИ!", "ПОТРЯСАЮЩЕ!", "БЕЗУПРЕЧНО!",
                 "НЕВЕРОЯТНО!", "ТАЛАНТЛИВО!", "ВОСХИТИТЕЛЬНО!", "ФЕНОМЕНАЛЬНО!",
-                "ГРАНДИОЗНО!", "БЕСПОДОБНО!", "ШИКАРНО!", "ИСКУСНО!", "ТРИУМФ!"
+                "ГРАНДИОЗНО!", "БЕСПОДОБНО!", "ШИКАРНО!", "ИСКУСНО!", "ТРИУМФ!",
+                "НЕПРЕВЗОЙДЁННО!", "ЭКСТРАКЛАСС!", "ИЗУМИТЕЛЬНО!"
             ];
             praiseEl.innerText = praiseWords[Math.floor(Math.random() * praiseWords.length)];
             
-            overlay.style.animation = 'none'; praiseEl.style.animation = 'none'; textEl.style.animation = 'none';
-            void overlay.offsetWidth; 
-            
-            overlay.style.animation = 'overlayFadeIn 0.3s ease-out forwards';
-            praiseEl.style.animation = 'praisePop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s forwards';
-            textEl.style.animation = 'textFadeIn 0.5s ease-out 0.8s forwards';
-
+            // Чистое CSS-переключение для гарантии работы в Colab
             overlay.style.display = 'flex';
+            overlay.className = ''; 
+            void overlay.offsetWidth; 
+            overlay.classList.add('active');
 
             setTimeout(() => { 
-                overlay.style.animation = 'overlayFadeOut 0.4s ease-in forwards';
+                overlay.classList.remove('active');
+                overlay.classList.add('fade-out');
                 setTimeout(() => {
                     overlay.style.display = 'none';
-                    initGame(); // <-- ЗАГРУЗКА НОВОГО УРОВНЯ
+                    overlay.className = '';
+                    initGame(); // <-- 100% ГАРАНТИЯ ЗАПУСКА НОВОГО УРОВНЯ
                 }, 400);
             }, 3000); 
         }
@@ -801,6 +808,7 @@
             finger.style.top = (rect.top + window.scrollY + rect.height / 2) + 'px';
         }
 
+        // --- ИДЕАЛЬНАЯ ЛОГИКА ВЫБОРА БЕЗ ДВОЙНЫХ КЛИКОВ ---
         function handleTileClick(t, event) { 
             if (isGameLocked) return;
             if (tutorialMode) { if (t !== tutorialPair[0] && t !== tutorialPair[1]) return; }
@@ -829,9 +837,10 @@
                     positionFingerOnTile(nextTile);
                 }
             } else if (firstTile !== t) { 
-                t.el.classList.add('selected'); 
+                
+                // СОВПАДЕНИЕ
                 if (firstTile.symbol === t.symbol) { 
-                    
+                    t.el.classList.add('selected'); 
                     if (tutorialMode) {
                         tutorialMode = false; document.getElementById('tutorial-overlay').style.display = 'none'; document.getElementById('tutorial-finger').style.display = 'none';
                         tutorialPair[0].el.classList.remove('tutorial-highlight'); tutorialPair[1].el.classList.remove('tutorial-highlight');
@@ -863,9 +872,14 @@
                         levelComplete();
                     }
                 } else { 
-                    AudioSys.playClick(false); 
-                    let t1 = firstTile, t2 = t; firstTile = null; 
-                    setTimeout(() => { t1.el.classList.remove('selected'); t2.el.classList.remove('selected'); }, 300); 
+                    // НЕСОВПАДЕНИЕ (МГНОВЕННОЕ ПЕРЕКЛЮЧЕНИЕ ВЫБОРА)
+                    AudioSys.playClick(true); 
+                    firstTile.el.classList.remove('selected'); 
+                    
+                    // Делаем новую фишку выбранной (не нужно кликать второй раз!)
+                    firstTile = t; 
+                    firstTile.el.classList.add('selected');
+                    
                     if (tutorialMode) positionFingerOnTile(tutorialPair[0].isFree ? tutorialPair[0] : tutorialPair[1]);
                 } 
             } else { 
