@@ -14,7 +14,6 @@
             --tileBg: radial-gradient(circle at 30% 30%, #ffffff 0%, #f5e6cb 40%, #d1b78a 100%); 
             --tileSide: #b89d70;
             --tileColor: #2b1d0f; 
-            /* Динамический фон */
             --game-bg: radial-gradient(circle at center, #6b1222 0%, #2a050b 100%);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,11 +24,11 @@
             background-size: 200% 200%;
             color: white; width: 100vw; height: 100vh; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            /* ЗАЩИТА UI (Отключение выделения и лупы iOS/Android) */
             user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: none;
             transition: background 0.5s ease;
         }
 
-        /* Анимация для премиум фонов */
         @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         .animated-bg { animation: gradientMove 15s ease infinite !important; }
 
@@ -62,7 +61,6 @@
 
         #btn-reset { margin-top: 15px; color: rgba(231, 76, 60, 0.8); text-decoration: underline; cursor: pointer; font-size: 14px; font-weight: bold; z-index: 2; padding: 10px; }
 
-        /* --- ИГРОВОЙ ЭКРАН --- */
         #game-screen { display: none; flex-direction: column; align-items: center; width: 100%; height: 100%; padding-top: 15px; z-index: 10; position: relative; }
         #top-bar { width: 100%; max-width: 500px; padding: 0 15px; display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .hud-center { display: flex; flex-direction: column; align-items: center; flex-grow: 1; margin: 0 5px; }
@@ -75,7 +73,6 @@
         #hud-level { font-family: 'Russo One', sans-serif; font-size: 18px; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.8); white-space: nowrap; line-height: 1.1;}
         #hud-chapter-text { font-size: 10px; color: #a2d9ce; font-weight: bold; text-transform: uppercase; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); margin-bottom: 2px;}
 
-        /* СТАТИСТИКА (Очки + Монеты) */
         .stats-container { display: flex; gap: 15px; margin-top: 4px; align-items: center;}
         #hud-score { font-family: 'Russo One', sans-serif; font-size: 15px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); transition: color 0.3s; }
         #hud-coins { font-family: 'Russo One', sans-serif; font-size: 15px; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.8); transition: color 0.3s; }
@@ -93,7 +90,6 @@
 
         #game-board { width: 90vw; flex-grow: 1; min-height: 400px; max-width: 400px; position: relative; perspective: 1000px; margin-bottom: 10px; }
         
-        /* ПЛИТКИ */
         .tile { position: absolute; width: 20%; height: 20%; left: calc(var(--x) * 10%); top: calc(var(--y) * 10%); margin-top: calc(var(--z) * -3.5vw); margin-left: calc(var(--z) * -2vw); background: var(--tileBg); color: var(--tileColor); font-size: 14vw; line-height: 1; text-shadow: 1px 2px 2px rgba(255,255,255,0.9), -1px -2px 4px rgba(0,0,0,0.4); font-family: 'Noto Color Emoji', sans-serif; display: flex; justify-content: center; align-items: center; border-radius: 14px; box-shadow: inset 3px 3px 6px rgba(255, 255, 255, 1), inset -4px -5px 8px rgba(0, 0, 0, 0.18), calc(0.5vw + var(--z) * 0.1vw) calc(0.9vw + var(--z) * 0.2vw) 0px var(--tileSide), calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(3vw + var(--z) * 0.8vw) rgba(0,0,0,0.65); border: 1px solid rgba(255,255,255,0.4); backdrop-filter: blur(4px); touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s, box-shadow 0.2s, top 0.5s ease-in-out, left 0.5s ease-in-out, margin-top 0.5s ease-in-out, margin-left 0.5s ease-in-out; cursor: pointer; transform-style: preserve-3d; pointer-events: auto; }
         .tile::before { content: ''; position: absolute; top: 2%; left: 3%; right: 3%; height: 35%; background: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 100%); border-radius: 12px 12px 25px 25px / 12px 12px 15px 15px; pointer-events: none; }
         @media (min-width: 400px) { .tile { font-size: 56px; border-radius: 16px; margin-top: calc(var(--z) * -14px); margin-left: calc(var(--z) * -8px); } .tile::before { border-radius: 14px 14px 30px 30px / 14px 14px 18px 18px; } }
@@ -101,17 +97,8 @@
         .tile.blocked { filter: brightness(0.65) contrast(1.1) saturate(0.85); cursor: not-allowed; }
         .tile.blocked::before { opacity: 0.2; }
         
-        /* НОВАЯ АНИМАЦИЯ ВЫБРАННОЙ ФИШКИ (ПЛАВНОЕ ПАРЕНИЕ БЕЗ СВЕЧЕНИЯ) */
-        .tile.selected { 
-            border-color: #fff !important; 
-            z-index: 999 !important; 
-            animation: tileFloat 1.5s ease-in-out infinite !important;
-        }
-        @keyframes tileFloat { 
-            0%   { transform: translateY(0px) scale(1.02); filter: brightness(1.05); } 
-            50%  { transform: translateY(-8px) scale(1.02); filter: brightness(1.1); } 
-            100% { transform: translateY(0px) scale(1.02); filter: brightness(1.05); } 
-        }
+        .tile.selected { border-color: #fff !important; z-index: 999 !important; animation: tileFloat 1.5s ease-in-out infinite !important; }
+        @keyframes tileFloat { 0% { transform: translateY(0px) scale(1.02); filter: brightness(1.05); } 50% { transform: translateY(-8px) scale(1.02); filter: brightness(1.1); } 100% { transform: translateY(0px) scale(1.02); filter: brightness(1.05); } }
         
         .tile.matched { opacity: 0; pointer-events: none !important; transform: scale(1.6); filter: brightness(2.5); }
         .tile.hinted { animation: hintGlow 1s infinite alternate; }
@@ -123,17 +110,14 @@
 
         .flip-anim { animation: flipTileIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes flipTileIn { 0% { transform: translateY(-4vw) scale(1.1) rotateY(-90deg); } 100% { transform: translateY(0) scale(1) rotateY(0deg); } }
-
         .flip-anim-back { animation: flipTileOut 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes flipTileOut { 0% { transform: translateY(0) scale(1) rotateY(0deg); } 100% { transform: translateY(-4vw) scale(1.1) rotateY(90deg); } }
 
-        /* --- СИСТЕМА ОБУЧЕНИЯ --- */
         #tutorial-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.75); z-index: 9000; pointer-events: none; transition: opacity 0.3s; }
         #tutorial-finger { display: none; position: absolute; font-size: 60px; z-index: 9002; pointer-events: none; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8)); animation: poke 0.8s infinite alternate cubic-bezier(0.25, 0.46, 0.45, 0.94); }
         @keyframes poke { 0% { transform: translate(-20%, 20%) scale(1); } 100% { transform: translate(-20%, -10%) scale(0.9); } }
         .tutorial-highlight { z-index: 9001 !important; box-shadow: 0 0 35px #f1c40f, inset 3px 3px 6px rgba(255, 255, 255, 1), inset -4px -5px 8px rgba(0, 0, 0, 0.18) !important; filter: brightness(1.2); }
 
-        /* --- СМАРТ-ЧАСТИЦЫ И КОРЗИНА --- */
         .css-basket-wrap { position: absolute; z-index: 9998; animation: popBasket 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; pointer-events: none; transform-origin: bottom center; }
         .css-basket { width: 60px; height: 40px; position: relative; background: repeating-linear-gradient(45deg, #c08b5c, #c08b5c 6px, #a87343 6px, #a87343 12px); border-radius: 5px 5px 20px 20px; border: 3px solid #4a2c17; border-top: 6px solid #4a2c17; box-shadow: 0 10px 15px rgba(0,0,0,0.6), inset 0 -5px 10px rgba(0,0,0,0.5); }
         .css-basket::before { content: ''; position: absolute; top: -24px; left: 8px; width: 38px; height: 24px; border: 5px solid #a87343; border-bottom: none; border-radius: 20px 20px 0 0; box-shadow: inset 0 2px 2px rgba(255,255,255,0.3); }
@@ -146,7 +130,6 @@
         .floating-text.combo { color: #f1c40f; font-size: 34px; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 18px rgba(241, 196, 15, 0.9); }
         @keyframes floatUpText { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 20% { transform: translateY(-20px) scale(1.2); opacity: 1; } 100% { transform: translateY(-60px) scale(1); opacity: 0; } }
 
-        /* --- ПАНЕЛЬ БУСТЕРОВ --- */
         #boosters-bar { display: flex; gap: 8px; margin-bottom: 20px; z-index: 10; align-items: center; justify-content: center; width: 100%; padding: 0 10px; }
         .booster { position: relative; width: 55px; height: 55px; border-radius: 12px; background: linear-gradient(135deg, #34495e, #2c3e50); border: 2px solid #7f8c8d; color: white; font-size: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; transition: all 0.2s; padding: 0;}
         .booster:active:not(.locked):not(.disabled) { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
@@ -155,7 +138,6 @@
         .b-cost { font-size: 12px; font-family: 'Russo One', sans-serif; margin-top: 2px; text-shadow: 1px 1px 2px #000; }
         .b-lock { position: absolute; top: -8px; right: -8px; background: #e74c3c; font-size: 10px; padding: 2px 5px; border-radius: 10px; font-weight: bold; border: 1px solid white;}
 
-        /* --- МОДАЛЬНЫЕ ОКНА И СТАБИЛИЗИРОВАННОЕ КОЛЕСО --- */
         #wheel-modal, #rules-modal, #ad-screen, #no-moves-modal, #leaderboard-modal, #settings-modal, #shop-modal { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.95); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px;}
         #wheel-modal h2, #rules-modal h2, #ad-screen h2, #no-moves-modal h2, #leaderboard-modal h2, #settings-modal h2, #shop-modal h2 { font-family: 'Russo One', sans-serif; font-size: 32px; color: #f1c40f; margin-bottom: 20px; text-shadow: 0 5px 10px rgba(0,0,0,1); }
         
@@ -180,7 +162,7 @@
         .lb-name { flex: 1; text-align: left; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;}
         .lb-score { font-family: 'Russo One', sans-serif; color: #2ecc71; text-align: right;}
 
-        /* --- МАГАЗИН (НОВЫЙ UI) --- */
+        /* МАГАЗИН */
         #shop-content { width: 100%; max-width: 400px; height: 60vh; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 20px; }
         .shop-section-title { font-family: 'Russo One', sans-serif; font-size: 20px; color: #fff; text-align: left; border-bottom: 2px solid #d4af37; padding-bottom: 5px; margin-bottom: 10px;}
         .shop-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.6); border: 1px solid #7f8c8d; border-radius: 12px; padding: 12px; transition: all 0.2s;}
@@ -195,7 +177,7 @@
         .btn-equipped { background: transparent; color: #2ecc71; border: 2px solid #2ecc71; padding: 6px 13px; cursor: default;}
         #shop-coins-header { font-family: 'Russo One', sans-serif; font-size: 22px; color: #f1c40f; margin-bottom: 15px; text-shadow: 0 2px 4px #000; }
 
-        /* --- ЭКРАН ПОБЕДЫ --- */
+        /* ЭКРАН ПОБЕДЫ */
         #level-complete-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, rgba(60, 10, 20, 0.95) 0%, rgba(0, 0, 0, 0.98) 100%); z-index: 15000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s ease-out; overflow: hidden; }
         #level-complete-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 150vw; height: 150vw; max-width: 600px; max-height: 600px; background: radial-gradient(circle, rgba(255,215,0,0.5) 0%, rgba(255,69,0,0.2) 40%, rgba(0,0,0,0) 70%); animation: spinGlow 4s linear infinite; z-index: 0; pointer-events: none; }
         @keyframes spinGlow { 0% { transform: translate(-50%, -50%) rotate(0deg) scale(0.8); } 50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.1); } 100% { transform: translate(-50%, -50%) rotate(360deg) scale(0.8); } }
@@ -209,7 +191,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
     <div id="tutorial-overlay"></div>
     <div id="tutorial-finger">👆</div>
@@ -240,7 +222,6 @@
         <div id="shop-content">
             <div class="shop-section-title">🎨 Красивые Фоны</div>
             <div id="shop-bgs-container"></div>
-            
             <div class="shop-section-title" style="margin-top: 15px;">🎵 Звуки Природы</div>
             <div id="shop-sounds-container"></div>
         </div>
@@ -271,13 +252,13 @@
         
         <button id="btn-play" class="btn-massive">▶ ИГРАТЬ</button>
         
+        <!-- КНОПКИ В МЕНЮ -->
         <div style="display: flex; flex-direction: column; gap: 10px; z-index: 2; margin-bottom: 10px; width: 220px;">
             <button id="btn-open-shop" class="btn-menu-small" style="margin-bottom: 0; background: rgba(155, 89, 182, 0.3); color: #e0aaff; border-color: #9b59b6;">🛒 Магазин & Бонусы</button>
             <button id="btn-leaderboard" class="btn-menu-small" style="margin-bottom: 0; color: #f1c40f; border-color: #f1c40f;">🏆 Рейтинг</button>
             <button id="btn-settings" class="btn-menu-small" style="margin-bottom: 0;">⚙️ Настройки</button>
             <button id="btn-rules" class="btn-menu-small" style="margin-bottom: 0;">📖 Как играть?</button>
         </div>
-
         <div id="btn-reset">Сбросить весь прогресс</div>
     </div>
 
@@ -327,7 +308,6 @@
                     <div id="hud-score" title="Ваши Очки (Рейтинг)">🏆 0</div>
                     <div id="hud-coins" title="Ваши Монеты (Для бустеров)">💰 0</div>
                 </div>
-
                 <div id="hud-difficulty">🟢 Легко</div>
             </div>
             <div style="flex-basis: 90px;"></div>
@@ -350,17 +330,69 @@
 
     <div id="ad-screen">
         <div class="loader"></div>
-        <h2>Рекламная пауза</h2><p>Перемешиваем фишки...</p>
+        <h2>Рекламная пауза</h2><p>Подождите...</p>
     </div>
 
     <script>
+        // --- 🔒 YANDEX SDK & PLAYER API INITIALIZATION ---
         let ys = null;
-        try { YaGames.init().then(ysdk => { ys = ysdk; if (ys.features && ys.features.LoadingAPI) { ys.features.LoadingAPI.ready(); } console.log("Yandex SDK initialized"); }).catch(e => console.warn("Yandex SDK not found")); } catch(e) {}
+        window.ysPlayer = null;
+        let isFirstLoad = true;
 
+        // Отключение контекстного меню мыши
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        try { 
+            YaGames.init().then(ysdk => { 
+                ys = ysdk; 
+                
+                // Вызываем LoadingAPI.ready() как только SDK загружен (П. 1.19.2)
+                if (ys.features && ys.features.LoadingAPI) { 
+                    ys.features.LoadingAPI.ready(); 
+                }
+                
+                // Инициализация Player API (П. 1.9)
+                ys.getPlayer({ scopes: false }).then(_player => {
+                    window.ysPlayer = _player;
+                    return _player.getData();
+                }).then(data => {
+                    SafeStorage.syncFromCloud(data);
+                }).catch(err => console.log("Yandex Player API init failed", err));
+                
+                console.log("Yandex SDK initialized"); 
+            }).catch(e => console.warn("Yandex SDK not found")); 
+        } catch(e) {}
+
+        // --- ГИБРИДНОЕ ХРАНИЛИЩЕ ПРОГРЕССА ---
         const SafeStorage = {
-            get: function(key) { try { return localStorage.getItem(key); } catch(e) { return null; } },
-            set: function(key, value) { try { localStorage.setItem(key, value); } catch(e) { console.warn("Storage blocked"); } },
-            remove: function(key) { try { localStorage.removeItem(key); } catch(e) {} }
+            data: {},
+            get: function(key) { 
+                return this.data[key] !== undefined ? this.data[key] : (localStorage.getItem(key) || null); 
+            },
+            set: function(key, value) { 
+                this.data[key] = String(value);
+                try { localStorage.setItem(key, value); } catch(e) {}
+                if (window.ysPlayer) window.ysPlayer.setData(this.data).catch(() => {});
+            },
+            remove: function(key) { 
+                delete this.data[key];
+                try { localStorage.removeItem(key); } catch(e) {}
+                if (window.ysPlayer) window.ysPlayer.setData(this.data).catch(() => {});
+            },
+            syncFromCloud: function(cloudData) {
+                if(cloudData) this.data = Object.assign(this.data, cloudData);
+                
+                // Обновляем переменные после подгрузки облака
+                let sLvl = this.get('mahjong_level'); if (sLvl && !isNaN(parseInt(sLvl))) currentLevel = parseInt(sLvl);
+                let sSco = this.get('mahjong_score'); if (sSco && !isNaN(parseInt(sSco))) totalScore = parseInt(sSco);
+                let sCoi = this.get('mahjong_coins'); if (sCoi && !isNaN(parseInt(sCoi))) totalCoins = parseInt(sCoi);
+                let sBst = this.get('mahjong_free_boosters'); if (sBst) freeBoosters = JSON.parse(sBst);
+                let sInv = this.get('mahjong_inventory'); if (sInv) userInventory = JSON.parse(sInv);
+                let sBg = this.get('mahjong_eq_bg'); if (sBg) eqBg = sBg;
+                let sSnd = this.get('mahjong_eq_snd'); if (sSnd) eqSnd = sSnd;
+                
+                updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI(); applyEquippedBg(); AudioSys.restartAmbient();
+            }
         };
 
         // --- ДАННЫЕ МАГАЗИНА ---
@@ -540,7 +572,11 @@
             document.getElementById('btn-settings-music').innerText = AudioSys.musicEnabled ? '🍃 Фон: ВКЛ' : '🔇 Фон: ВЫКЛ';
         });
 
-        document.addEventListener("visibilitychange", () => { if (document.hidden) { if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend(); } else { if (AudioSys.ctx && AudioSys.ctx.state === 'suspended' && (AudioSys.enabled || AudioSys.musicEnabled)) AudioSys.ctx.resume(); } });
+        // --- УЛУЧШЕННАЯ ОБРАБОТКА ФОКУСА (П. 1.3) ---
+        document.addEventListener("visibilitychange", () => { 
+            if (document.hidden) { if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend(); } 
+            else { if (AudioSys.ctx && AudioSys.ctx.state === 'suspended' && (AudioSys.enabled || AudioSys.musicEnabled)) AudioSys.ctx.resume(); } 
+        });
         window.addEventListener("blur", () => { if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend(); });
         window.addEventListener("focus", () => { if (AudioSys.ctx && AudioSys.ctx.state === 'suspended' && (AudioSys.enabled || AudioSys.musicEnabled)) AudioSys.ctx.resume(); });
 
@@ -552,7 +588,7 @@
 
         let currentLevel = 1, totalScore = 0, totalCoins = 0, comboCount = 0, lastMatchTime = 0, totalTilesForLevel = 0;
         let activeTiles = [], firstTile = null; let matchHistory = []; let tutorialMode = false, tutorialPair = [];
-        let isGameLocked = false; window.isLevelCompleting = false; let isFirstLoad = true; const COMBO_TIME_LIMIT = 4000; 
+        let isGameLocked = false; window.isLevelCompleting = false; const COMBO_TIME_LIMIT = 4000; 
 
         let savedLvl = SafeStorage.get('mahjong_level'); if (savedLvl && !isNaN(parseInt(savedLvl))) currentLevel = parseInt(savedLvl); else currentLevel = 1;
         let savedScore = SafeStorage.get('mahjong_score'); if (savedScore && !isNaN(parseInt(savedScore))) totalScore = parseInt(savedScore); else totalScore = 0;
@@ -942,8 +978,6 @@
             updateFreeState(); updateProgressBar();
 
             if (currentLevel === 1 && !SafeStorage.get('mahjong_tutorial_done')) { setTimeout(startTutorial, 600); }
-
-            if (isFirstLoad && ys && ys.features && ys.features.LoadingAPI) { ys.features.LoadingAPI.ready(); isFirstLoad = false; }
         }
 
         function updateFreeState() {
@@ -1215,9 +1249,8 @@
 
         function watchAdToShuffle() { 
             if (activeTiles.length === 0 || tutorialMode || window.isLevelCompleting) return;
-            const ad = document.getElementById('ad-screen'); if(ad) ad.style.display = 'flex'; 
-            setTimeout(() => { 
-                if(ad) ad.style.display = 'none'; 
+            
+            let triggerShuffle = () => {
                 try {
                     AudioSys.playShuffle(); 
                     let currentSymbols = activeTiles.map(t => t.symbol); let pairsPool = [];
@@ -1248,7 +1281,28 @@
                     let msg = document.getElementById('message'); if(msg) { msg.innerText = 'Фишки перемешаны! ✨'; msg.style.color = '#f1c40f'; }
                     let btn = document.getElementById('btn-shuffle'); if(btn) btn.classList.remove('btn-pulse');
                 } catch(e) { console.error("Ошибка микса:", e); }
-            }, 1000); 
+            };
+
+            // ИНТЕГРАЦИЯ YANDEX ADS ДЛЯ БУСТЕРА (П. 4.7)
+            if (ys && ys.adv) {
+                if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend();
+                ys.adv.showRewardedVideo({
+                    callbacks: {
+                        onOpen: () => { if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend(); },
+                        onRewarded: () => { triggerShuffle(); },
+                        onClose: () => { if (AudioSys.enabled || AudioSys.musicEnabled) AudioSys.ctx.resume(); },
+                        onError: () => { triggerShuffle(); if (AudioSys.enabled || AudioSys.musicEnabled) AudioSys.ctx.resume(); }
+                    }
+                });
+            } else {
+                const ad = document.getElementById('ad-screen'); if(ad) ad.style.display = 'flex'; 
+                if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend();
+                setTimeout(() => { 
+                    if(ad) ad.style.display = 'none'; 
+                    if (AudioSys.enabled || AudioSys.musicEnabled) AudioSys.ctx.resume();
+                    triggerShuffle();
+                }, 1000); 
+            }
         }
 
         function updateBoostersUI() {
