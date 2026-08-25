@@ -124,6 +124,7 @@
         #hud-level { font-family: 'Russo One', sans-serif; font-size: 18px; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.8); white-space: nowrap; line-height: 1.1;}
         #hud-chapter-text { font-size: 10px; color: #a2d9ce; font-weight: bold; text-transform: uppercase; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); margin-bottom: 2px;}
 
+        /* СТАТИСТИКА (Очки + Монеты) */
         .stats-container { display: flex; gap: 15px; margin-top: 4px; align-items: center;}
         #hud-score { font-family: 'Russo One', sans-serif; font-size: 15px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); transition: color 0.3s; }
         #hud-coins { font-family: 'Russo One', sans-serif; font-size: 15px; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.8); transition: color 0.3s; }
@@ -209,7 +210,7 @@
         .booster:active:not(.locked):not(.disabled) { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
         .booster.locked { filter: grayscale(1) brightness(0.5); cursor: not-allowed; }
         .booster.disabled { opacity: 0.5; cursor: not-allowed; }
-        .b-cost { font-size: 11px; font-family: 'Russo One', sans-serif; color: #f1c40f; margin-top: 2px; text-shadow: 1px 1px 2px #000; }
+        .b-cost { font-size: 12px; font-family: 'Russo One', sans-serif; margin-top: 2px; text-shadow: 1px 1px 2px #000; }
         .b-lock { position: absolute; top: -8px; right: -8px; background: #e74c3c; font-size: 10px; padding: 2px 5px; border-radius: 10px; font-weight: bold; border: 1px solid white;}
 
         /* --- МОДАЛЬНЫЕ ОКНА И СТАБИЛИЗИРОВАННОЕ КОЛЕСО --- */
@@ -219,9 +220,8 @@
         .wheel-container { position: relative; width: 300px; height: 300px; border-radius: 50%; border: 6px solid #d4af37; box-shadow: 0 0 30px rgba(241, 196, 15, 0.5), inset 0 0 20px rgba(0,0,0,0.8); background: #222; }
         .wheel-spinner { width: 100%; height: 100%; border-radius: 50%; transition: transform 4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden; }
         
-        /* ИДЕАЛЬНОЕ ПОЗИЦИОНИРОВАНИЕ ТЕКСТА НА КОЛЕСЕ */
         .wheel-text-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: flex-start; transform-origin: center center; pointer-events: none; }
-        .wheel-text { margin-top: 25px; font-family: 'Russo One', sans-serif; font-size: 17px; color: white; text-shadow: 0 2px 4px rgba(0,0,0,1); white-space: nowrap; z-index: 2;}
+        .wheel-text { margin-top: 25px; font-family: 'Russo One', sans-serif; font-size: 15px; color: white; text-shadow: 0 2px 4px rgba(0,0,0,1); white-space: nowrap; z-index: 2;}
         
         .wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid #fff; z-index: 10; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.8)); }
         .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background: radial-gradient(circle, #fff, #d4af37); border-radius: 50%; z-index: 5; box-shadow: 0 0 10px black;}
@@ -374,7 +374,7 @@
                 
                 <div class="stats-container">
                     <div id="hud-score" title="Ваши Очки (Рейтинг)">🏆 0</div>
-                    <div id="hud-coins" title="Ваши Монеты (Для бустеров)">🪙 0</div>
+                    <div id="hud-coins" title="Ваши Монеты (Для бустеров)">💰 0</div>
                 </div>
 
                 <div id="hud-difficulty">🟢 Легко</div>
@@ -518,6 +518,8 @@
         let savedScore = SafeStorage.get('mahjong_score'); if (savedScore && !isNaN(parseInt(savedScore))) totalScore = parseInt(savedScore); else totalScore = 0;
         let savedCoins = SafeStorage.get('mahjong_coins'); if (savedCoins && !isNaN(parseInt(savedCoins))) totalCoins = parseInt(savedCoins); else totalCoins = 0;
         
+        let freeBoosters = JSON.parse(SafeStorage.get('mahjong_free_boosters') || '{"hint":0, "undo":0, "bomb":0, "light":0}');
+
         const botNames = ["Игрок777", "MahjongMaster", "Сенсей", "Дракон", "Тигр", "Катя99", "AlexPro", "Panda", "Ninja", "Lucky", "Shadow", "Samurai", "Fox", "Zen", "GamerX", "КиберКот", "Чемпион", "Маг", "Winner", "Alpha"];
         let mockLeaderboard = SafeStorage.get('mahjong_leaderboard');
         if (!mockLeaderboard) {
@@ -651,56 +653,89 @@
             else return { text: "🔴 ЭКСПЕРТ", color: "#e74c3c", maxLayers: 5, density: 0.95 };
         }
 
+        // --- БРОНИРОВАННЫЙ ГЕНЕРАТОР (Исключает тупики с 1 фишкой на старте) ---
         function getLayoutCoords(level) {
             let diff = getDifficultyParams(level);
             let seed = level * 13371337;
             function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
 
-            let layout = []; let grid = {}; let shapeIndex = (level - 1) % 30;
+            let shapeIndex = (level - 1) % 30;
+            let layout = [];
 
-            for (let z = 0; z < diff.maxLayers; z++) {
-                let offset = (z % 2 === 0) ? 0 : 1;
-                let shrink = Math.floor(z / 2) * 2 + offset;
-                let currentLayerTiles = [];
+            for (let attempt = 0; attempt < 500; attempt++) {
+                layout = [];
+                let grid = {};
 
-                for (let y = shrink; y <= 8 - shrink; y += 2) {
-                    for (let x = shrink; x <= 8 - shrink; x += 2) {
-                        let isSupported = (z === 0) || grid[`${x-1},${y-1},${z-1}`] || grid[`${x+1},${y-1},${z-1}`] || grid[`${x-1},${y+1},${z-1}`] || grid[`${x+1},${y+1},${z-1}`] || grid[`${x},${y},${z-1}`];
-                        if (!isSupported) continue;
+                for (let z = 0; z < diff.maxLayers; z++) {
+                    let offset = (z % 2 === 0) ? 0 : 1;
+                    let shrink = Math.floor(z / 2) * 2 + offset;
+                    let currentLayerTiles = [];
 
-                        let cx = x - 4, cy = y - 4; let isMasked = true;
+                    for (let y = shrink; y <= 8 - shrink; y += 2) {
+                        for (let x = shrink; x <= 8 - shrink; x += 2) {
+                            let isSupported = (z === 0) || grid[`${x-1},${y-1},${z-1}`] || grid[`${x+1},${y-1},${z-1}`] || grid[`${x-1},${y+1},${z-1}`] || grid[`${x+1},${y+1},${z-1}`] || grid[`${x},${y},${z-1}`];
+                            if (!isSupported) continue;
 
-                        switch (shapeIndex) {
-                            case 0: break; case 1: if (Math.abs(cx)<=2 && Math.abs(cy)<=2 && z<2) isMasked = false; break; 
-                            case 2: if (Math.abs(cx)>2 && Math.abs(cy)>2) isMasked = false; break; case 3: if (Math.abs(cx)<=1 || Math.abs(cy)<=1) isMasked = false; break; 
-                            case 4: if (Math.abs(cx)+Math.abs(cy)>5) isMasked = false; break; case 5: if (Math.abs(cy)<=1) isMasked = false; break; 
-                            case 6: if (Math.abs(cx)<=1) isMasked = false; break; case 7: if (Math.abs(cx)===Math.abs(cy) && z===0) isMasked = false; break; 
-                            case 8: if ((x+y)%4===0 && z===0) isMasked = false; break; case 9: if (Math.abs(cx)>2) isMasked = false; break; 
-                            case 10: if (Math.abs(cy)>2) isMasked = false; break; case 11: if (Math.abs(cx)===4 && Math.abs(cy)===4) isMasked = false; break; 
-                            case 12: if ((Math.abs(cx)===0 || Math.abs(cy)===0) && z<2) isMasked = false; break; case 13: if (Math.abs(cy)===2) isMasked = false; break; 
-                            case 14: if (Math.abs(cx)===2) isMasked = false; break; case 15: if (Math.abs(cx)>2 && Math.abs(cy)<3) isMasked = false; break; 
-                            case 16: if (Math.abs(cy)>2 && Math.abs(cx)<3) isMasked = false; break; case 17: if (Math.abs(cx)!==Math.abs(cy)) isMasked = false; break; 
-                            case 18: if (z>0 && Math.abs(cx)+Math.abs(cy)<3) isMasked = false; break; case 19: if (z===0 && Math.abs(cx)===2 && Math.abs(cy)===2) isMasked = false; break;
-                            case 20: if (x===y) isMasked = false; break; case 21: if (z>1 && Math.abs(cx)<2) isMasked = false; break;
-                            case 22: if (Math.abs(cx)+Math.abs(cy)===4) isMasked = false; break; case 23: if (z===0 && (cx===0 || cy===0)) isMasked = false; break;
-                            case 24: if (z>0 && x%4===0) isMasked = false; break; case 25: if (z>0 && y%4===0) isMasked = false; break;
-                            case 26: if (Math.abs(cx)>0 && Math.abs(cy)>0 && z===1) isMasked = false; break; case 27: if (z===0 && x===4) isMasked = false; break;
-                            case 28: if (z===0 && y===4) isMasked = false; break; case 29: if (Math.abs(cx)===4 || Math.abs(cy)===4) isMasked = false; break;
+                            let cx = x - 4, cy = y - 4; let isMasked = true;
+
+                            switch (shapeIndex) {
+                                case 0: break; case 1: if (Math.abs(cx)<=2 && Math.abs(cy)<=2 && z<2) isMasked = false; break; 
+                                case 2: if (Math.abs(cx)>2 && Math.abs(cy)>2) isMasked = false; break; case 3: if (Math.abs(cx)<=1 || Math.abs(cy)<=1) isMasked = false; break; 
+                                case 4: if (Math.abs(cx)+Math.abs(cy)>5) isMasked = false; break; case 5: if (Math.abs(cy)<=1) isMasked = false; break; 
+                                case 6: if (Math.abs(cx)<=1) isMasked = false; break; case 7: if (Math.abs(cx)===Math.abs(cy) && z===0) isMasked = false; break; 
+                                case 8: if ((x+y)%4===0 && z===0) isMasked = false; break; case 9: if (Math.abs(cx)>2) isMasked = false; break; 
+                                case 10: if (Math.abs(cy)>2) isMasked = false; break; case 11: if (Math.abs(cx)===4 && Math.abs(cy)===4) isMasked = false; break; 
+                                case 12: if ((Math.abs(cx)===0 || Math.abs(cy)===0) && z<2) isMasked = false; break; case 13: if (Math.abs(cy)===2) isMasked = false; break; 
+                                case 14: if (Math.abs(cx)===2) isMasked = false; break; case 15: if (Math.abs(cx)>2 && Math.abs(cy)<3) isMasked = false; break; 
+                                case 16: if (Math.abs(cy)>2 && Math.abs(cx)<3) isMasked = false; break; case 17: if (Math.abs(cx)!==Math.abs(cy)) isMasked = false; break; 
+                                case 18: if (z>0 && Math.abs(cx)+Math.abs(cy)<3) isMasked = false; break; case 19: if (z===0 && Math.abs(cx)===2 && Math.abs(cy)===2) isMasked = false; break;
+                                case 20: if (x===y) isMasked = false; break; case 21: if (z>1 && Math.abs(cx)<2) isMasked = false; break;
+                                case 22: if (Math.abs(cx)+Math.abs(cy)===4) isMasked = false; break; case 23: if (z===0 && (cx===0 || cy===0)) isMasked = false; break;
+                                case 24: if (z>0 && x%4===0) isMasked = false; break; case 25: if (z>0 && y%4===0) isMasked = false; break;
+                                case 26: if (Math.abs(cx)>0 && Math.abs(cy)>0 && z===1) isMasked = false; break; case 27: if (z===0 && x===4) isMasked = false; break;
+                                case 28: if (z===0 && y===4) isMasked = false; break; case 29: if (Math.abs(cx)===4 || Math.abs(cy)===4) isMasked = false; break;
+                            }
+
+                            if (isMasked && rnd() < diff.density) { currentLayerTiles.push({x, y, z}); }
                         }
-
-                        if (isMasked && rnd() < diff.density) { currentLayerTiles.push({x, y, z}); }
                     }
+
+                    currentLayerTiles.forEach(t => {
+                        let mx = 8 - t.x;
+                        if (!grid[`${t.x},${t.y},${t.z}`]) { layout.push({...t}); grid[`${t.x},${t.y},${t.z}`] = true; }
+                        if (!grid[`${mx},${t.y},${t.z}`]) { layout.push({x: mx, y: t.y, z: t.z}); grid[`${mx},${t.y},${t.z}`] = true; }
+                    });
                 }
 
-                currentLayerTiles.forEach(t => {
-                    let mx = 8 - t.x;
-                    if (!grid[`${t.x},${t.y},${t.z}`]) { layout.push({...t}); grid[`${t.x},${t.y},${t.z}`] = true; }
-                    if (!grid[`${mx},${t.y},${t.z}`]) { layout.push({x: mx, y: t.y, z: t.z}); grid[`${mx},${t.y},${t.z}`] = true; }
+                if (layout.length % 2 !== 0) { let idx = layout.findIndex(t => t.x === 4); if (idx !== -1) layout.splice(idx, 1); else layout.pop(); }
+
+                if (layout.length < 8) continue;
+
+                // --- ПРОВЕРКА НА ТУПИКИ (МИНИМУМ 2 ФИШКИ НА СТАРТЕ) ---
+                let initialFreeCount = 0;
+                layout.forEach(tile => {
+                    let blockedTop = false, blockedLeft = false, blockedRight = false;
+                    for (let other of layout) {
+                        if (other === tile) continue;
+                        let overlapX = Math.abs(tile.x - other.x) < 2, overlapY = Math.abs(tile.y - other.y) < 2;
+                        if (other.z > tile.z && overlapX && overlapY) blockedTop = true;
+                        if (other.z === tile.z && overlapY) {
+                            if (other.x === tile.x - 2) blockedLeft = true;
+                            if (other.x === tile.x + 2) blockedRight = true;
+                        }
+                    }
+                    if (!blockedTop && (!blockedLeft || !blockedRight)) initialFreeCount++;
                 });
+
+                // Строгий фильтр: Уровень должен начинаться минимум с 2 свободных фишек!
+                if (initialFreeCount >= 2) {
+                    return layout;
+                }
             }
 
-            if (layout.length % 2 !== 0) { let idx = layout.findIndex(t => t.x === 4); if (idx !== -1) layout.splice(idx, 1); else layout.pop(); }
-            if (layout.length < 8) { layout = []; grid = {}; for(let i=0; i<12; i++) { let lx = (i%4)*2; let ly = Math.floor(i/4)*2; layout.push({x: lx, y: ly, z: 0}); } }
+            // Заглушка, если алгоритм 500 раз собрал плохую форму
+            layout = [];
+            for(let i=0; i<12; i++) { let lx = (i%4)*2; let ly = Math.floor(i/4)*2; layout.push({x: lx, y: ly, z: 0}); }
             return layout;
         }
 
@@ -735,8 +770,9 @@
         
         document.getElementById('btn-reset').addEventListener('click', () => {
             if (confirm('Начать с 1 уровня? Весь прогресс будет удален.')) { 
-                currentLevel = 1; totalScore = 0; totalCoins = 0; 
-                SafeStorage.set('mahjong_level', 1); SafeStorage.set('mahjong_score', 0); SafeStorage.set('mahjong_coins', 0); SafeStorage.remove('mahjong_tutorial_done'); 
+                currentLevel = 1; totalScore = 0; totalCoins = 0; freeBoosters = {hint:0, undo:0, bomb:0, light:0};
+                SafeStorage.set('mahjong_level', 1); SafeStorage.set('mahjong_score', 0); SafeStorage.set('mahjong_coins', 0);
+                SafeStorage.remove('mahjong_free_boosters'); SafeStorage.remove('mahjong_tutorial_done'); 
                 updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI(); 
             }
         });
@@ -752,7 +788,7 @@
             let elScore = document.getElementById('hud-score'); 
             let elCoins = document.getElementById('hud-coins');
             if(elScore) elScore.innerText = '🏆 ' + totalScore; 
-            if(elCoins) elCoins.innerText = '🪙 ' + totalCoins; 
+            if(elCoins) elCoins.innerText = '💰 ' + totalCoins; 
             updateBoostersUI(); 
         }
         
@@ -822,7 +858,14 @@
             let pairsPool = [];
             for(let i=0; i<finalLayout.length/2; i++) { pairsPool.push(baseSymbols[Math.floor(Math.random() * baseSymbols.length)]); }
 
-            let prepared = assignSymbolsSmart(finalLayout, pairsPool, Math.random); 
+            // Двойная защита от тупиков - 100 попыток раздать фишки умно!
+            let prepared = null;
+            let attemptMix = 0;
+            while (!prepared && attemptMix < 100) {
+                attemptMix++;
+                prepared = assignSymbolsSmart(finalLayout, pairsPool, Math.random);
+            }
+
             if (prepared) { finalLayout = prepared; } else { finalLayout = forceSolvableAssignment(finalLayout, pairsPool); }
 
             let cyclePos = (currentLevel - 1) % 10;
@@ -1164,19 +1207,41 @@
             }, 1000); 
         }
 
+        // БУСТЕРЫ
         function updateBoostersUI() {
             document.querySelectorAll('.booster').forEach(btn => {
                 if (btn.id === 'btn-shuffle') return; 
-                let unlockLvl = parseInt(btn.getAttribute('data-unlock')); let cost = parseInt(btn.getAttribute('data-cost')); let lockTag = btn.querySelector('.b-lock');
+                let unlockLvl = parseInt(btn.getAttribute('data-unlock')); 
+                let cost = parseInt(btn.getAttribute('data-cost')); 
+                let lockTag = btn.querySelector('.b-lock');
+                let costTag = btn.querySelector('.b-cost');
+                let bId = btn.id.replace('bst-', ''); 
+
                 if (currentLevel < unlockLvl) {
-                    btn.classList.add('locked'); btn.classList.remove('disabled'); if(lockTag) lockTag.style.display = 'block';
+                    btn.classList.add('locked'); btn.classList.remove('disabled'); 
+                    if(lockTag) lockTag.style.display = 'block';
+                    if(costTag) { costTag.innerText = cost; costTag.style.color = '#f1c40f'; }
                 } else {
-                    btn.classList.remove('locked'); if(lockTag) lockTag.style.display = 'none';
-                    if (totalCoins < cost || activeTiles.length === 0) { btn.classList.add('disabled'); } 
-                    else {
+                    btn.classList.remove('locked'); 
+                    if(lockTag) lockTag.style.display = 'none';
+
+                    let count = freeBoosters[bId] || 0;
+                    let hasFree = count > 0;
+
+                    if (hasFree && costTag) {
+                        costTag.innerText = `${count} шт.`;
+                        costTag.style.color = '#2ecc71'; 
+                    } else if (costTag) {
+                        costTag.innerText = cost;
+                        costTag.style.color = '#f1c40f'; 
+                    }
+
+                    if (!hasFree && totalCoins < cost || activeTiles.length === 0) { 
+                        btn.classList.add('disabled'); 
+                    } else {
                         btn.classList.remove('disabled');
-                        if (btn.id === 'bst-undo' && matchHistory.length === 0) btn.classList.add('disabled');
-                        if (btn.id === 'bst-hint' && getAvailablePairs().length === 0) btn.classList.add('disabled');
+                        if (bId === 'undo' && matchHistory.length === 0) btn.classList.add('disabled');
+                        if (bId === 'hint' && getAvailablePairs().length === 0) btn.classList.add('disabled');
                     }
                 }
             });
@@ -1185,11 +1250,27 @@
         function buyBooster(btnId, cost, action) {
             if (tutorialMode || window.isLevelCompleting || (isGameLocked && btnId !== 'bst-undo' && btnId !== 'bst-bomb' && btnId !== 'bst-light')) return;
             let btn = document.getElementById(btnId);
+            
             if (btn.classList.contains('locked') || btn.classList.contains('disabled')) { 
                 AudioSys.playError(); 
-                let coinsEl = document.getElementById('hud-coins'); coinsEl.style.color = '#e74c3c'; setTimeout(() => coinsEl.style.color = '#f1c40f', 300); return; 
+                let coinsEl = document.getElementById('hud-coins'); coinsEl.style.color = '#e74c3c'; setTimeout(() => coinsEl.style.color = '#f1c40f', 300); 
+                return; 
             }
-            totalCoins -= cost; SafeStorage.set('mahjong_coins', totalCoins); updateScoreDisplay(); AudioSys.playBooster(); action();
+
+            let bId = btnId.replace('bst-', '');
+            let count = freeBoosters[bId] || 0;
+
+            if (count > 0) {
+                freeBoosters[bId]--;
+                SafeStorage.set('mahjong_free_boosters', JSON.stringify(freeBoosters));
+            } else {
+                totalCoins -= cost; 
+                SafeStorage.set('mahjong_coins', totalCoins); 
+            }
+
+            updateScoreDisplay(); 
+            AudioSys.playBooster(); 
+            action();
         }
 
         function getAvailablePairs() {
@@ -1253,26 +1334,25 @@
 
         const wheelModal = document.getElementById('wheel-modal'); const wheelSpinner = document.getElementById('wheel-spinner'); const btnOpenWheel = document.getElementById('btn-open-wheel'); const btnSpin = document.getElementById('btn-spin'); const btnCloseWheel = document.getElementById('btn-close-wheel');
         
-        const wheelPrizes = [ { text: "1000 🪙", val: 1000, color: "#e74c3c" }, { text: "5000 🪙", val: 5000, color: "#f1c40f" }, { text: "500 🪙", val: 500, color: "#3498db" }, { text: "2000 🪙", val: 2000, color: "#2ecc71" }, { text: "ДЖЕКПОТ", val: 15000, color: "#9b59b6" }, { text: "750 🪙", val: 750, color: "#e67e22" } ];
+        // --- 7 СЕКТОРОВ: ДЕНЬГИ И БУСТЕРЫ ---
+        const wheelPrizes = [ 
+            { type: 'coins', text: "500 💰", val: 500, color: "#3498db" }, 
+            { type: 'booster', id: 'hint', text: "🔍 Поиск", color: "#9b59b6" }, 
+            { type: 'coins', text: "1500 💰", val: 1500, color: "#e67e22" }, 
+            { type: 'booster', id: 'undo', text: "↩️ Возврат", color: "#e74c3c" }, 
+            { type: 'coins', text: "3000 💰", val: 3000, color: "#f1c40f" }, 
+            { type: 'booster', id: 'bomb', text: "💣 Бомбочка", color: "#2ecc71" },
+            { type: 'booster', id: 'light', text: "⚡ Молния", color: "#1abc9c" } 
+        ];
+        
         let conicGradient = []; let sliceAngle = 360 / wheelPrizes.length;
         
-        // --- ⚙️ НОВАЯ СТАБИЛИЗАЦИЯ ТЕКСТА КОЛЕСА ---
         wheelPrizes.forEach((prize, i) => {
             let start = i * sliceAngle; let end = (i + 1) * sliceAngle; conicGradient.push(`${prize.color} ${start}deg ${end}deg`);
-            
-            // Создаем невидимый капсульный контейнер (300х300)
-            let container = document.createElement('div'); 
-            container.className = 'wheel-text-container';
-            // Вращаем сам контейнер на центр сектора
+            let container = document.createElement('div'); container.className = 'wheel-text-container';
             container.style.transform = `rotate(${start + sliceAngle/2}deg)`;
-            
-            // Текст внутри выравнивается flexbox'ом сверху (align-items: flex-start)
-            let textEl = document.createElement('div'); 
-            textEl.className = 'wheel-text'; 
-            textEl.innerText = prize.text; 
-            
-            container.appendChild(textEl); 
-            wheelSpinner.appendChild(container);
+            let textEl = document.createElement('div'); textEl.className = 'wheel-text'; textEl.innerText = prize.text; 
+            container.appendChild(textEl); wheelSpinner.appendChild(container);
         });
         wheelSpinner.style.background = `conic-gradient(${conicGradient.join(', ')})`;
 
@@ -1295,13 +1375,24 @@
             let prizeIndex = Math.floor(Math.random() * wheelPrizes.length); let targetSliceAngle = (prizeIndex * sliceAngle) + (sliceAngle / 2); let rotateAngle = 360 * 5 + (360 - targetSliceAngle); 
             wheelSpinner.style.transform = `rotate(${rotateAngle}deg)`;
             let ticks = 0; let tickInterval = setInterval(() => { AudioSys.playWheelTick(); ticks++; if(ticks > 25) clearInterval(tickInterval); }, 150);
+            
             setTimeout(() => {
                 AudioSys.playWin(); 
                 let wonPrize = wheelPrizes[prizeIndex]; 
-                totalCoins += wonPrize.val; 
-                SafeStorage.set('mahjong_coins', totalCoins); 
+                
+                if (wonPrize.type === 'coins') {
+                    totalCoins += wonPrize.val; 
+                    SafeStorage.set('mahjong_coins', totalCoins); 
+                    alert(`ПОЗДРАВЛЯЕМ! Вы выиграли ${wonPrize.text}`);
+                } else if (wonPrize.type === 'booster') {
+                    freeBoosters[wonPrize.id] = (freeBoosters[wonPrize.id] || 0) + 1;
+                    SafeStorage.set('mahjong_free_boosters', JSON.stringify(freeBoosters));
+                    alert(`ПОЗДРАВЛЯЕМ! Вы выиграли бесплатный бустер:\n${wonPrize.text}`);
+                }
+
                 SafeStorage.set('mahjong_last_spin', Date.now().toString());
-                updateScoreDisplay(); alert(`ПОЗДРАВЛЯЕМ! Вы выиграли ${wonPrize.text}`);
+                updateScoreDisplay(); 
+                
                 isSpinning = false; wheelSpinner.style.transition = 'none'; wheelSpinner.style.transform = `rotate(${360 - targetSliceAngle}deg)`; setTimeout(() => wheelSpinner.style.transition = 'transform 4s cubic-bezier(0.175, 0.885, 0.32, 1.275)', 50); checkWheelTimer();
             }, 4000);
         });
