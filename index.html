@@ -386,7 +386,7 @@
     </div>
 
     <script>
-        // Инициализация Yandex Games SDK (Скрываем загрузочный экран Яндекса)
+        // Инициализация Yandex Games SDK
         let ys = null;
         try { 
             YaGames.init().then(ysdk => { 
@@ -401,9 +401,66 @@
             remove: function(key) { try { localStorage.removeItem(key); } catch(e) {} }
         };
 
+        // --- АСМР АУДИОСИСТЕМА С ЭМБИЕНТОМ ЛИСТВЫ И ФАНФАРОЙ ---
         const AudioSys = {
-            ctx: null, enabled: true,
-            init: function() { try { let AContext = window.AudioContext || window.webkitAudioContext; if (AContext && !this.ctx) this.ctx = new AContext(); if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); } catch(e) { this.enabled = false; } },
+            ctx: null, enabled: true, ambientPlaying: false,
+            noiseSrc: null, noiseGain: null, windLFO: null, lfoGain: null,
+            
+            init: function() { 
+                try { 
+                    let AContext = window.AudioContext || window.webkitAudioContext; 
+                    if (AContext && !this.ctx) this.ctx = new AContext(); 
+                    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); 
+                    if (this.enabled && !this.ambientPlaying) this.startAmbient();
+                } catch(e) { this.enabled = false; } 
+            },
+            
+            startAmbient: function() {
+                if (!this.enabled || !this.ctx || this.ambientPlaying) return;
+                try {
+                    let bufferSize = this.ctx.sampleRate * 2;
+                    let noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                    let output = noiseBuffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) { output[i] = Math.random() * 2 - 1; }
+                    
+                    this.noiseSrc = this.ctx.createBufferSource();
+                    this.noiseSrc.buffer = noiseBuffer;
+                    this.noiseSrc.loop = true;
+
+                    this.noiseFilter = this.ctx.createBiquadFilter();
+                    this.noiseFilter.type = 'bandpass';
+                    this.noiseFilter.frequency.value = 600;
+                    this.noiseFilter.Q.value = 0.5;
+
+                    this.noiseGain = this.ctx.createGain();
+                    this.noiseGain.gain.value = 0.05; // Тихий базовый фон
+
+                    this.windLFO = this.ctx.createOscillator();
+                    this.windLFO.type = 'sine';
+                    this.windLFO.frequency.value = 0.15; // Медленный ветер
+
+                    this.lfoGain = this.ctx.createGain();
+                    this.lfoGain.gain.value = 0.04;
+
+                    this.windLFO.connect(this.lfoGain);
+                    this.lfoGain.connect(this.noiseGain.gain);
+
+                    this.noiseSrc.connect(this.noiseFilter);
+                    this.noiseFilter.connect(this.noiseGain);
+                    this.noiseGain.connect(this.ctx.destination);
+
+                    this.noiseSrc.start();
+                    this.windLFO.start();
+                    this.ambientPlaying = true;
+                } catch(e) {}
+            },
+            
+            stopAmbient: function() {
+                if (this.noiseSrc) { try { this.noiseSrc.stop(); } catch(e){} this.noiseSrc = null; }
+                if (this.windLFO) { try { this.windLFO.stop(); } catch(e){} this.windLFO = null; }
+                this.ambientPlaying = false;
+            },
+
             playOsc: function(type, freq, dropFreq, duration, vol) {
                 try {
                     if (!this.enabled || !this.ctx || this.ctx.state !== 'running') return;
@@ -414,17 +471,49 @@
                     osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + duration);
                 } catch(e) {}
             },
+            
             playClick: function(isSelected) { let startFreq = isSelected ? 300 : 200; let endFreq = isSelected ? 80 : 60; this.playOsc('sine', startFreq, endFreq, 0.05, 0.4); },
             playUnlock: function() { this.playOsc('square', 600, 200, 0.1, 0.1); setTimeout(() => this.playOsc('square', 800, 300, 0.1, 0.1), 50); },
             playMatch: function() {
                 try { if (!this.enabled || !this.ctx || this.ctx.state !== 'running') return; let playTock = (delay, freq) => { setTimeout(() => { if (!this.ctx || this.ctx.state !== 'running') return; let osc = this.ctx.createOscillator(); let gain = this.ctx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(freq, this.ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(freq * 0.2, this.ctx.currentTime + 0.04); gain.gain.setValueAtTime(0.7, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.04); osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.05); }, delay); }; playTock(0, 250); playTock(35, 300); } catch(e) {}
             },
-            playWin: function() { let freqs = [392, 493.88, 587.33, 783.99]; freqs.forEach((f, i) => { setTimeout(() => { this.playOsc('sine', f, f * 0.95, 1.0, 0.3); this.playOsc('triangle', f * 2, f * 1.9, 0.8, 0.1); }, i * 100); }); },
+            
+            // НОВАЯ ФАНФАРА "Та-да-дам, та-дам"
+            playWin: function() { 
+                try {
+                    if (!this.enabled || !this.ctx || this.ctx.state !== 'running') return;
+                    let notes = [
+                        {f: 523.25, d: 0.15, delay: 0},     // Та
+                        {f: 523.25, d: 0.15, delay: 200},   // да
+                        {f: 523.25, d: 0.30, delay: 400},   // дам
+                        {f: 392.00, d: 0.20, delay: 750},   // та
+                        {f: 523.25, d: 0.80, delay: 1000}   // дам!
+                    ];
+                    notes.forEach(n => {
+                        setTimeout(() => {
+                            this.playOsc('square', n.f, null, n.d, 0.15); // Медь
+                            this.playOsc('sine', n.f, null, n.d, 0.3);    // Основа
+                        }, n.delay);
+                    });
+                } catch(e) {}
+            },
+            
             playShuffle: function() { for(let i = 0; i < 15; i++) { setTimeout(() => { let f = 150 + Math.random() * 200; this.playOsc('sine', f, f/2, 0.04, 0.3); }, Math.random() * 400); } },
             playWheelTick: function() { this.playOsc('square', 800, 600, 0.05, 0.05); },
             playBooster: function() { this.playOsc('triangle', 800, 200, 0.2, 0.3); },
             playError: function() { this.playOsc('sawtooth', 150, 100, 0.2, 0.3); },
-            toggle: function() { this.enabled = !this.enabled; const btn = document.getElementById('btn-sound'); if (btn) btn.innerText = this.enabled ? '🔊' : '🔇'; }
+            
+            toggle: function() { 
+                this.enabled = !this.enabled; 
+                const btn = document.getElementById('btn-sound'); 
+                if (btn) btn.innerText = this.enabled ? '🔊' : '🔇'; 
+                if (this.enabled) {
+                    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+                    this.startAmbient();
+                } else {
+                    this.stopAmbient();
+                }
+            }
         };
 
         // ТРЕБОВАНИЕ ЯНДЕКСА: УПРАВЛЕНИЕ АУДИО ПРИ СВЕРТЫВАНИИ ВКЛАДКИ
@@ -778,13 +867,17 @@
                 SafeStorage.set('mahjong_level', currentLevel);
             } catch(e){}
 
+            // 1. ЗАПУСК ФОНТАНА И ФЕЙЕРВЕРКОВ
             shootEpicConfetti();
             launchFireworks();
             
-            // СТРАХОВКА (Если анимация зависнет, уровень всё равно загрузится через 3.5 секунды)
-            let fallbackTimer = setTimeout(() => {
+            // 2. СТРАХОВКА: ДАЖЕ ЕСЛИ ОКНО ПОЛОМАЕТСЯ, ИГРА ПЕРЕЙДЕТ ДАЛЬШЕ
+            setTimeout(() => {
                 const overlay = document.getElementById('level-complete-overlay');
-                if(overlay) { overlay.style.opacity = '0'; setTimeout(() => { overlay.style.display = 'none'; }, 300); }
+                if(overlay) {
+                    overlay.style.opacity = '0';
+                    setTimeout(() => { overlay.style.display = 'none'; }, 300);
+                }
                 initGame(); 
             }, 3500);
 
@@ -806,16 +899,10 @@
                 }
                 if (textEl) textEl.style.opacity = '1';
 
-                // Запуск плавного исчезновения и сброса страховки
+                // Запуск плавного исчезновения
                 setTimeout(() => { 
                     if (overlay) overlay.style.opacity = '0';
                     if (praiseEl) praiseEl.style.transform = 'scale(0.8)';
-                    
-                    setTimeout(() => {
-                        if (overlay) overlay.style.display = 'none';
-                        clearTimeout(fallbackTimer);
-                        initGame(); // 100% ВЫЗОВ НОВОГО УРОВНЯ
-                    }, 500);
                 }, 3000); 
 
             } catch(e) {
@@ -858,7 +945,7 @@
                 const colors = ['#ffdf00', '#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#ff00ff'];
                 
                 let fwInterval = setInterval(() => {
-                    if(!isLevelCompleting) { clearInterval(fwInterval); return; }
+                    if(!window.isLevelCompleting) { clearInterval(fwInterval); return; }
                     
                     let startX = 20 + Math.random() * 60; 
                     let startY = 20 + Math.random() * 50; 
@@ -955,7 +1042,7 @@
 
         // --- УМНЫЙ ПЕРЕХВАТЧИК КЛИКОВ (СКВОЗНОЙ КЛИК) ---
         function handleTileClick(t, event) { 
-            if (isLevelCompleting || isGameLocked) return; 
+            if (window.isLevelCompleting || isGameLocked) return; 
             if (t.isMatched) return; 
             if (tutorialMode) { if (t !== tutorialPair[0] && t !== tutorialPair[1]) return; }
             if (!t.isFree) return;
@@ -1034,7 +1121,7 @@
         document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
 
         function watchAdToShuffle() { 
-            if (activeTiles.length === 0 || tutorialMode || isLevelCompleting) return;
+            if (activeTiles.length === 0 || tutorialMode || window.isLevelCompleting) return;
             const ad = document.getElementById('ad-screen'); if(ad) ad.style.display = 'flex'; 
             setTimeout(() => { 
                 if(ad) ad.style.display = 'none'; 
@@ -1074,7 +1161,6 @@
         function updateBoostersUI() {
             document.querySelectorAll('.booster').forEach(btn => {
                 if (btn.id === 'btn-shuffle') return; 
-                
                 let unlockLvl = parseInt(btn.getAttribute('data-unlock')); let cost = parseInt(btn.getAttribute('data-cost')); let lockTag = btn.querySelector('.b-lock');
                 if (currentLevel < unlockLvl) {
                     btn.classList.add('locked'); btn.classList.remove('disabled'); if(lockTag) lockTag.style.display = 'block';
@@ -1091,7 +1177,7 @@
         }
 
         function buyBooster(btnId, cost, action) {
-            if (tutorialMode || isLevelCompleting || (isGameLocked && btnId !== 'bst-undo' && btnId !== 'bst-bomb' && btnId !== 'bst-light')) return;
+            if (tutorialMode || window.isLevelCompleting || (isGameLocked && btnId !== 'bst-undo' && btnId !== 'bst-bomb' && btnId !== 'bst-light')) return;
             let btn = document.getElementById(btnId);
             if (btn.classList.contains('locked') || btn.classList.contains('disabled')) { AudioSys.playError(); let scoreEl = document.getElementById('hud-score'); scoreEl.style.color = '#e74c3c'; setTimeout(() => scoreEl.style.color = '#fff', 300); return; }
             totalScore -= cost; SafeStorage.set('mahjong_score', totalScore); updateScoreDisplay(); AudioSys.playBooster(); action();
