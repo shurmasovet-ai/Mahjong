@@ -70,6 +70,20 @@
             font-size: 13px; color: #f1c40f; margin-top: 5px; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,1); text-align: center;
         }
 
+        /* --- СТИЛИ ДЛЯ ПРЕВЬЮ МИНИ-КАРТЫ --- */
+        #menu-level-preview {
+            width: 80px; height: 80px;
+            position: relative; margin-top: 15px; margin-bottom: 5px;
+            transform-style: preserve-3d;
+        }
+        .preview-tile {
+            position: absolute; width: 20%; height: 20%;
+            left: calc(var(--x) * 10%); top: calc(var(--y) * 10%);
+            margin-top: calc(var(--z) * -4px); margin-left: calc(var(--z) * -2px);
+            background: var(--tileBg); border: 1px solid rgba(255,255,255,0.6);
+            border-radius: 2px; box-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        }
+
         .btn-arrow {
             background: rgba(0, 0, 0, 0.4); border: 2px solid rgba(241, 196, 15, 0.5); color: #f1c40f;
             font-size: 20px; border-radius: 15px; padding: 10px 15px; cursor: pointer;
@@ -186,7 +200,7 @@
         .flip-anim { animation: flipTileIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes flipTileIn { 0% { transform: translateY(-4vw) scale(1.1) rotateY(-90deg); } 100% { transform: translateY(0) scale(1) rotateY(0deg); } }
 
-        /* Анимация ЗАКРЫТИЯ замка при промахе (Memory Mechanic) */
+        /* Анимация ЗАКРЫТИЯ замка при промахе */
         .flip-anim-back { animation: flipTileOut 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes flipTileOut { 0% { transform: translateY(0) scale(1) rotateY(0deg); } 100% { transform: translateY(-4vw) scale(1.1) rotateY(90deg); } }
 
@@ -271,7 +285,6 @@
             transition: opacity 0.5s ease-out; transition-delay: 0.4s;
         }
 
-        /* Частицы Фейерверка */
         .fw-particle { 
             position: absolute; pointer-events: none; z-index: 15001; 
             animation: fwExplode 1s ease-out forwards; 
@@ -281,7 +294,6 @@
             100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; } 
         }
 
-        /* Фонтан Конфетти */
         .epic-confetti { 
             position: absolute; z-index: 15002; bottom: 0; left: 50%;
             animation: epicFountain var(--dur) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
@@ -300,6 +312,7 @@
     <div id="tutorial-overlay"></div>
     <div id="tutorial-finger">👆</div>
 
+    <!-- ОКНО ПОБЕДЫ -->
     <div id="level-complete-overlay">
         <div id="level-complete-glow"></div>
         <h2 id="level-complete-praise">ВЕЛИКОЛЕПНО!</h2>
@@ -314,6 +327,8 @@
             <div id="menu-level-badge">
                 <div id="menu-level-text">УРОВЕНЬ 1</div>
                 <div id="menu-chapter-title">ГЛАВА 1: Светлая роща</div>
+                <!-- МИНИ-КАРТА (ПРЕВЬЮ УРОВНЯ) -->
+                <div id="menu-level-preview"></div>
             </div>
             <button id="btn-next-level" class="btn-arrow">▶</button>
         </div>
@@ -351,7 +366,6 @@
 
     <div id="game-screen">
         <div id="top-bar">
-            <!-- Две раздельные кнопки звука в одном блоке -->
             <div style="display: flex; flex-direction: column; flex-basis: 75px;">
                 <button id="btn-menu" class="btn-small-top">🏠 Меню</button>
                 <div style="display: flex; gap: 4px;">
@@ -474,90 +488,55 @@
                 } catch(e) {}
             },
             
-            // --- ЗВУКОВЫЕ ЭФФЕКТЫ ---
             playClick: function(isSelected) { let startFreq = isSelected ? 300 : 200; let endFreq = isSelected ? 80 : 60; this.playOsc('sine', startFreq, endFreq, 0.05, 0.4); },
-            
-            // НОВЫЙ ЗВУК ОТКРЫТИЯ ЗАМКА (Магический перезвон + щелчок)
             playUnlock: function() { 
                 try {
                     this.playOsc('sine', 800, 1200, 0.15, 0.2); 
                     setTimeout(() => this.playOsc('triangle', 300, 100, 0.1, 0.3), 50); 
                 } catch(e) {}
             },
-
-            // НОВЫЙ ЗВУК ЗАКРЫТИЯ ЗАМКА (Тяжелый щелчок)
             playLockClose: function() {
                 try {
                     this.playOsc('triangle', 400, 200, 0.15, 0.3);
                     setTimeout(() => this.playOsc('square', 200, 100, 0.1, 0.2), 80);
                 } catch(e) {}
             },
-
             playMatch: function() {
                 try { if (!this.enabled || !this.ctx || this.ctx.state !== 'running') return; let playTock = (delay, freq) => { setTimeout(() => { if (!this.ctx || this.ctx.state !== 'running') return; let osc = this.ctx.createOscillator(); let gain = this.ctx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(freq, this.ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(freq * 0.2, this.ctx.currentTime + 0.04); gain.gain.setValueAtTime(0.7, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.04); osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.05); }, delay); }; playTock(0, 250); playTock(35, 300); } catch(e) {}
             },
-            
             playWin: function() { 
                 try {
                     if (!this.enabled || !this.ctx || this.ctx.state !== 'running') return;
-                    let notes = [
-                        {f: 523.25, d: 0.15, delay: 0},     
-                        {f: 523.25, d: 0.15, delay: 200},   
-                        {f: 523.25, d: 0.30, delay: 400},   
-                        {f: 392.00, d: 0.20, delay: 750},   
-                        {f: 523.25, d: 0.80, delay: 1000}   
-                    ];
-                    notes.forEach(n => {
-                        setTimeout(() => {
-                            this.playOsc('square', n.f, null, n.d, 0.15); 
-                            this.playOsc('sine', n.f, null, n.d, 0.3);    
-                        }, n.delay);
-                    });
+                    let notes = [ {f: 523.25, d: 0.15, delay: 0}, {f: 523.25, d: 0.15, delay: 200}, {f: 523.25, d: 0.30, delay: 400}, {f: 392.00, d: 0.20, delay: 750}, {f: 523.25, d: 0.80, delay: 1000} ];
+                    notes.forEach(n => { setTimeout(() => { this.playOsc('square', n.f, null, n.d, 0.15); this.playOsc('sine', n.f, null, n.d, 0.3); }, n.delay); });
                 } catch(e) {}
             },
-            
             playShuffle: function() { for(let i = 0; i < 15; i++) { setTimeout(() => { let f = 150 + Math.random() * 200; this.playOsc('sine', f, f/2, 0.04, 0.3); }, Math.random() * 400); } },
             playWheelTick: function() { this.playOsc('square', 800, 600, 0.05, 0.05); },
             playBooster: function() { this.playOsc('triangle', 800, 200, 0.2, 0.3); },
             playError: function() { this.playOsc('sawtooth', 150, 100, 0.2, 0.3); },
             
             toggleSound: function() { 
-                this.enabled = !this.enabled; 
-                SafeStorage.set('mahjong_sound', this.enabled);
-                const btn = document.getElementById('btn-sound'); 
-                if (btn) btn.innerText = this.enabled ? '🔊' : '🔇'; 
+                this.enabled = !this.enabled; SafeStorage.set('mahjong_sound', this.enabled);
+                const btn = document.getElementById('btn-sound'); if (btn) btn.innerText = this.enabled ? '🔊' : '🔇'; 
             },
-            
             toggleMusic: function() {
-                this.musicEnabled = !this.musicEnabled;
-                SafeStorage.set('mahjong_music', this.musicEnabled);
-                const btn = document.getElementById('btn-music');
-                if (btn) btn.innerText = this.musicEnabled ? '🍃' : '🔇';
-                if (this.musicEnabled) {
-                    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
-                    this.startAmbient();
-                } else {
-                    this.stopAmbient();
-                }
+                this.musicEnabled = !this.musicEnabled; SafeStorage.set('mahjong_music', this.musicEnabled);
+                const btn = document.getElementById('btn-music'); if (btn) btn.innerText = this.musicEnabled ? '🍃' : '🔇';
+                if (this.musicEnabled) { if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); this.startAmbient(); } else { this.stopAmbient(); }
             }
         };
 
         document.addEventListener("DOMContentLoaded", () => {
-            let savedMusic = SafeStorage.get('mahjong_music');
-            if (savedMusic !== null) AudioSys.musicEnabled = (savedMusic === 'true');
-            let savedSound = SafeStorage.get('mahjong_sound');
-            if (savedSound !== null) AudioSys.enabled = (savedSound === 'true');
-            
+            let savedMusic = SafeStorage.get('mahjong_music'); if (savedMusic !== null) AudioSys.musicEnabled = (savedMusic === 'true');
+            let savedSound = SafeStorage.get('mahjong_sound'); if (savedSound !== null) AudioSys.enabled = (savedSound === 'true');
             document.getElementById('btn-sound').innerText = AudioSys.enabled ? '🔊' : '🔇';
             document.getElementById('btn-music').innerText = AudioSys.musicEnabled ? '🍃' : '🔇';
         });
 
         document.addEventListener("visibilitychange", () => {
-            if (document.hidden) {
-                if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend();
-            } else {
-                if (AudioSys.ctx && AudioSys.ctx.state === 'suspended' && (AudioSys.enabled || AudioSys.musicEnabled)) AudioSys.ctx.resume();
-            }
+            if (document.hidden) { if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend(); } 
+            else { if (AudioSys.ctx && AudioSys.ctx.state === 'suspended' && (AudioSys.enabled || AudioSys.musicEnabled)) AudioSys.ctx.resume(); }
         });
         window.addEventListener("blur", () => { if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend(); });
         window.addEventListener("focus", () => { if (AudioSys.ctx && AudioSys.ctx.state === 'suspended' && (AudioSys.enabled || AudioSys.musicEnabled)) AudioSys.ctx.resume(); });
@@ -643,7 +622,7 @@
             ['🐻','🌲','🍯','🍞','🍄','🌾','🌻','🍎','🍓','🐿️','🦊','🦉','🐴','🦢','🦆','🦅','🐟','🪵','🛖','🔥']
         ];
         
-        // --- 1. ОСТАВЛЕН ТОЛЬКО ОДИН ВИД ЗАМКА ---
+        // --- ТОЛЬКО ОДИН ЗАМОК ---
         const coverSymbols = ['🔒'];
         
         const materials = [
@@ -668,13 +647,66 @@
             return `ГЛАВА ${chapterNum}: ${title}`;
         }
 
+        function getDifficultyParams(level) {
+            let cyclePos = (level - 1) % 10;
+            if (cyclePos >= 0 && cyclePos <= 2) return { text: "🟢 Легко", color: "#2ecc71", maxLayers: 2, density: 0.55 };
+            else if (cyclePos >= 3 && cyclePos <= 5) return { text: "🟡 Средне", color: "#f1c40f", maxLayers: 3, density: 0.6 };
+            else if (cyclePos >= 6 && cyclePos <= 8) return { text: "🟠 Сложно", color: "#e67e22", maxLayers: 4, density: 0.8 };
+            else return { text: "🔴 ЭКСПЕРТ", color: "#e74c3c", maxLayers: 5, density: 0.95 };
+        }
+
+        // --- ГЕНЕРАТОР МИНИ-ПРЕВЬЮ ---
+        function renderPreview(level) {
+            let previewContainer = document.getElementById('menu-level-preview');
+            if (!previewContainer) return;
+            previewContainer.innerHTML = '';
+            
+            let diff = getDifficultyParams(level);
+            let shapeIndex = (level - 1) % 8;
+            let maxCols = 8, maxRows = 8;
+            
+            // Строим идеальную фигуру уровня для отрисовки в меню
+            for (let z = 0; z < diff.maxLayers; z++) {
+                let offset = (z % 2 === 0) ? 0 : 1;
+                let shrink = Math.floor(z / 2) * 2 + offset; 
+                for (let y = shrink; y <= maxRows - shrink; y += 2) {
+                    for (let x = shrink; x <= maxCols - shrink; x += 2) {
+                        let isMasked = true; let cx = x - 4, cy = y - 4; 
+                        switch(shapeIndex) {
+                            case 0: break; 
+                            case 1: if (Math.abs(cx) <= 2 && Math.abs(cy) <= 2 && z < 2) isMasked = false; break; 
+                            case 2: if (Math.abs(cx) > 2 && Math.abs(cy) > 2) isMasked = false; break; 
+                            case 3: if (Math.abs(cx) <= 1 || Math.abs(cy) <= 1) isMasked = false; break; 
+                            case 4: if (Math.abs(cx) + Math.abs(cy) > 5) isMasked = false; break; 
+                            case 5: if (Math.abs(cy) <= 1) isMasked = false; break; 
+                            case 6: if (Math.abs(cx) <= 1) isMasked = false; break; 
+                            case 7: if (Math.abs(cx) === Math.abs(cy) && z === 0) isMasked = false; break; 
+                        }
+                        if (isMasked) {
+                            let pt = document.createElement('div');
+                            pt.className = 'preview-tile';
+                            pt.style.setProperty('--x', x);
+                            pt.style.setProperty('--y', y);
+                            pt.style.setProperty('--z', z);
+                            pt.style.zIndex = (z * 10) + y;
+                            previewContainer.appendChild(pt);
+                        }
+                    }
+                }
+            }
+        }
+
         function updateMenuLevelText() { 
             document.getElementById('menu-level-text').innerText = 'УРОВЕНЬ ' + currentLevel; 
             document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
             let chapterTitle = getChapterName(currentLevel);
             document.getElementById('menu-chapter-title').innerText = chapterTitle;
             document.getElementById('hud-chapter-text').innerText = chapterTitle;
+            applyMaterial(currentLevel); 
+            renderPreview(currentLevel); // Обновляем мини-карту
         }
+
+        // Запуск при старте
         updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI();
         
         document.getElementById('btn-play').addEventListener('click', () => { AudioSys.init(); document.getElementById('main-menu').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; initGame(); });
@@ -700,14 +732,6 @@
             root.style.setProperty('--tileBg', mat.tileBg); root.style.setProperty('--tileSide', mat.tileSide); root.style.setProperty('--tileColor', mat.tileColor); 
         }
 
-        function getDifficultyParams(level) {
-            let cyclePos = (level - 1) % 10;
-            if (cyclePos >= 0 && cyclePos <= 2) return { text: "🟢 Легко", color: "#2ecc71", maxLayers: 2, density: 0.55 };
-            else if (cyclePos >= 3 && cyclePos <= 5) return { text: "🟡 Средне", color: "#f1c40f", maxLayers: 3, density: 0.6 };
-            else if (cyclePos >= 6 && cyclePos <= 8) return { text: "🟠 Сложно", color: "#e67e22", maxLayers: 4, density: 0.8 };
-            else return { text: "🔴 ЭКСПЕРТ", color: "#e74c3c", maxLayers: 5, density: 0.95 };
-        }
-        
         function getSymbolsForLevel(level) {
             let s = level * 12345; function localRnd() { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }
             let t1 = Math.floor(localRnd() * themeSets.length); let t2 = Math.floor(localRnd() * themeSets.length); let t3 = Math.floor(localRnd() * themeSets.length);
@@ -839,7 +863,7 @@
                 if (obj.isHidden) { el.classList.add('is-hidden'); el.setAttribute('data-cover', obj.coverSymbol); }
                 obj.el = el; 
                 obj.isMatched = false; 
-                obj.isTempOpen = false; // Броня: временно открытая закрытая фишка
+                obj.isTempOpen = false; 
                 el.addEventListener('click', (e) => handleTileClick(obj, e));
                 board.appendChild(el); activeTiles.push(obj);
             });
@@ -1070,7 +1094,6 @@
             finger.style.left = (rect.left + window.scrollX + rect.width / 2) + 'px'; finger.style.top = (rect.top + window.scrollY + rect.height / 2) + 'px';
         }
 
-        // --- УМНАЯ МЕХАНИКА "МЕМОРИ" (ЗАКРЫТИЕ ПРИ ПРОМАХЕ) ---
         function handleTileClick(t, event) { 
             if (window.isLevelCompleting || isGameLocked) return; 
             if (t.isMatched) return; 
@@ -1081,13 +1104,13 @@
 
             if (t.isHidden) { 
                 t.isHidden = false; 
-                t.isTempOpen = true; // Запоминаем, что фишка открыта временно
+                t.isTempOpen = true; 
                 t.el.classList.remove('is-hidden'); 
                 t.el.classList.add('flip-anim'); 
                 setTimeout(() => { if(t.el) t.el.classList.remove('flip-anim'); }, 300); 
                 updateFreeState(); 
                 justUnlocked = true;
-                AudioSys.playUnlock(); // 🎵 Уникальный звук открытия
+                AudioSys.playUnlock(); 
             }
 
             if (!firstTile) { 
@@ -1140,19 +1163,17 @@
                         levelComplete(); 
                     }
                 } else { 
-                    // 🛑 ЕСЛИ НЕ СОВПАЛО - ЗАКРЫВАЕМ ОБРАТНО!
                     if (!justUnlocked) AudioSys.playClick(true);
                     
                     if (firstTile && firstTile.el) {
                         firstTile.el.classList.remove('selected'); 
-                        // Если первая фишка была под замком - переворачиваем её обратно
                         if (firstTile.isTempOpen) {
                             firstTile.isHidden = true;
                             firstTile.isTempOpen = false;
                             
                             let closingEl = firstTile.el;
                             closingEl.classList.add('flip-anim-back');
-                            AudioSys.playLockClose(); // 🎵 Звук закрытия замка
+                            AudioSys.playLockClose(); 
                             
                             setTimeout(() => {
                                 if (closingEl) {
@@ -1168,19 +1189,17 @@
                     if (tutorialMode) positionFingerOnTile(tutorialPair[0].isFree ? tutorialPair[0] : tutorialPair[1]);
                 } 
             } else { 
-                // Сброс выбора при клике на саму себя
                 if (!justUnlocked) {
                     AudioSys.playClick(false);
                     t.el.classList.remove('selected');
                     
-                    // Если фишка была под замком - переворачиваем её обратно
                     if (t.isTempOpen) {
                         t.isHidden = true;
                         t.isTempOpen = false;
                         
                         let closingEl = t.el;
                         closingEl.classList.add('flip-anim-back');
-                        AudioSys.playLockClose(); // 🎵 Звук закрытия замка
+                        AudioSys.playLockClose(); 
                         
                         setTimeout(() => {
                             if (closingEl) {
@@ -1222,7 +1241,7 @@
                         let pt = preparedTiles[index]; tile.x = pt.x; tile.y = pt.y; tile.z = pt.z;
                         tile.symbol = pt.symbol; tile.el.innerText = pt.symbol; tile.el.classList.remove('selected');
                         
-                        tile.isTempOpen = false; // Очищаем временные статусы при миксе
+                        tile.isTempOpen = false; 
                         tile.el.classList.remove('flip-anim-back');
                         
                         tile.el.classList.add('flip-anim'); setTimeout(() => tile.el.classList.remove('flip-anim'), 400);
