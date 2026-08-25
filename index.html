@@ -22,7 +22,7 @@
             background: radial-gradient(circle at center, #6b1222 0%, #2a050b 100%);
             color: white; width: 100vw; height: 100vh; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-            /* ЗАЩИТА ДЛЯ ЯНДЕКС ИГР */
+            /* ЗАЩИТА ДЛЯ ЯНДЕКС ИГР: БЛОКИРОВКА СКРОЛЛА И ВЫДЕЛЕНИЯ ТЕКСТА */
             user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: none;
         }
 
@@ -335,6 +335,7 @@
         <h2>Как играть?</h2>
         <p>Находите пары одинаковых фишек, чтобы очистить поле.</p>
         <p>Фишка активна, если на ней <b>ничего не лежит</b>, и она <b>свободна слева ИЛИ справа</b>.</p>
+        <p>Замки: если вы выбрали открытую фишку с замком, но затем кликнули на другую, первая <b>закроется обратно</b>! Тренируйте память.</p>
         <button id="btn-close-rules" class="btn-massive" style="font-size:20px; padding:10px 30px; min-width:auto;">ПОНЯТНО</button>
     </div>
 
@@ -480,11 +481,11 @@
                 try {
                     if (!this.enabled || !this.ctx || this.ctx.state !== 'running') return;
                     let notes = [
-                        {f: 523.25, d: 0.15, delay: 0},     // Та
-                        {f: 523.25, d: 0.15, delay: 200},   // да
-                        {f: 523.25, d: 0.30, delay: 400},   // дам
-                        {f: 392.00, d: 0.20, delay: 750},   // та
-                        {f: 523.25, d: 0.80, delay: 1000}   // дам!
+                        {f: 523.25, d: 0.15, delay: 0},     
+                        {f: 523.25, d: 0.15, delay: 200},   
+                        {f: 523.25, d: 0.30, delay: 400},   
+                        {f: 392.00, d: 0.20, delay: 750},   
+                        {f: 523.25, d: 0.80, delay: 1000}   
                     ];
                     notes.forEach(n => {
                         setTimeout(() => {
@@ -532,7 +533,7 @@
             document.getElementById('btn-music').innerText = AudioSys.musicEnabled ? '🍃' : '🔇';
         });
 
-        // ПАУЗА ЗВУКА ПРИ СВЕРТЫВАНИИ (ЯНДЕКС)
+        // ПАУЗА ЗВУКА ПРИ СВЕРТЫВАНИИ
         document.addEventListener("visibilitychange", () => {
             if (document.hidden) {
                 if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend();
@@ -665,10 +666,6 @@
         document.getElementById('btn-close-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'none');
         document.getElementById('btn-menu').addEventListener('click', () => { document.getElementById('game-screen').style.display = 'none'; document.getElementById('main-menu').style.display = 'flex'; updateMenuLevelText(); });
         
-        // --- ДВЕ КНОПКИ ЗВУКА ---
-        document.getElementById('btn-sound').addEventListener('click', () => { AudioSys.init(); AudioSys.toggleSound(); });
-        document.getElementById('btn-music').addEventListener('click', () => { AudioSys.init(); AudioSys.toggleMusic(); });
-        
         document.getElementById('btn-hud-prev').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; SafeStorage.set('mahjong_level', currentLevel); initGame(); }});
         document.getElementById('btn-hud-next').addEventListener('click', () => { currentLevel++; SafeStorage.set('mahjong_level', currentLevel); initGame(); });
 
@@ -793,8 +790,17 @@
                 }
             }
 
-            if ((currentLevel % 10 === 7) || (currentLevel % 10 === 8)) {
-                let hideCount = (finalLayout.length >= 30) ? 6 : 4;
+            // --- НОВАЯ СЛОЖНОСТЬ ЗАКРЫТЫХ ФИШЕК ---
+            let cyclePos = (currentLevel - 1) % 10;
+            let hideCount = 0;
+            if (cyclePos >= 3 && cyclePos <= 5) hideCount = 4;
+            else if (cyclePos >= 6 && cyclePos <= 8) hideCount = 8;
+            else if (cyclePos === 9) hideCount = 14;
+            
+            hideCount = Math.min(hideCount, Math.floor(finalLayout.length * 0.4));
+            if (hideCount % 2 !== 0) hideCount--;
+
+            if (hideCount > 0) {
                 let hideIndices = Array.from({length: finalLayout.length}, (_, i) => i);
                 for (let i = hideIndices.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [hideIndices[i], hideIndices[j]] = [hideIndices[j], hideIndices[i]]; }
                 for(let i=0; i<hideCount; i++) {
@@ -810,6 +816,7 @@
                 if (obj.isHidden) { el.classList.add('is-hidden'); el.setAttribute('data-cover', obj.coverSymbol); }
                 obj.el = el; 
                 obj.isMatched = false; 
+                obj.isTempOpen = false; // Броня: временно открытая закрытая фишка
                 el.addEventListener('click', (e) => handleTileClick(obj, e));
                 board.appendChild(el); activeTiles.push(obj);
             });
@@ -872,7 +879,7 @@
         document.getElementById('btn-close-no-moves').addEventListener('click', () => { document.getElementById('no-moves-modal').style.display = 'none'; });
 
         // ========================================================================
-        // --- 💥 ЭКРАН ПОБЕДЫ (С ФАНФАРОЙ) 💥 ---
+        // --- 💥 ЭКРАН ПОБЕДЫ ---
         // ========================================================================
         function levelComplete() {
             if (window.isLevelCompleting) return; 
@@ -924,7 +931,7 @@
                 }, 3000); 
 
             } catch(e) {
-                console.error("Victory screen failed", e);
+                console.error("Victory screen failed, proceeding to next level", e);
             }
         }
 
@@ -934,22 +941,18 @@
                 for(let i = 0; i < 150; i++) {
                     let conf = document.createElement('div'); 
                     conf.classList.add('epic-confetti');
-                    
                     let size = Math.random() * 8 + 4;
                     conf.style.width = size + 'px';
                     conf.style.height = (Math.random() > 0.5 ? size * 2 : size) + 'px';
                     conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
                     if(Math.random() > 0.5) conf.style.borderRadius = '50%';
-                    
                     let angle = (Math.PI / 2) + (Math.random() * Math.PI - Math.PI / 2); 
                     let velocity = 50 + Math.random() * 150;
-                    
                     conf.style.setProperty('--tx', (Math.cos(angle) * velocity) + 'vw');
                     conf.style.setProperty('--ty', (-Math.random() * 80 - 20) + 'vh');
                     conf.style.setProperty('--rot1', (Math.random() * 360) + 'deg');
                     conf.style.setProperty('--rot2', (Math.random() * 720) + 'deg');
                     conf.style.setProperty('--dur', (Math.random() * 1.5 + 1.5) + 's');
-                    
                     document.body.appendChild(conf); 
                     setTimeout(() => { if(conf.parentNode) conf.parentNode.removeChild(conf); }, 3000);
                 }
@@ -960,36 +963,26 @@
             try {
                 const overlay = document.getElementById('level-complete-overlay');
                 const colors = ['#ffdf00', '#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#ff00ff'];
-                
                 let fwInterval = setInterval(() => {
                     if(!window.isLevelCompleting) { clearInterval(fwInterval); return; }
-                    
                     let startX = 20 + Math.random() * 60; 
                     let startY = 20 + Math.random() * 50; 
                     let amount = 30 + Math.random() * 20;
                     let color = colors[Math.floor(Math.random() * colors.length)];
-                    
                     for(let i=0; i<amount; i++) {
                         let p = document.createElement('div');
                         p.className = 'fw-particle';
-                        p.style.left = startX + 'vw';
-                        p.style.top = startY + 'vh';
-                        p.style.width = '6px'; p.style.height = '6px';
-                        p.style.borderRadius = '50%';
+                        p.style.left = startX + 'vw'; p.style.top = startY + 'vh';
+                        p.style.width = '6px'; p.style.height = '6px'; p.style.borderRadius = '50%';
                         p.style.backgroundColor = (Math.random() > 0.3) ? color : '#ffffff';
                         p.style.boxShadow = `0 0 8px ${color}`;
-                        
-                        let angle = Math.random() * Math.PI * 2;
-                        let velocity = 50 + Math.random() * 100;
-                        
+                        let angle = Math.random() * Math.PI * 2; let velocity = 50 + Math.random() * 100;
                         p.style.setProperty('--dx', (Math.cos(angle) * velocity) + 'px');
                         p.style.setProperty('--dy', (Math.sin(angle) * velocity + 30) + 'px'); 
-                        
                         if(overlay) overlay.appendChild(p);
                         setTimeout(() => { if(p.parentNode) p.parentNode.removeChild(p); }, 1000);
                     }
                 }, 350);
-                
                 setTimeout(() => clearInterval(fwInterval), 2500);
             } catch(e) {}
         }
@@ -1057,6 +1050,7 @@
             finger.style.left = (rect.left + window.scrollX + rect.width / 2) + 'px'; finger.style.top = (rect.top + window.scrollY + rect.height / 2) + 'px';
         }
 
+        // --- УМНАЯ МЕХАНИКА "МЕМОРИ" (ЗАКРЫТИЕ ПРИ ПРОМАХЕ) ---
         function handleTileClick(t, event) { 
             if (window.isLevelCompleting || isGameLocked) return; 
             if (t.isMatched) return; 
@@ -1067,6 +1061,7 @@
 
             if (t.isHidden) { 
                 t.isHidden = false; 
+                t.isTempOpen = true; // Запоминаем, что фишка открыта "в кредит"
                 t.el.classList.remove('is-hidden'); 
                 t.el.classList.add('flip-anim'); 
                 setTimeout(() => { if(t.el) t.el.classList.remove('flip-anim'); }, 400); 
@@ -1087,6 +1082,8 @@
                     
                     t.isMatched = true; 
                     firstTile.isMatched = true;
+                    t.isTempOpen = false; 
+                    firstTile.isTempOpen = false;
                     
                     t.el.classList.add('selected'); 
                     if (tutorialMode) {
@@ -1123,14 +1120,34 @@
                         levelComplete(); 
                     }
                 } else { 
+                    // ЕСЛИ НЕ СОВПАЛО - ЗАКРЫВАЕМ ОБРАТНО!
                     if (!justUnlocked) AudioSys.playClick(true);
-                    if (firstTile && firstTile.el) firstTile.el.classList.remove('selected'); 
+                    
+                    if (firstTile && firstTile.el) {
+                        firstTile.el.classList.remove('selected'); 
+                        if (firstTile.isTempOpen) {
+                            firstTile.isHidden = true;
+                            firstTile.isTempOpen = false;
+                            firstTile.el.classList.add('is-hidden');
+                        }
+                    }
+                    
                     firstTile = t; 
                     if (firstTile && firstTile.el) firstTile.el.classList.add('selected');
                     if (tutorialMode) positionFingerOnTile(tutorialPair[0].isFree ? tutorialPair[0] : tutorialPair[1]);
                 } 
             } else { 
-                return;
+                // Случайный двойной тап (или ручной сброс выбора)
+                if (!justUnlocked) {
+                    AudioSys.playClick(false);
+                    t.el.classList.remove('selected');
+                    if (t.isTempOpen) {
+                        t.isHidden = true;
+                        t.isTempOpen = false;
+                        t.el.classList.add('is-hidden');
+                    }
+                    firstTile = null;
+                }
             }
         }
 
@@ -1146,7 +1163,7 @@
                     let currentSymbols = activeTiles.map(t => t.symbol); let pairsPool = [];
                     let counts = {}; currentSymbols.forEach(s => counts[s] = (counts[s] || 0) + 1);
                     for (let s in counts) { for(let i=0; i < Math.floor(counts[s] / 2); i++) pairsPool.push(s); }
-                    let hiddenCount = activeTiles.filter(t => t.isHidden).length;
+                    let hiddenCount = activeTiles.filter(t => t.isHidden || t.isTempOpen).length;
                     
                     let currentLayout = activeTiles.map(t => ({x: t.x, y: t.y, z: t.z}));
                     let attemptMix = 0, preparedTiles = null;
@@ -1160,8 +1177,8 @@
 
                     activeTiles.forEach((tile, index) => {
                         let pt = preparedTiles[index]; tile.x = pt.x; tile.y = pt.y; tile.z = pt.z;
-                        tile.el.style.setProperty('--x', tile.x); tile.el.style.setProperty('--y', tile.y); tile.el.style.setProperty('--z', tile.z);
                         tile.symbol = pt.symbol; tile.el.innerText = pt.symbol; tile.el.classList.remove('selected');
+                        tile.isTempOpen = false; // Сброс временных замков при миксе
                         tile.el.classList.add('flip-anim'); setTimeout(() => tile.el.classList.remove('flip-anim'), 400);
                         if (toHide.has(index)) { tile.isHidden = true; tile.el.classList.add('is-hidden'); tile.coverSymbol = coverSymbols[Math.floor(Math.random() * coverSymbols.length)]; tile.el.setAttribute('data-cover', tile.coverSymbol); } 
                         else { tile.isHidden = false; tile.el.classList.remove('is-hidden'); }
@@ -1216,6 +1233,7 @@
                 if (matchHistory.length === 0) return;
                 let pair = matchHistory.pop(); 
                 pair[0].isMatched = false; pair[1].isMatched = false;
+                pair[0].isTempOpen = false; pair[1].isTempOpen = false;
                 pair[0].el.classList.remove('matched', 'selected'); pair[1].el.classList.remove('matched', 'selected');
                 pair[0].el.style.display = 'flex'; pair[1].el.style.display = 'flex'; 
                 activeTiles.push(pair[0], pair[1]); comboCount = 0; updateFreeState(); updateProgressBar();
