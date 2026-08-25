@@ -75,7 +75,7 @@
         #hud-level { font-family: 'Russo One', sans-serif; font-size: 18px; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.8); white-space: nowrap; line-height: 1.1;}
         #hud-chapter-text { font-size: 10px; color: #a2d9ce; font-weight: bold; text-transform: uppercase; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); margin-bottom: 2px;}
 
-        /* СТАТИСТИКА */
+        /* СТАТИСТИКА (Очки + Монеты) */
         .stats-container { display: flex; gap: 15px; margin-top: 4px; align-items: center;}
         #hud-score { font-family: 'Russo One', sans-serif; font-size: 15px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); transition: color 0.3s; }
         #hud-coins { font-family: 'Russo One', sans-serif; font-size: 15px; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.8); transition: color 0.3s; }
@@ -197,6 +197,7 @@
     <div id="tutorial-overlay"></div>
     <div id="tutorial-finger">👆</div>
 
+    <!-- ОКНО ПОБЕДЫ -->
     <div id="level-complete-overlay">
         <div id="level-complete-glow"></div>
         <h2 id="level-complete-praise">ВЕЛИКОЛЕПНО!</h2>
@@ -210,7 +211,7 @@
         <button id="btn-close-leaderboard" class="btn-massive" style="font-size: 20px; padding: 10px 30px;">ЗАКРЫТЬ</button>
     </div>
 
-    <!-- ОКНО МАГАЗИНА (ФОНЫ И ЗВУКИ) -->
+    <!-- МАГАЗИН И БОНУСЫ -->
     <div id="shop-modal">
         <h2>🛒 МАГАЗИН</h2>
         <div id="shop-coins-header">Ваши монеты: 💰 0</div>
@@ -253,7 +254,6 @@
         
         <button id="btn-play" class="btn-massive">▶ ИГРАТЬ</button>
         
-        <!-- КНОПКИ В МЕНЮ -->
         <div style="display: flex; flex-direction: column; gap: 10px; z-index: 2; margin-bottom: 10px; width: 220px;">
             <button id="btn-open-shop" class="btn-menu-small" style="margin-bottom: 0; background: rgba(155, 89, 182, 0.3); color: #e0aaff; border-color: #9b59b6;">🛒 Магазин & Бонусы</button>
             <button id="btn-leaderboard" class="btn-menu-small" style="margin-bottom: 0; color: #f1c40f; border-color: #f1c40f;">🏆 Рейтинг</button>
@@ -346,7 +346,7 @@
             remove: function(key) { try { localStorage.removeItem(key); } catch(e) {} }
         };
 
-        // --- ДАННЫЕ МАГАЗИНА ---
+        // --- ДАННЫЕ МАГАЗИНА (Фоны + Звуки) ---
         const ShopData = {
             bgs: [
                 { id: 'bg0', name: 'Багровый закат', desc: 'Классика', price: 0, css: 'radial-gradient(circle at center, #6b1222 0%, #2a050b 100%)' },
@@ -361,11 +361,13 @@
                 { id: 'snd1', name: 'Тихий дождь', desc: 'Белый шум', price: 0, type: 'rain' },
                 { id: 'snd2', name: 'Морской прибой', desc: 'Волны', price: 0, type: 'ocean' },
                 { id: 'snd3', name: 'Пещера гномов', desc: 'Эхо земли', price: 1500, type: 'cave' },
-                { id: 'snd4', name: 'Космический гул', desc: 'Атмосфера', price: 3000, type: 'space' }
+                { id: 'snd4', name: 'Космический гул', desc: 'Атмосфера', price: 3000, type: 'space' },
+                // НОВЫЕ ПЛАТНЫЕ ЗВУКИ
+                { id: 'snd5', name: 'Трель птиц', desc: 'Утренний лес', price: 4500, type: 'birds' },
+                { id: 'snd6', name: 'Звенящие сосульки', desc: 'Зимняя сказка', price: 6000, type: 'icicles' }
             ]
         };
 
-        // Загрузка инвентаря
         let userInventory = JSON.parse(SafeStorage.get('mahjong_inventory') || '["bg0", "bg1", "bg2", "snd0", "snd1", "snd2"]');
         let eqBg = SafeStorage.get('mahjong_eq_bg') || 'bg0';
         let eqSnd = SafeStorage.get('mahjong_eq_snd') || 'snd0';
@@ -373,8 +375,7 @@
         function applyEquippedBg() {
             let bgObj = ShopData.bgs.find(b => b.id === eqBg) || ShopData.bgs[0];
             document.documentElement.style.setProperty('--game-bg', bgObj.css);
-            if(bgObj.isAnim) document.body.classList.add('animated-bg');
-            else document.body.classList.remove('animated-bg');
+            if(bgObj.isAnim) document.body.classList.add('animated-bg'); else document.body.classList.remove('animated-bg');
         }
         applyEquippedBg();
 
@@ -382,6 +383,7 @@
             ctx: null, enabled: true, musicEnabled: true, ambientPlaying: false,
             noiseSrc: null, noiseFilter: null, noiseGain: null, 
             lfo1: null, lfo2: null, lfoGain: null,
+            ambientInterval: null, // Контроллер для прерывистых звуков (птицы, сосульки)
             
             init: function() { 
                 try { 
@@ -395,6 +397,7 @@
             startAmbient: function() {
                 if (!this.musicEnabled || !this.ctx || this.ambientPlaying) return;
                 try {
+                    let sndObj = ShopData.sounds.find(s => s.id === eqSnd) || ShopData.sounds[0];
                     let bufferSize = this.ctx.sampleRate * 2;
                     let noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
                     let output = noiseBuffer.getChannelData(0);
@@ -408,22 +411,18 @@
                     this.lfo2 = this.ctx.createOscillator(); this.lfo2.type = 'sine'; 
                     this.lfoGain = this.ctx.createGain(); 
                     
-                    // Настройка синтеза в зависимости от купленного звука
-                    let sndObj = ShopData.sounds.find(s => s.id === eqSnd) || ShopData.sounds[0];
-                    
+                    // --- ОБНОВЛЕННЫЙ СИНТЕЗ ФОНА ---
                     if (sndObj.type === 'leaves') {
                         this.noiseFilter.type = 'bandpass'; this.noiseFilter.frequency.value = 600; this.noiseFilter.Q.value = 0.5;
                         this.noiseGain.gain.value = 0.05; this.lfo1.frequency.value = 0.15; this.lfoGain.gain.value = 0.04;
                         this.lfo1.connect(this.lfoGain); this.lfoGain.connect(this.noiseGain.gain);
                     } else if (sndObj.type === 'rain') {
                         this.noiseFilter.type = 'lowpass'; this.noiseFilter.frequency.value = 800;
-                        this.noiseGain.gain.value = 0.15; this.lfo1.frequency.value = 0; this.lfoGain.gain.value = 0; // Дождь ровный
+                        this.noiseGain.gain.value = 0.15; this.lfo1.frequency.value = 0; this.lfoGain.gain.value = 0; 
                     } else if (sndObj.type === 'ocean') {
                         this.noiseFilter.type = 'lowpass'; this.noiseFilter.frequency.value = 400; 
                         this.noiseGain.gain.value = 0.02; this.lfo1.frequency.value = 0.08; this.lfoGain.gain.value = 0.08;
                         this.lfo1.connect(this.lfoGain); this.lfoGain.connect(this.noiseGain.gain);
-                        
-                        // Меняем частоту фильтра для эффекта накатывания волны
                         let lfoFreq = this.ctx.createOscillator(); lfoFreq.frequency.value = 0.08;
                         let lfoFreqGain = this.ctx.createGain(); lfoFreqGain.gain.value = 300;
                         lfoFreq.connect(lfoFreqGain); lfoFreqGain.connect(this.noiseFilter.frequency);
@@ -436,16 +435,60 @@
                         this.noiseFilter.type = 'highpass'; this.noiseFilter.frequency.value = 2000;
                         this.noiseGain.gain.value = 0.01; this.lfo1.frequency.value = 0.1; this.lfoGain.gain.value = 0.01;
                         this.lfo1.connect(this.lfoGain); this.lfoGain.connect(this.noiseGain.gain);
+                    } else if (sndObj.type === 'birds') {
+                        // Тихий лес + Интервальные трели птиц
+                        this.noiseFilter.type = 'bandpass'; this.noiseFilter.frequency.value = 600; this.noiseFilter.Q.value = 0.5;
+                        this.noiseGain.gain.value = 0.02; 
+                        
+                        let playBird = () => {
+                            if(!this.ctx || this.ctx.state !== 'running') return;
+                            let osc = this.ctx.createOscillator(); let gain = this.ctx.createGain();
+                            osc.type = 'sine'; let baseFreq = 3000 + Math.random() * 1500;
+                            osc.frequency.setValueAtTime(baseFreq, this.ctx.currentTime);
+                            osc.frequency.linearRampToValueAtTime(baseFreq + 500, this.ctx.currentTime + 0.05);
+                            osc.frequency.linearRampToValueAtTime(baseFreq - 200, this.ctx.currentTime + 0.1);
+                            osc.frequency.linearRampToValueAtTime(baseFreq + 400, this.ctx.currentTime + 0.15);
+                            gain.gain.setValueAtTime(0, this.ctx.currentTime);
+                            gain.gain.linearRampToValueAtTime(0.1, this.ctx.currentTime + 0.05);
+                            gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.2);
+                            osc.connect(gain); gain.connect(this.ctx.destination);
+                            osc.start(); osc.stop(this.ctx.currentTime + 0.2);
+                        };
+                        
+                        this.ambientInterval = setInterval(() => {
+                            playBird();
+                            if(Math.random() > 0.5) setTimeout(playBird, 200 + Math.random()*200);
+                        }, 3500);
+
+                    } else if (sndObj.type === 'icicles') {
+                        // Морозный гул + Звенящие ноты
+                        this.noiseFilter.type = 'bandpass'; this.noiseFilter.frequency.value = 1000; this.noiseFilter.Q.value = 1;
+                        this.noiseGain.gain.value = 0.02;
+                        
+                        this.ambientInterval = setInterval(() => {
+                            if(!this.ctx || this.ctx.state !== 'running') return;
+                            let osc = this.ctx.createOscillator(); let gain = this.ctx.createGain();
+                            osc.type = 'sine'; let f = 4000 + Math.random() * 2000;
+                            osc.frequency.setValueAtTime(f, this.ctx.currentTime);
+                            gain.gain.setValueAtTime(0, this.ctx.currentTime);
+                            gain.gain.linearRampToValueAtTime(0.15, this.ctx.currentTime + 0.01); 
+                            gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 1.5); 
+                            osc.connect(gain); gain.connect(this.ctx.destination);
+                            osc.start(); osc.stop(this.ctx.currentTime + 1.5);
+                        }, 2000);
                     }
 
                     this.noiseSrc.connect(this.noiseFilter); this.noiseFilter.connect(this.noiseGain); this.noiseGain.connect(this.ctx.destination);
-                    this.noiseSrc.start(); this.lfo1.start(); this.ambientPlaying = true;
+                    this.noiseSrc.start(); 
+                    if(this.lfo1.frequency.value > 0) this.lfo1.start(); 
+                    this.ambientPlaying = true;
                 } catch(e) {}
             },
             stopAmbient: function() {
                 if (this.noiseSrc) { try { this.noiseSrc.stop(); } catch(e){} this.noiseSrc = null; }
                 if (this.lfo1) { try { this.lfo1.stop(); } catch(e){} this.lfo1 = null; }
                 if (this.lfo2) { try { this.lfo2.stop(); } catch(e){} this.lfo2 = null; }
+                if (this.ambientInterval) { clearInterval(this.ambientInterval); this.ambientInterval = null; }
                 this.ambientPlaying = false;
             },
             restartAmbient: function() { this.stopAmbient(); this.startAmbient(); },
@@ -535,7 +578,6 @@
         document.getElementById('btn-settings-sound').addEventListener('click', () => { AudioSys.init(); AudioSys.toggleSound(); });
         document.getElementById('btn-settings-music').addEventListener('click', () => { AudioSys.init(); AudioSys.toggleMusic(); });
 
-        // --- ЛОГИКА РЕНДЕРА МАГАЗИНА ---
         function renderShop() {
             document.getElementById('shop-coins-header').innerText = `Ваши монеты: 💰 ${totalCoins}`;
             
@@ -543,40 +585,24 @@
             ShopData.bgs.forEach(item => {
                 let isOwned = userInventory.includes(item.id);
                 let isEquipped = eqBg === item.id;
-                
                 let btnHtml = '';
                 if (isEquipped) btnHtml = `<button class="btn-shop btn-equipped">ВЫБРАНО</button>`;
                 else if (isOwned) btnHtml = `<button class="btn-shop btn-equip" onclick="equipItem('${item.id}', 'bg')">Выбрать</button>`;
                 else btnHtml = `<button class="btn-shop btn-buy" onclick="buyItem('${item.id}', 'bg', ${item.price})">💰 ${item.price}</button>`;
 
-                bgContainer.innerHTML += `
-                    <div class="shop-item ${isEquipped ? 'equipped' : ''}">
-                        <div class="shop-item-info">
-                            <span class="shop-item-name">${item.name}</span>
-                            <span class="shop-item-desc">${item.desc}</span>
-                        </div>
-                        ${btnHtml}
-                    </div>`;
+                bgContainer.innerHTML += `<div class="shop-item ${isEquipped ? 'equipped' : ''}"> <div class="shop-item-info"> <span class="shop-item-name">${item.name}</span> <span class="shop-item-desc">${item.desc}</span> </div> ${btnHtml} </div>`;
             });
 
             let sndContainer = document.getElementById('shop-sounds-container'); sndContainer.innerHTML = '';
             ShopData.sounds.forEach(item => {
                 let isOwned = userInventory.includes(item.id);
                 let isEquipped = eqSnd === item.id;
-                
                 let btnHtml = '';
                 if (isEquipped) btnHtml = `<button class="btn-shop btn-equipped">ВЫБРАНО</button>`;
                 else if (isOwned) btnHtml = `<button class="btn-shop btn-equip" onclick="equipItem('${item.id}', 'snd')">Выбрать</button>`;
                 else btnHtml = `<button class="btn-shop btn-buy" onclick="buyItem('${item.id}', 'snd', ${item.price})">💰 ${item.price}</button>`;
 
-                sndContainer.innerHTML += `
-                    <div class="shop-item ${isEquipped ? 'equipped' : ''}">
-                        <div class="shop-item-info">
-                            <span class="shop-item-name">${item.name}</span>
-                            <span class="shop-item-desc">${item.desc}</span>
-                        </div>
-                        ${btnHtml}
-                    </div>`;
+                sndContainer.innerHTML += `<div class="shop-item ${isEquipped ? 'equipped' : ''}"> <div class="shop-item-info"> <span class="shop-item-name">${item.name}</span> <span class="shop-item-desc">${item.desc}</span> </div> ${btnHtml} </div>`;
             });
         }
 
@@ -694,20 +720,16 @@
         }
 
         function getLayoutCoords(level) {
-            let diff = getDifficultyParams(level);
-            let seed = level * 13371337;
+            let diff = getDifficultyParams(level); let seed = level * 13371337;
             function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
 
             let layout = []; let grid = {}; let shapeIndex = (level - 1) % 30;
 
             for (let attempt = 0; attempt < 500; attempt++) {
-                layout = [];
-                let grid = {};
+                layout = []; let grid = {};
 
                 for (let z = 0; z < diff.maxLayers; z++) {
-                    let offset = (z % 2 === 0) ? 0 : 1;
-                    let shrink = Math.floor(z / 2) * 2 + offset;
-                    let currentLayerTiles = [];
+                    let offset = (z % 2 === 0) ? 0 : 1; let shrink = Math.floor(z / 2) * 2 + offset; let currentLayerTiles = [];
 
                     for (let y = shrink; y <= 8 - shrink; y += 2) {
                         for (let x = shrink; x <= 8 - shrink; x += 2) {
@@ -746,7 +768,6 @@
                 }
 
                 if (layout.length % 2 !== 0) { let idx = layout.findIndex(t => t.x === 4); if (idx !== -1) layout.splice(idx, 1); else layout.pop(); }
-
                 if (layout.length < 8) continue;
 
                 let initialFreeCount = 0;
@@ -757,8 +778,7 @@
                         let overlapX = Math.abs(tile.x - other.x) < 2, overlapY = Math.abs(tile.y - other.y) < 2;
                         if (other.z > tile.z && overlapX && overlapY) blockedTop = true;
                         if (other.z === tile.z && overlapY) {
-                            if (other.x === tile.x - 2) blockedLeft = true;
-                            if (other.x === tile.x + 2) blockedRight = true;
+                            if (other.x === tile.x - 2) blockedLeft = true; if (other.x === tile.x + 2) blockedRight = true;
                         }
                     }
                     if (!blockedTop && (!blockedLeft || !blockedRight)) initialFreeCount++;
@@ -773,26 +793,15 @@
         }
 
         function renderPreview(level) {
-            let previewContainer = document.getElementById('menu-level-preview');
-            if (!previewContainer) return;
-            previewContainer.innerHTML = '';
-            
+            let previewContainer = document.getElementById('menu-level-preview'); if (!previewContainer) return; previewContainer.innerHTML = '';
             let layoutCoords = getLayoutCoords(level);
-            layoutCoords.forEach(t => {
-                let pt = document.createElement('div'); pt.className = 'preview-tile';
-                pt.style.setProperty('--x', t.x); pt.style.setProperty('--y', t.y); pt.style.setProperty('--z', t.z);
-                pt.style.zIndex = (t.z * 100) + t.y; previewContainer.appendChild(pt);
-            });
+            layoutCoords.forEach(t => { let pt = document.createElement('div'); pt.className = 'preview-tile'; pt.style.setProperty('--x', t.x); pt.style.setProperty('--y', t.y); pt.style.setProperty('--z', t.z); pt.style.zIndex = (t.z * 100) + t.y; previewContainer.appendChild(pt); });
         }
 
         function updateMenuLevelText() { 
-            document.getElementById('menu-level-text').innerText = 'УРОВЕНЬ ' + currentLevel; 
-            document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
-            let chapterTitle = getChapterName(currentLevel);
-            document.getElementById('menu-chapter-title').innerText = chapterTitle;
-            document.getElementById('hud-chapter-text').innerText = chapterTitle;
-            applyMaterial(currentLevel);
-            renderPreview(currentLevel); 
+            document.getElementById('menu-level-text').innerText = 'УРОВЕНЬ ' + currentLevel; document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
+            let chapterTitle = getChapterName(currentLevel); document.getElementById('menu-chapter-title').innerText = chapterTitle; document.getElementById('hud-chapter-text').innerText = chapterTitle;
+            applyMaterial(currentLevel); renderPreview(currentLevel); 
         }
         
         updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI();
@@ -818,10 +827,8 @@
         document.getElementById('btn-hud-next').addEventListener('click', () => { currentLevel++; SafeStorage.set('mahjong_level', currentLevel); initGame(); });
 
         function updateScoreDisplay() { 
-            let elScore = document.getElementById('hud-score'); 
-            let elCoins = document.getElementById('hud-coins');
-            if(elScore) elScore.innerText = '🏆 ' + totalScore; 
-            if(elCoins) elCoins.innerText = '💰 ' + totalCoins; 
+            let elScore = document.getElementById('hud-score'); let elCoins = document.getElementById('hud-coins');
+            if(elScore) elScore.innerText = '🏆 ' + totalScore; if(elCoins) elCoins.innerText = '💰 ' + totalCoins; 
             updateBoostersUI(); 
         }
         
@@ -891,12 +898,8 @@
             let pairsPool = [];
             for(let i=0; i<finalLayout.length/2; i++) { pairsPool.push(baseSymbols[Math.floor(Math.random() * baseSymbols.length)]); }
 
-            let prepared = null;
-            let attemptMix = 0;
-            while (!prepared && attemptMix < 100) {
-                attemptMix++;
-                prepared = assignSymbolsSmart(finalLayout, pairsPool, Math.random);
-            }
+            let prepared = null; let attemptMix = 0;
+            while (!prepared && attemptMix < 100) { attemptMix++; prepared = assignSymbolsSmart(finalLayout, pairsPool, Math.random); }
 
             if (prepared) { finalLayout = prepared; } else { finalLayout = forceSolvableAssignment(finalLayout, pairsPool); }
 
@@ -1393,8 +1396,8 @@
         wheelSpinner.style.background = `conic-gradient(${conicGradient.join(', ')})`;
 
         let isSpinning = false;
-        btnOpenWheel.addEventListener('click', () => { AudioSys.init(); wheelModal.style.display = 'flex'; checkWheelTimer(); });
-        btnCloseWheel.addEventListener('click', () => { if(!isSpinning) wheelModal.style.display = 'none'; });
+        btnOpenWheel.addEventListener('click', () => { AudioSys.init(); document.getElementById('shop-modal').style.display = 'none'; wheelModal.style.display = 'flex'; checkWheelTimer(); });
+        btnCloseWheel.addEventListener('click', () => { if(!isSpinning) { wheelModal.style.display = 'none'; document.getElementById('shop-modal').style.display = 'flex'; }});
 
         function checkWheelTimer() {
             let lastSpin = SafeStorage.get('mahjong_last_spin');
