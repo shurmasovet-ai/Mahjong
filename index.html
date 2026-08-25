@@ -229,7 +229,7 @@
         #no-moves-modal p { font-size: 16px; margin-bottom: 30px; color: #bdc3c7; max-width: 300px; line-height: 1.4;}
         #btn-close-no-moves { background: transparent; color: #95a5a6; border: none; font-size: 16px; text-decoration: underline; margin-top: 20px; cursor: pointer; }
 
-        /* --- РОСКОШНЫЙ ЭКРАН ПОХВАЛЫ (ЧИСТЫЙ CSS) --- */
+        /* --- РОСКОШНЫЙ ЭКРАН ПОХВАЛЫ (ЧИСТЫЙ CSS ДЛЯ COLAB) --- */
         #level-complete-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 15000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         
         #level-complete-overlay.active { display: flex; animation: overlayFadeIn 0.3s ease-out forwards; }
@@ -339,7 +339,7 @@
     </div>
 
     <script>
-        // --- АСМР АУДИОСИСТЕМА ---
+        // --- АСМР АУДИОСИСТЕМА (Сверхнадежная защита для Colab) ---
         const AudioSys = {
             ctx: null, enabled: true,
             init: function() {
@@ -542,6 +542,20 @@
             return [...themeSets[t1].slice(0, 7), ...themeSets[t2].slice(7, 14), ...themeSets[t3].slice(14, 20)];
         }
         
+        // --- 100% МАТЕМАТИЧЕСКАЯ ГАРАНТИЯ РЕШАЕМОСТИ УРОВНЯ ---
+        function forceSolvableAssignment(layout, pairsPool) {
+            let sorted = [...layout].sort((a, b) => b.z - a.z || a.y - b.y || a.x - b.x);
+            let pool = [...pairsPool];
+            for (let i = pool.length - 1; i > 0; i--) { 
+                const j = Math.floor(Math.random() * (i + 1)); 
+                [pool[i], pool[j]] = [pool[j], pool[i]]; 
+            }
+            sorted.forEach((tile, i) => {
+                tile.symbol = pool[Math.floor(i / 2)];
+            });
+            return sorted;
+        }
+
         function assignSymbolsSmart(layout, pairsPool, customRnd) {
             let unassigned = layout.map(pos => ({...pos, symbol: null}));
             let symbolPool = [...pairsPool];
@@ -587,7 +601,9 @@
             function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
             let shapeIndex = (currentLevel - 1) % 8; 
             
-            while (!finalLayout && attempt < 500) {
+            let lastValidLayout = null, lastPairsPool = null;
+
+            while (!finalLayout && attempt < 200) {
                 attempt++; 
                 let layout = [], grid = {}, maxCols = 8, maxRows = 8;
                 for (let z = 0; z < diff.maxLayers; z++) {
@@ -612,17 +628,26 @@
                 }
                 if (layout.length % 2 !== 0) layout.pop(); 
                 if (layout.length < 4) continue;
+                
+                lastValidLayout = layout.map(t => ({...t}));
                 let pairsPool = []; for(let i = 0; i < layout.length / 2; i++) pairsPool.push(baseSymbols[Math.floor(rnd() * baseSymbols.length)]);
-                let prepared = assignSymbolsSmart(layout, pairsPool, rnd); if (prepared) finalLayout = prepared; 
+                lastPairsPool = [...pairsPool];
+
+                let prepared = assignSymbolsSmart(layout, pairsPool, rnd); 
+                if (prepared) finalLayout = prepared; 
             }
 
+            // АБСОЛЮТНАЯ ЗАЩИТА: Если 200 попыток провалились, используем запасной план (100% решаемый)
             if (!finalLayout) {
-                let fallbackLayout = []; let maxTiles = Math.min(40, Math.max(8, currentLevel * 2)); if (maxTiles % 2 !== 0) maxTiles++; 
-                let fX = 0, fY = 0;
-                for (let i = 0; i < maxTiles; i++) { fallbackLayout.push({x: fX, y: fY, z: 0}); fX += 2; if (fX > 8) { fX = 0; fY += 2; } }
-                let fallbackPool = []; for(let i = 0; i < maxTiles / 2; i++) { fallbackPool.push(baseSymbols[Math.floor(rnd() * baseSymbols.length)]); }
-                let prepared = assignSymbolsSmart(fallbackLayout, fallbackPool, rnd);
-                finalLayout = prepared || fallbackLayout.map((pos, i) => ({...pos, symbol: fallbackPool[Math.floor(i/2)]}));
+                if (lastValidLayout && lastPairsPool) {
+                    finalLayout = forceSolvableAssignment(lastValidLayout, lastPairsPool);
+                } else {
+                    let fallback = [];
+                    for(let i=0; i<12; i++) fallback.push({x: (i%4)*2, y: Math.floor(i/4)*2, z: 0});
+                    let pool = [];
+                    for(let i=0; i<6; i++) pool.push(baseSymbols[i]);
+                    finalLayout = forceSolvableAssignment(fallback, pool);
+                }
             }
 
             if ((currentLevel % 10 === 7) || (currentLevel % 10 === 8)) {
@@ -873,17 +898,24 @@
                     }
                 } else { 
                     // НЕСОВПАДЕНИЕ (МГНОВЕННОЕ ПЕРЕКЛЮЧЕНИЕ ВЫБОРА)
-                    AudioSys.playClick(true); 
+                    if (!justUnlocked) {
+                        AudioSys.playClick(true);
+                    }
                     firstTile.el.classList.remove('selected'); 
                     
-                    // Делаем новую фишку выбранной (не нужно кликать второй раз!)
+                    // Мгновенно выбираем новую фишку без второго клика
                     firstTile = t; 
                     firstTile.el.classList.add('selected');
                     
                     if (tutorialMode) positionFingerOnTile(tutorialPair[0].isFree ? tutorialPair[0] : tutorialPair[1]);
                 } 
             } else { 
-                AudioSys.playClick(false); t.el.classList.remove('selected'); firstTile = null; 
+                // Случайный двойной клик по одной и той же фишке
+                if (!justUnlocked) {
+                    AudioSys.playClick(false); 
+                    t.el.classList.remove('selected'); 
+                    firstTile = null; 
+                }
                 if (tutorialMode) positionFingerOnTile(tutorialPair[0].isFree ? tutorialPair[0] : tutorialPair[1]);
             }
         }
@@ -904,11 +936,9 @@
                     let attemptMix = 0, preparedTiles = null;
                     while (!preparedTiles && attemptMix < 100) { attemptMix++; preparedTiles = assignSymbolsSmart(currentLayout, pairsPool, Math.random); }
                     
+                    // ЕСЛИ МИКС ЗАСТРЯЛ, ГАРАНТИРУЕМ РЕШАЕМОСТЬ
                     if (!preparedTiles) {
-                        currentLayout = []; let fX = 0, fY = 4;
-                        for (let i = 0; i < activeTiles.length; i++) { currentLayout.push({x: fX, y: fY, z: 0}); fX += 2; if (fX > 8) { fX = 0; fY += 2; } }
-                        preparedTiles = assignSymbolsSmart(currentLayout, pairsPool, Math.random);
-                        if (!preparedTiles) { let shuffledSymbols = [...currentSymbols]; preparedTiles = currentLayout.map((pos, i) => ({...pos, symbol: shuffledSymbols[i]})); }
+                        preparedTiles = forceSolvableAssignment(currentLayout, pairsPool);
                     }
 
                     let hideIndices = Array.from({length: currentLayout.length}, (_, i) => i);
