@@ -178,7 +178,7 @@
         .flip-anim { animation: flipTileIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes flipTileIn { 0% { transform: translateY(-4vw) scale(1.1) rotateY(-90deg); } 100% { transform: translateY(-4vw) scale(1.1) rotateY(0deg); } }
 
-        /* --- СИСТЕМА ОБУЧЕНИЯ --- */
+        /* --- СИСТЕМА ОБУЧЕНИЯ (TUTORIAL) --- */
         #tutorial-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.75); z-index: 9000; pointer-events: none; transition: opacity 0.3s; }
         #tutorial-finger { display: none; position: absolute; font-size: 60px; z-index: 9002; pointer-events: none; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8)); animation: poke 0.8s infinite alternate cubic-bezier(0.25, 0.46, 0.45, 0.94); }
         @keyframes poke { 0% { transform: translate(-20%, 20%) scale(1); } 100% { transform: translate(-20%, -10%) scale(0.9); } }
@@ -229,8 +229,9 @@
         #no-moves-modal p { font-size: 16px; margin-bottom: 30px; color: #bdc3c7; max-width: 300px; line-height: 1.4;}
         #btn-close-no-moves { background: transparent; color: #95a5a6; border: none; font-size: 16px; text-decoration: underline; margin-top: 20px; cursor: pointer; }
 
-        /* --- РОСКОШНЫЙ ЭКРАН ПОХВАЛЫ --- */
+        /* --- РОСКОШНЫЙ ЭКРАН ПОХВАЛЫ (ЧИСТЫЙ CSS ДЛЯ COLAB/GITHUB) --- */
         #level-complete-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 15000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        
         #level-complete-overlay.active { display: flex; animation: overlayFadeIn 0.3s ease-out forwards; }
         #level-complete-overlay.fade-out { animation: overlayFadeOut 0.4s ease-in forwards; }
         
@@ -338,14 +339,14 @@
     </div>
 
     <script>
-        // --- 1. БЕЗОПАСНОЕ ХРАНИЛИЩЕ (Защита от крашей Colab/Iframe) ---
+        // --- 1. БЕЗОПАСНОЕ ХРАНИЛИЩЕ (Снимает краши в Colab и Github Pages) ---
         const SafeStorage = {
             get: function(key) { try { return localStorage.getItem(key); } catch(e) { return null; } },
-            set: function(key, value) { try { localStorage.setItem(key, value); } catch(e) { console.warn("Storage locked by Colab"); } },
+            set: function(key, value) { try { localStorage.setItem(key, value); } catch(e) { console.warn("Storage warning"); } },
             remove: function(key) { try { localStorage.removeItem(key); } catch(e) {} }
         };
 
-        // --- 2. АСМР АУДИОСИСТЕМА ---
+        // --- 2. АСМР АУДИОСИСТЕМА (Неубиваемая) ---
         const AudioSys = {
             ctx: null, enabled: true,
             init: function() {
@@ -410,13 +411,13 @@
         let tutorialMode = false;
         let tutorialPair = [];
         let isGameLocked = false; 
+        let isLevelCompleting = false; // ЖЕСТКИЙ БЛОКИРАТОР БАГОВ ПРИ ПЕРЕХОДЕ
         const COMBO_TIME_LIMIT = 4000; 
 
-        // ИСПОЛЬЗУЕМ БЕЗОПАСНОЕ ХРАНИЛИЩЕ
         let savedLvl = SafeStorage.get('mahjong_level'); if (savedLvl) currentLevel = parseInt(savedLvl); 
         let savedScore = SafeStorage.get('mahjong_score'); if (savedScore) totalScore = parseInt(savedScore);
         
-        // 60 ИДЕАЛЬНЫХ НАБОРОВ
+        // --- 60 ИДЕАЛЬНЫХ НАБОРОВ (МАТЕМАТИКА ПРОВЕРЕНА) ---
         const themeSets = [
             ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'],
             ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'],
@@ -546,7 +547,7 @@
             return [...themeSets[t1].slice(0, 7), ...themeSets[t2].slice(7, 14), ...themeSets[t3].slice(14, 20)];
         }
 
-        // АБСОЛЮТНАЯ ГАРАНТИЯ РЕШАЕМОСТИ ЛЮБОГО ИЗ 14.5 МЛН УРОВНЕЙ
+        // --- ГАРАНТИЯ 14.5 МЛН УРОВНЕЙ БЕЗ ТУПИКОВ ---
         function forceSolvableAssignment(layout, pairsPool) {
             let sorted = [...layout].sort((a, b) => b.z - a.z || a.y - b.y || a.x - b.x);
             let pool = [...pairsPool];
@@ -586,6 +587,8 @@
         }
 
         function initGame() {
+            isLevelCompleting = false; // ЖЕСТКИЙ СБРОС БЛОКИРАТОРА
+            
             const board = document.getElementById('game-board'); board.innerHTML = ''; activeTiles = []; firstTile = null; matchHistory = [];
             document.getElementById('message').innerHTML = ''; document.getElementById('btn-shuffle').classList.remove('btn-pulse'); document.getElementById('progress-bar').style.width = '0%';
             comboCount = 0; isGameLocked = false; updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI();
@@ -684,9 +687,12 @@
         }
 
         function checkGameState() {
-            if (activeTiles.length === 0) return;
+            if (activeTiles.length === 0 || isLevelCompleting) return;
+            
             let freeTiles = activeTiles.filter(t => t.isFree);
-            let hasMoves = false; let symbolsSet = new Set();
+            let hasMoves = false;
+            let symbolsSet = new Set();
+            
             for (let t of freeTiles) {
                 if (t.isHidden) { hasMoves = true; break; }
                 if (symbolsSet.has(t.symbol)) { hasMoves = true; break; } 
@@ -697,11 +703,15 @@
             if (!hasMoves) { 
                 isGameLocked = true; 
                 if (firstTile) { firstTile.el.classList.remove('selected'); firstTile = null; }
-                document.getElementById('message').innerText = 'НЕТ ХОДОВ! Нажмите Микс ➔'; document.getElementById('message').style.color = '#e74c3c'; 
-                btnShuffle.classList.add('btn-pulse'); document.getElementById('no-moves-modal').style.display = 'flex';
+                document.getElementById('message').innerText = 'НЕТ ХОДОВ! Нажмите Микс ➔'; 
+                document.getElementById('message').style.color = '#e74c3c'; 
+                btnShuffle.classList.add('btn-pulse'); 
+                document.getElementById('no-moves-modal').style.display = 'flex';
             } else { 
-                isGameLocked = false; document.getElementById('message').innerHTML = ''; 
-                btnShuffle.classList.remove('btn-pulse'); document.getElementById('no-moves-modal').style.display = 'none';
+                isGameLocked = false; 
+                document.getElementById('message').innerHTML = ''; 
+                btnShuffle.classList.remove('btn-pulse'); 
+                document.getElementById('no-moves-modal').style.display = 'none';
             }
             updateBoostersUI();
         }
@@ -709,8 +719,11 @@
         document.getElementById('btn-modal-shuffle').addEventListener('click', () => { document.getElementById('no-moves-modal').style.display = 'none'; watchAdToShuffle(); });
         document.getElementById('btn-close-no-moves').addEventListener('click', () => { document.getElementById('no-moves-modal').style.display = 'none'; });
 
-        // --- ГАРАНТИЯ ЗАГРУЗКИ СЛЕДУЮЩЕГО УРОВНЯ ---
+        // --- 3. БРОНИРОВАННЫЙ, НЕУБИВАЕМЫЙ ПЕРЕХОД УРОВНЯ ---
         function levelComplete() {
+            if (isLevelCompleting) return; // Запрещаем двойной вызов!
+            isLevelCompleting = true; 
+
             AudioSys.playWin(); 
             currentLevel++; 
             SafeStorage.set('mahjong_level', currentLevel);
@@ -719,6 +732,7 @@
             const overlay = document.getElementById('level-complete-overlay');
             const praiseEl = document.getElementById('level-complete-praise');
             
+            // 20 разнообразных вариантов похвалы
             const praiseWords = [
                 "ВЕЛИКОЛЕПНО!", "БЛЕСТЯЩЕ!", "ГЕНИАЛЬНО!", "ИДЕАЛЬНО!", 
                 "ПРЕВОСХОДНО!", "МАСТЕРСКИ!", "ПОТРЯСАЮЩЕ!", "БЕЗУПРЕЧНО!",
@@ -733,13 +747,14 @@
             void overlay.offsetWidth; 
             overlay.classList.add('active');
 
+            // Запускаем железобетонный таймер перехода
             setTimeout(() => { 
                 overlay.classList.remove('active');
                 overlay.classList.add('fade-out');
                 setTimeout(() => {
                     overlay.style.display = 'none';
                     overlay.className = '';
-                    initGame(); // <-- ЖЕЛЕЗОБЕТОННЫЙ ПЕРЕХОД
+                    initGame(); // <-- ГАРАНТИЯ 100% ВЫЗОВА
                 }, 400);
             }, 3000); 
         }
@@ -807,9 +822,9 @@
             finger.style.left = (rect.left + window.scrollX + rect.width / 2) + 'px'; finger.style.top = (rect.top + window.scrollY + rect.height / 2) + 'px';
         }
 
-        // --- ИДЕАЛЬНАЯ ЛОГИКА ВЫБОРА БЕЗ ДВОЙНЫХ КЛИКОВ 2.0 ---
+        // --- 4. СКВОЗНОЙ КЛИК 2.0 (Защита от двойных нажатий) ---
         function handleTileClick(t, event) { 
-            if (isGameLocked) return;
+            if (isGameLocked || isLevelCompleting) return; // Игнорируем клики при блокировке и загрузке
             if (tutorialMode) { if (t !== tutorialPair[0] && t !== tutorialPair[1]) return; }
             if (!t.isFree) return;
             
@@ -830,8 +845,10 @@
                 firstTile = t; 
                 if (!justUnlocked) AudioSys.playClick(true); 
                 if (tutorialMode) { let nextTile = (t === tutorialPair[0]) ? tutorialPair[1] : tutorialPair[0]; positionFingerOnTile(nextTile); }
+            
             } else if (firstTile !== t) { 
                 
+                // МГНОВЕННОЕ СОВПАДЕНИЕ
                 if (firstTile.symbol === t.symbol) { 
                     t.el.classList.add('selected'); 
                     if (tutorialMode) {
@@ -864,9 +881,11 @@
                     firstTile = null; 
                     updateFreeState(); updateProgressBar();
                     
-                    if (activeTiles.length === 0) { levelComplete(); }
+                    if (activeTiles.length === 0) { 
+                        levelComplete(); // <-- ВЫЗЫВАЕМ ПОБЕДУ
+                    }
                 } else { 
-                    // МГНОВЕННОЕ ПЕРЕКЛЮЧЕНИЕ ПРИ ПРОМАХЕ (ОТМЕНЯЕТ ДВОЙНОЙ КЛИК)
+                    // СМЕНА ВЫБОРА БЕЗ ВТОРОГО КЛИКА (Моментально)
                     if (!justUnlocked) AudioSys.playClick(true);
                     firstTile.el.classList.remove('selected'); 
                     firstTile = t; 
@@ -874,16 +893,29 @@
                     if (tutorialMode) positionFingerOnTile(tutorialPair[0].isFree ? tutorialPair[0] : tutorialPair[1]);
                 } 
             } else { 
-                // Отмена выбора
-                if (!justUnlocked) {
-                    AudioSys.playClick(false); t.el.classList.remove('selected'); firstTile = null; 
-                }
-                if (tutorialMode) positionFingerOnTile(tutorialPair[0].isFree ? tutorialPair[0] : tutorialPair[1]);
+                // АНТИ-БАГ: Если игрок дважды кликнул на ту же самую фишку
+                // Мы ПРОСТО ИГНОРИРУЕМ второй клик. Фишка не сбрасывается.
+                // Это решает проблему "нажатия по 2 раза".
+                return;
             }
         }
 
+        // --- 5. НЕУБИВАЕМОЕ КОНФЕТТИ ---
+        function shootConfetti() {
+            try {
+                const colors = ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6'];
+                for(let i = 0; i < 60; i++) {
+                    let conf = document.createElement('div'); conf.classList.add('confetti');
+                    conf.style.left = Math.random() * 100 + 'vw'; conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    conf.style.animationDuration = (Math.random() * 2 + 2) + 's'; conf.style.animationDelay = (Math.random() * 0.5) + 's';
+                    document.body.appendChild(conf); 
+                    setTimeout(() => { if(conf && conf.parentNode) conf.parentNode.removeChild(conf); }, 5000);
+                }
+            } catch(e) {}
+        }
+
         function watchAdToShuffle() { 
-            if (activeTiles.length === 0 || tutorialMode) return;
+            if (activeTiles.length === 0 || tutorialMode || isLevelCompleting) return;
             const ad = document.getElementById('ad-screen'); if(ad) ad.style.display = 'flex'; 
             setTimeout(() => { 
                 if(ad) ad.style.display = 'none'; 
@@ -898,9 +930,7 @@
                     let attemptMix = 0, preparedTiles = null;
                     while (!preparedTiles && attemptMix < 100) { attemptMix++; preparedTiles = assignSymbolsSmart(currentLayout, pairsPool, Math.random); }
                     
-                    if (!preparedTiles) {
-                        preparedTiles = forceSolvableAssignment(currentLayout, pairsPool);
-                    }
+                    if (!preparedTiles) { preparedTiles = forceSolvableAssignment(currentLayout, pairsPool); }
 
                     let hideIndices = Array.from({length: currentLayout.length}, (_, i) => i);
                     for (let i = hideIndices.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [hideIndices[i], hideIndices[j]] = [hideIndices[j], hideIndices[i]]; }
@@ -940,7 +970,7 @@
         }
 
         function buyBooster(btnId, cost, action) {
-            if (tutorialMode || (isGameLocked && btnId !== 'bst-undo' && btnId !== 'bst-bomb' && btnId !== 'bst-light')) return;
+            if (tutorialMode || isLevelCompleting || (isGameLocked && btnId !== 'bst-undo' && btnId !== 'bst-bomb' && btnId !== 'bst-light')) return;
             let btn = document.getElementById(btnId);
             if (btn.classList.contains('locked') || btn.classList.contains('disabled')) { AudioSys.playError(); let scoreEl = document.getElementById('hud-score'); scoreEl.style.color = '#e74c3c'; setTimeout(() => scoreEl.style.color = '#fff', 300); return; }
             totalScore -= cost; SafeStorage.set('mahjong_score', totalScore); updateScoreDisplay(); AudioSys.playBooster(); action();
