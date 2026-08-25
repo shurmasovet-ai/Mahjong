@@ -22,7 +22,7 @@
             background: radial-gradient(circle at center, #6b1222 0%, #2a050b 100%);
             color: white; width: 100vw; height: 100vh; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-            /* ЗАЩИТА ДЛЯ ЯНДЕКС ИГР: БЛОКИРОВКА СКРОЛЛА И ВЫДЕЛЕНИЯ ТЕКСТА */
+            /* ЗАЩИТА ДЛЯ ЯНДЕКС ИГР */
             user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: none;
         }
 
@@ -131,6 +131,8 @@
         .btn-small-top:active { transform: translateY(4px); box-shadow: 0 0 0 #2980b9; }
         .btn-sound { background-color: #9b59b6; box-shadow: 0 4px 0 #8e44ad, 0 5px 10px rgba(0,0,0,0.5); font-size: 14px;}
         .btn-sound:active { box-shadow: 0 0 0 #8e44ad; }
+        .btn-music { background-color: #27ae60; box-shadow: 0 4px 0 #2ecc71, 0 5px 10px rgba(0,0,0,0.5); font-size: 14px;}
+        .btn-music:active { box-shadow: 0 0 0 #2ecc71; }
 
         @keyframes pulseBtnTop { 
             0% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 0 0 rgba(231, 76, 60, 0.7); } 
@@ -151,8 +153,7 @@
             box-shadow: inset 3px 3px 6px rgba(255, 255, 255, 1), inset -4px -5px 8px rgba(0, 0, 0, 0.18), calc(0.5vw + var(--z) * 0.1vw) calc(0.9vw + var(--z) * 0.2vw) 0px var(--tileSide), calc(1vw + var(--z) * 0.5vw) calc(1.5vw + var(--z) * 0.5vw) calc(3vw + var(--z) * 0.8vw) rgba(0,0,0,0.65); 
             border: 1px solid rgba(255,255,255,0.4); backdrop-filter: blur(4px); touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent;
             transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s, box-shadow 0.2s, top 0.5s ease-in-out, left 0.5s ease-in-out, margin-top 0.5s ease-in-out, margin-left 0.5s ease-in-out; 
-            cursor: pointer; transform-style: preserve-3d;
-            pointer-events: auto;
+            cursor: pointer; transform-style: preserve-3d; pointer-events: auto;
         }
 
         .tile::before {
@@ -346,9 +347,13 @@
 
     <div id="game-screen">
         <div id="top-bar">
-            <div style="display: flex; flex-direction: column; flex-basis: 60px;">
+            <!-- Две раздельные кнопки звука в одном блоке -->
+            <div style="display: flex; flex-direction: column; flex-basis: 75px;">
                 <button id="btn-menu" class="btn-small-top">🏠 Меню</button>
-                <button id="btn-sound" class="btn-small-top btn-sound">🔊</button>
+                <div style="display: flex; gap: 4px;">
+                    <button id="btn-sound" class="btn-small-top btn-sound" style="flex: 1; padding: 8px 0; margin-bottom: 0;" title="Эффекты">🔊</button>
+                    <button id="btn-music" class="btn-small-top btn-music" style="flex: 1; padding: 8px 0; margin-bottom: 0;" title="Фон">🍃</button>
+                </div>
             </div>
             <div class="hud-center">
                 <div class="level-switcher">
@@ -362,7 +367,7 @@
                 <div id="hud-score">🏆 0</div>
                 <div id="hud-difficulty">🟢 Легко</div>
             </div>
-            <div style="flex-basis: 60px;"></div>
+            <div style="flex-basis: 75px;"></div>
         </div>
         
         <div id="progress-container"><div id="progress-bar"></div></div>
@@ -386,14 +391,8 @@
     </div>
 
     <script>
-        // Инициализация Yandex Games SDK
         let ys = null;
-        try { 
-            YaGames.init().then(ysdk => { 
-                ys = ysdk; 
-                console.log("Yandex SDK initialized"); 
-            }).catch(e => console.warn("Yandex SDK not found")); 
-        } catch(e) {}
+        try { YaGames.init().then(ysdk => { ys = ysdk; if (ys.features && ys.features.LoadingAPI) { ys.features.LoadingAPI.ready(); } console.log("Yandex SDK initialized"); }).catch(e => console.warn("Yandex SDK not found")); } catch(e) {}
 
         const SafeStorage = {
             get: function(key) { try { return localStorage.getItem(key); } catch(e) { return null; } },
@@ -401,9 +400,8 @@
             remove: function(key) { try { localStorage.removeItem(key); } catch(e) {} }
         };
 
-        // --- АСМР АУДИОСИСТЕМА С ЭМБИЕНТОМ ЛИСТВЫ И ФАНФАРОЙ ---
         const AudioSys = {
-            ctx: null, enabled: true, ambientPlaying: false,
+            ctx: null, enabled: true, musicEnabled: true, ambientPlaying: false,
             noiseSrc: null, noiseGain: null, windLFO: null, lfoGain: null,
             
             init: function() { 
@@ -411,12 +409,12 @@
                     let AContext = window.AudioContext || window.webkitAudioContext; 
                     if (AContext && !this.ctx) this.ctx = new AContext(); 
                     if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); 
-                    if (this.enabled && !this.ambientPlaying) this.startAmbient();
-                } catch(e) { this.enabled = false; } 
+                    if (this.musicEnabled && !this.ambientPlaying) this.startAmbient();
+                } catch(e) { this.enabled = false; this.musicEnabled = false; } 
             },
             
             startAmbient: function() {
-                if (!this.enabled || !this.ctx || this.ambientPlaying) return;
+                if (!this.musicEnabled || !this.ctx || this.ambientPlaying) return;
                 try {
                     let bufferSize = this.ctx.sampleRate * 2;
                     let noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
@@ -433,11 +431,11 @@
                     this.noiseFilter.Q.value = 0.5;
 
                     this.noiseGain = this.ctx.createGain();
-                    this.noiseGain.gain.value = 0.05; // Тихий базовый фон
+                    this.noiseGain.gain.value = 0.05; 
 
                     this.windLFO = this.ctx.createOscillator();
                     this.windLFO.type = 'sine';
-                    this.windLFO.frequency.value = 0.15; // Медленный ветер
+                    this.windLFO.frequency.value = 0.15; 
 
                     this.lfoGain = this.ctx.createGain();
                     this.lfoGain.gain.value = 0.04;
@@ -478,7 +476,6 @@
                 try { if (!this.enabled || !this.ctx || this.ctx.state !== 'running') return; let playTock = (delay, freq) => { setTimeout(() => { if (!this.ctx || this.ctx.state !== 'running') return; let osc = this.ctx.createOscillator(); let gain = this.ctx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(freq, this.ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(freq * 0.2, this.ctx.currentTime + 0.04); gain.gain.setValueAtTime(0.7, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.04); osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.05); }, delay); }; playTock(0, 250); playTock(35, 300); } catch(e) {}
             },
             
-            // НОВАЯ ФАНФАРА "Та-да-дам, та-дам"
             playWin: function() { 
                 try {
                     if (!this.enabled || !this.ctx || this.ctx.state !== 'running') return;
@@ -491,8 +488,8 @@
                     ];
                     notes.forEach(n => {
                         setTimeout(() => {
-                            this.playOsc('square', n.f, null, n.d, 0.15); // Медь
-                            this.playOsc('sine', n.f, null, n.d, 0.3);    // Основа
+                            this.playOsc('square', n.f, null, n.d, 0.15); 
+                            this.playOsc('sine', n.f, null, n.d, 0.3);    
                         }, n.delay);
                     });
                 } catch(e) {}
@@ -503,11 +500,19 @@
             playBooster: function() { this.playOsc('triangle', 800, 200, 0.2, 0.3); },
             playError: function() { this.playOsc('sawtooth', 150, 100, 0.2, 0.3); },
             
-            toggle: function() { 
+            toggleSound: function() { 
                 this.enabled = !this.enabled; 
+                SafeStorage.set('mahjong_sound', this.enabled);
                 const btn = document.getElementById('btn-sound'); 
                 if (btn) btn.innerText = this.enabled ? '🔊' : '🔇'; 
-                if (this.enabled) {
+            },
+            
+            toggleMusic: function() {
+                this.musicEnabled = !this.musicEnabled;
+                SafeStorage.set('mahjong_music', this.musicEnabled);
+                const btn = document.getElementById('btn-music');
+                if (btn) btn.innerText = this.musicEnabled ? '🍃' : '🔇';
+                if (this.musicEnabled) {
                     if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
                     this.startAmbient();
                 } else {
@@ -516,16 +521,27 @@
             }
         };
 
-        // ТРЕБОВАНИЕ ЯНДЕКСА: УПРАВЛЕНИЕ АУДИО ПРИ СВЕРТЫВАНИИ ВКЛАДКИ
+        // ВОССТАНОВЛЕНИЕ НАСТРОЕК ЗВУКА ИЗ ПАМЯТИ
+        document.addEventListener("DOMContentLoaded", () => {
+            let savedMusic = SafeStorage.get('mahjong_music');
+            if (savedMusic !== null) AudioSys.musicEnabled = (savedMusic === 'true');
+            let savedSound = SafeStorage.get('mahjong_sound');
+            if (savedSound !== null) AudioSys.enabled = (savedSound === 'true');
+            
+            document.getElementById('btn-sound').innerText = AudioSys.enabled ? '🔊' : '🔇';
+            document.getElementById('btn-music').innerText = AudioSys.musicEnabled ? '🍃' : '🔇';
+        });
+
+        // ПАУЗА ЗВУКА ПРИ СВЕРТЫВАНИИ (ЯНДЕКС)
         document.addEventListener("visibilitychange", () => {
             if (document.hidden) {
                 if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend();
             } else {
-                if (AudioSys.ctx && AudioSys.ctx.state === 'suspended' && AudioSys.enabled) AudioSys.ctx.resume();
+                if (AudioSys.ctx && AudioSys.ctx.state === 'suspended' && (AudioSys.enabled || AudioSys.musicEnabled)) AudioSys.ctx.resume();
             }
         });
         window.addEventListener("blur", () => { if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend(); });
-        window.addEventListener("focus", () => { if (AudioSys.ctx && AudioSys.ctx.state === 'suspended' && AudioSys.enabled) AudioSys.ctx.resume(); });
+        window.addEventListener("focus", () => { if (AudioSys.ctx && AudioSys.ctx.state === 'suspended' && (AudioSys.enabled || AudioSys.musicEnabled)) AudioSys.ctx.resume(); });
 
         function createParticles() {
             const container = document.getElementById('particles-container'); container.innerHTML = '';
@@ -538,7 +554,7 @@
         let matchHistory = [];
         let tutorialMode = false, tutorialPair = [];
         let isGameLocked = false; 
-        let isLevelCompleting = false; 
+        window.isLevelCompleting = false; 
         let isFirstLoad = true;
         const COMBO_TIME_LIMIT = 4000; 
 
@@ -649,7 +665,10 @@
         document.getElementById('btn-close-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'none');
         document.getElementById('btn-menu').addEventListener('click', () => { document.getElementById('game-screen').style.display = 'none'; document.getElementById('main-menu').style.display = 'flex'; updateMenuLevelText(); });
         
-        document.getElementById('btn-sound').addEventListener('click', () => { AudioSys.init(); AudioSys.toggle(); });
+        // --- ДВЕ КНОПКИ ЗВУКА ---
+        document.getElementById('btn-sound').addEventListener('click', () => { AudioSys.init(); AudioSys.toggleSound(); });
+        document.getElementById('btn-music').addEventListener('click', () => { AudioSys.init(); AudioSys.toggleMusic(); });
+        
         document.getElementById('btn-hud-prev').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; SafeStorage.set('mahjong_level', currentLevel); initGame(); }});
         document.getElementById('btn-hud-next').addEventListener('click', () => { currentLevel++; SafeStorage.set('mahjong_level', currentLevel); initGame(); });
 
@@ -713,7 +732,7 @@
         }
 
         function initGame() {
-            isLevelCompleting = false; 
+            window.isLevelCompleting = false; 
             
             const board = document.getElementById('game-board'); board.innerHTML = ''; activeTiles = []; firstTile = null; matchHistory = [];
             document.getElementById('message').innerHTML = ''; document.getElementById('btn-shuffle').classList.remove('btn-pulse'); document.getElementById('progress-bar').style.width = '0%';
@@ -798,7 +817,6 @@
 
             if (currentLevel === 1 && !SafeStorage.get('mahjong_tutorial_done')) { setTimeout(startTutorial, 600); }
 
-            // Требование Яндекс Игр (сообщаем, что игра загрузилась)
             if (isFirstLoad && ys && ys.features && ys.features.LoadingAPI) {
                 ys.features.LoadingAPI.ready();
                 isFirstLoad = false;
@@ -821,7 +839,7 @@
         }
 
         function checkGameState() {
-            if (activeTiles.length === 0 || isLevelCompleting) return;
+            if (activeTiles.length === 0 || window.isLevelCompleting) return;
             
             let freeTiles = activeTiles.filter(t => t.isFree);
             let hasMoves = false;
@@ -854,11 +872,11 @@
         document.getElementById('btn-close-no-moves').addEventListener('click', () => { document.getElementById('no-moves-modal').style.display = 'none'; });
 
         // ========================================================================
-        // --- 💥 ЭКРАН ПОБЕДЫ, ФЕЙЕРВЕРКОВ И 100% ПЕРЕХОДА УРОВНЯ 💥 ---
+        // --- 💥 ЭКРАН ПОБЕДЫ (С ФАНФАРОЙ) 💥 ---
         // ========================================================================
         function levelComplete() {
-            if (isLevelCompleting) return; 
-            isLevelCompleting = true; 
+            if (window.isLevelCompleting) return; 
+            window.isLevelCompleting = true; 
 
             try { AudioSys.playWin(); } catch(e){}
             
@@ -867,17 +885,12 @@
                 SafeStorage.set('mahjong_level', currentLevel);
             } catch(e){}
 
-            // 1. ЗАПУСК ФОНТАНА И ФЕЙЕРВЕРКОВ
             shootEpicConfetti();
             launchFireworks();
             
-            // 2. СТРАХОВКА: ДАЖЕ ЕСЛИ ОКНО ПОЛОМАЕТСЯ, ИГРА ПЕРЕЙДЕТ ДАЛЬШЕ
-            setTimeout(() => {
+            let fallbackTimer = setTimeout(() => {
                 const overlay = document.getElementById('level-complete-overlay');
-                if(overlay) {
-                    overlay.style.opacity = '0';
-                    setTimeout(() => { overlay.style.display = 'none'; }, 300);
-                }
+                if(overlay) { overlay.style.opacity = '0'; setTimeout(() => { overlay.style.display = 'none'; }, 300); }
                 initGame(); 
             }, 3500);
 
@@ -899,18 +912,22 @@
                 }
                 if (textEl) textEl.style.opacity = '1';
 
-                // Запуск плавного исчезновения
                 setTimeout(() => { 
                     if (overlay) overlay.style.opacity = '0';
                     if (praiseEl) praiseEl.style.transform = 'scale(0.8)';
+                    
+                    setTimeout(() => {
+                        if (overlay) overlay.style.display = 'none';
+                        clearTimeout(fallbackTimer);
+                        initGame(); 
+                    }, 500);
                 }, 3000); 
 
             } catch(e) {
-                console.error("Victory screen failed, proceeding to next level", e);
+                console.error("Victory screen failed", e);
             }
         }
 
-        // --- НОВЫЕ ФЕЙЕРВЕРКИ И КОНФЕТТИ ---
         function shootEpicConfetti() {
             try {
                 const colors = ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#ff00ff', '#00ffff'];
@@ -924,7 +941,7 @@
                     conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
                     if(Math.random() > 0.5) conf.style.borderRadius = '50%';
                     
-                    let angle = (Math.PI / 2) + (Math.random() * Math.PI - Math.PI / 2); // Вверх
+                    let angle = (Math.PI / 2) + (Math.random() * Math.PI - Math.PI / 2); 
                     let velocity = 50 + Math.random() * 150;
                     
                     conf.style.setProperty('--tx', (Math.cos(angle) * velocity) + 'vw');
@@ -1040,7 +1057,6 @@
             finger.style.left = (rect.left + window.scrollX + rect.width / 2) + 'px'; finger.style.top = (rect.top + window.scrollY + rect.height / 2) + 'px';
         }
 
-        // --- УМНЫЙ ПЕРЕХВАТЧИК КЛИКОВ (СКВОЗНОЙ КЛИК) ---
         function handleTileClick(t, event) { 
             if (window.isLevelCompleting || isGameLocked) return; 
             if (t.isMatched) return; 
