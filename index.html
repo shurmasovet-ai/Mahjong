@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="color-scheme" content="light only">
     <title>Mahjong Deluxe - Infinity</title>
+    <!-- ПОДКЛЮЧЕНИЕ YANDEX SDK ДЛЯ ПУБЛИКАЦИИ -->
+    <script src="https://yandex.ru/games/sdk/v2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -123,8 +125,6 @@
 
         .btn-small-top { font-family: sans-serif; font-size: 13px; padding: 8px 10px; border-radius: 15px; background-color: #3498db; color: white; border: none; font-weight: bold; box-shadow: 0 4px 0 #2980b9, 0 5px 10px rgba(0,0,0,0.5); transition: all 0.2s; cursor: pointer; white-space: nowrap; margin-bottom: 5px;}
         .btn-small-top:active { transform: translateY(4px); box-shadow: 0 0 0 #2980b9; }
-        .btn-mix { background-color: #e67e22; box-shadow: 0 4px 0 #d35400, 0 5px 10px rgba(0,0,0,0.5); }
-        .btn-mix:active { box-shadow: 0 0 0 #d35400; }
         .btn-sound { background-color: #9b59b6; box-shadow: 0 4px 0 #8e44ad, 0 5px 10px rgba(0,0,0,0.5); font-size: 14px;}
         .btn-sound:active { box-shadow: 0 0 0 #8e44ad; }
 
@@ -233,7 +233,7 @@
         #no-moves-modal p { font-size: 16px; margin-bottom: 30px; color: #bdc3c7; max-width: 300px; line-height: 1.4;}
         #btn-close-no-moves { background: transparent; color: #95a5a6; border: none; font-size: 16px; text-decoration: underline; margin-top: 20px; cursor: pointer; }
 
-        /* --- БЕЗОТКАЗНЫЙ ЭКРАН ПОХВАЛЫ (С ПРЯМЫМИ CSS ТРАНЗИЦИЯМИ) --- */
+        /* --- БРОНЕБОЙНЫЙ ЭКРАН ПОХВАЛЫ (ТРАНЗИЦИИ ВМЕСТО КЛАССОВ) --- */
         #level-complete-overlay { 
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
             background: rgba(0, 0, 0, 0.85); z-index: 15000; flex-direction: column; 
@@ -328,13 +328,14 @@
                 <div id="hud-score">🏆 0</div>
                 <div id="hud-difficulty">🟢 Легко</div>
             </div>
-            <div style="flex-basis: 60px;"></div> <!-- Пустое место для центровки -->
+            <div style="flex-basis: 60px;"></div>
         </div>
         
         <div id="progress-container"><div id="progress-bar"></div></div>
         <div id="message"></div>
         <div id="game-board"></div>
 
+        <!-- КНОПКА МИКС ПЕРЕНЕСЕНА ВНИЗ -->
         <div id="boosters-bar">
             <button class="booster" id="btn-shuffle" style="background: linear-gradient(135deg, #e67e22, #d35400); border-color: #d35400;">
                 🎥<div class="b-cost" style="color:#fff; text-shadow: none; font-size: 10px;">МИКС</div>
@@ -352,6 +353,18 @@
     </div>
 
     <script>
+        // Инициализация Yandex Games SDK (Защищена от ошибок в Colab/Локально)
+        let ys = null;
+        try {
+            YaGames.init().then(ysdk => {
+                ys = ysdk;
+                if (ys.features && ys.features.LoadingAPI) {
+                    ys.features.LoadingAPI.ready(); // Сообщаем Яндексу, что игра загрузилась
+                }
+                console.log("Yandex SDK initialized");
+            }).catch(e => console.warn("Yandex SDK not found (playing outside Yandex)"));
+        } catch(e) {}
+
         // --- БЕЗОПАСНОЕ ХРАНИЛИЩЕ ---
         const SafeStorage = {
             get: function(key) { try { return localStorage.getItem(key); } catch(e) { return null; } },
@@ -424,11 +437,15 @@
         let matchHistory = [];
         let tutorialMode = false, tutorialPair = [];
         let isGameLocked = false; 
-        window.isLevelCompleting = false; // Броня от множественных срабатываний перехода уровня
+        window.isLevelCompleting = false; 
         const COMBO_TIME_LIMIT = 4000; 
 
-        let savedLvl = SafeStorage.get('mahjong_level'); if (savedLvl) currentLevel = parseInt(savedLvl); 
-        let savedScore = SafeStorage.get('mahjong_score'); if (savedScore) totalScore = parseInt(savedScore);
+        // Защита от NaN при загрузке сохранения
+        let savedLvl = SafeStorage.get('mahjong_level'); 
+        if (savedLvl && !isNaN(parseInt(savedLvl))) currentLevel = parseInt(savedLvl); else currentLevel = 1;
+        
+        let savedScore = SafeStorage.get('mahjong_score'); 
+        if (savedScore && !isNaN(parseInt(savedScore))) totalScore = parseInt(savedScore); else totalScore = 0;
         
         const themeSets = [
             ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'],
@@ -675,7 +692,7 @@
                 el.style.setProperty('--x', obj.x); el.style.setProperty('--y', obj.y); el.style.setProperty('--z', obj.z); el.style.zIndex = (obj.z * 100) + obj.y;
                 if (obj.isHidden) { el.classList.add('is-hidden'); el.setAttribute('data-cover', obj.coverSymbol); }
                 obj.el = el; 
-                obj.isMatched = false; // Броня: флаг, что фишка уже собрана
+                obj.isMatched = false; 
                 el.addEventListener('click', (e) => handleTileClick(obj, e));
                 board.appendChild(el); activeTiles.push(obj);
             });
@@ -734,7 +751,7 @@
 
         // --- БРОНИРОВАННЫЙ, НЕУБИВАЕМЫЙ ПЕРЕХОД УРОВНЯ ---
         function levelComplete() {
-            if (window.isLevelCompleting) return; // Запрещаем двойной вызов!
+            if (window.isLevelCompleting) return; // Защита от дублей
             window.isLevelCompleting = true; 
 
             try { AudioSys.playWin(); } catch(e){}
@@ -744,8 +761,15 @@
                 SafeStorage.set('mahjong_level', currentLevel);
             } catch(e){}
 
-            shootConfetti();
+            try { shootConfetti(); } catch(e){}
             
+            // --- СТРАХОВКА: ДАЖЕ ЕСЛИ ОКНО ПОХВАЛЫ СЛОМАЕТСЯ, ИГРА ПЕРЕЙДЕТ НА СЛЕД. УРОВЕНЬ ---
+            setTimeout(() => {
+                const overlay = document.getElementById('level-complete-overlay');
+                if(overlay) overlay.style.display = 'none';
+                initGame(); 
+            }, 3500);
+
             try {
                 const overlay = document.getElementById('level-complete-overlay');
                 const praiseEl = document.getElementById('level-complete-praise');
@@ -753,38 +777,23 @@
                 
                 // 20 разнообразных вариантов похвалы
                 const praiseWords = ["ВЕЛИКОЛЕПНО!", "БЛЕСТЯЩЕ!", "ГЕНИАЛЬНО!", "ИДЕАЛЬНО!", "ПРЕВОСХОДНО!", "МАСТЕРСКИ!", "ПОТРЯСАЮЩЕ!", "БЕЗУПРЕЧНО!", "НЕВЕРОЯТНО!", "ТАЛАНТЛИВО!", "ВОСХИТИТЕЛЬНО!", "ФЕНОМЕНАЛЬНО!", "ГРАНДИОЗНО!", "БЕСПОДОБНО!", "ШИКАРНО!", "ИСКУСНО!", "ТРИУМФ!", "НЕПРЕВЗОЙДЁННО!", "ЭКСТРАКЛАСС!", "ИЗУМИТЕЛЬНО!"];
-                praiseEl.innerText = praiseWords[Math.floor(Math.random() * praiseWords.length)];
+                if (praiseEl) praiseEl.innerText = praiseWords[Math.floor(Math.random() * praiseWords.length)];
                 
-                overlay.style.display = 'flex';
-                
-                // Сброс всех стилей для чистого перехода (Обход бага CSS в Colab)
-                overlay.style.opacity = '0';
-                praiseEl.style.opacity = '0';
-                praiseEl.style.transform = 'scale(0.3)';
-                textEl.style.opacity = '0';
-                
-                void overlay.offsetWidth; // Принудительно заставляем браузер применить изменения
-                
-                // Запуск плавного появления
-                overlay.style.opacity = '1';
-                praiseEl.style.opacity = '1';
-                praiseEl.style.transform = 'scale(1)';
-                textEl.style.opacity = '1';
+                if (overlay) {
+                    overlay.style.display = 'flex';
+                    overlay.style.opacity = '1';
+                }
+                if (praiseEl) praiseEl.style.transform = 'scale(1)';
+                if (textEl) textEl.style.opacity = '1';
 
-                // Ждем 3 секунды, затем плавно скрываем и грузим уровень
+                // Запуск таймера плавного исчезновения
                 setTimeout(() => { 
-                    overlay.style.opacity = '0';
-                    praiseEl.style.transform = 'scale(0.8)';
-                    
-                    setTimeout(() => {
-                        overlay.style.display = 'none';
-                        initGame(); // 100% ВЫЗОВ НОВОГО УРОВНЯ
-                    }, 500);
+                    if (overlay) overlay.style.opacity = '0';
+                    if (praiseEl) praiseEl.style.transform = 'scale(0.8)';
                 }, 3000); 
+
             } catch(e) {
-                // Если вдруг сломался HTML, всё равно грузим следующий уровень
-                console.error("Окно победы дало сбой, принудительный запуск", e);
-                initGame();
+                console.error("Окно победы дало сбой, переход сработает по страховке", e);
             }
         }
 
@@ -851,10 +860,10 @@
             finger.style.left = (rect.left + window.scrollX + rect.width / 2) + 'px'; finger.style.top = (rect.top + window.scrollY + rect.height / 2) + 'px';
         }
 
-        // --- УМНЫЙ ПЕРЕХВАТЧИК КЛИКОВ (Защита от двойных нажатий) ---
+        // --- УМНЫЙ ПЕРЕХВАТЧИК КЛИКОВ (Защита от залипаний и двойных тапов) ---
         function handleTileClick(t, event) { 
             if (window.isLevelCompleting || isGameLocked) return; 
-            if (t.isMatched) return; // Игнорируем клик по уже исчезающей фишке!
+            if (t.isMatched) return; // <-- БРОНЯ: Игнорируем клик по уже собранной фишке!
             if (tutorialMode) { if (t !== tutorialPair[0] && t !== tutorialPair[1]) return; }
             if (!t.isFree) return;
             
@@ -916,18 +925,18 @@
                     updateFreeState(); updateProgressBar();
                     
                     if (activeTiles.length === 0) { 
-                        levelComplete(); // УРОВЕНЬ ПРОЙДЕН
+                        levelComplete(); // <-- ВЫЗЫВАЕМ ПОБЕДУ
                     }
                 } else { 
-                    // МГНОВЕННАЯ СМЕНА ВЫБОРА
+                    // СМЕНА ВЫБОРА БЕЗ ВТОРОГО КЛИКА (Моментально)
                     if (!justUnlocked) AudioSys.playClick(true);
-                    firstTile.el.classList.remove('selected'); 
+                    if (firstTile && firstTile.el) firstTile.el.classList.remove('selected'); 
                     firstTile = t; 
-                    firstTile.el.classList.add('selected');
+                    if (firstTile && firstTile.el) firstTile.el.classList.add('selected');
                     if (tutorialMode) positionFingerOnTile(tutorialPair[0].isFree ? tutorialPair[0] : tutorialPair[1]);
                 } 
             } else { 
-                // Случайный тап по той же фишке
+                // АНТИ-БАГ ДВОЙНОГО КЛИКА: если нажали на уже выбранную фишку, ничего не делаем.
                 return;
             }
         }
@@ -951,10 +960,7 @@
                     let attemptMix = 0, preparedTiles = null;
                     while (!preparedTiles && attemptMix < 100) { attemptMix++; preparedTiles = assignSymbolsSmart(currentLayout, pairsPool, Math.random); }
                     
-                    // ЕСЛИ МИКС ЗАСТРЯЛ, ГАРАНТИРУЕМ РЕШАЕМОСТЬ
-                    if (!preparedTiles) {
-                        preparedTiles = forceSolvableAssignment(currentLayout, pairsPool);
-                    }
+                    if (!preparedTiles) { preparedTiles = forceSolvableAssignment(currentLayout, pairsPool); }
 
                     let hideIndices = Array.from({length: currentLayout.length}, (_, i) => i);
                     for (let i = hideIndices.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [hideIndices[i], hideIndices[j]] = [hideIndices[j], hideIndices[i]]; }
