@@ -59,7 +59,7 @@
         #menu-level-badge {
             background: rgba(0, 0, 0, 0.4); border: 2px solid rgba(241, 196, 15, 0.5);
             box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.5);
-            border-radius: 20px; padding: 10px 30px; backdrop-filter: blur(5px);
+            border-radius: 20px; padding: 15px 30px 10px; backdrop-filter: blur(5px);
             display: flex; flex-direction: column; align-items: center; min-width: 250px;
         }
         #menu-level-text { 
@@ -70,9 +70,9 @@
             font-size: 13px; color: #f1c40f; margin-top: 5px; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,1); text-align: center;
         }
 
-        /* --- СТИЛИ ДЛЯ ПРЕВЬЮ МИНИ-КАРТЫ --- */
+        /* --- ПРЕВЬЮ МИНИ-КАРТЫ УРОВНЯ --- */
         #menu-level-preview {
-            width: 80px; height: 80px;
+            width: 100px; height: 100px;
             position: relative; margin-top: 15px; margin-bottom: 5px;
             transform-style: preserve-3d;
         }
@@ -80,8 +80,9 @@
             position: absolute; width: 20%; height: 20%;
             left: calc(var(--x) * 10%); top: calc(var(--y) * 10%);
             margin-top: calc(var(--z) * -4px); margin-left: calc(var(--z) * -2px);
-            background: var(--tileBg); border: 1px solid rgba(255,255,255,0.6);
-            border-radius: 2px; box-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            background: var(--tileBg); border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 3px; box-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+            pointer-events: none;
         }
 
         .btn-arrow {
@@ -196,19 +197,11 @@
         .tile.is-hidden::after { content: attr(data-cover); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10vw; color: initial; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.8)); }
         @media (min-width: 400px) { .tile.is-hidden::after { font-size: 40px; } }
 
-        /* Анимация открытия замка */
         .flip-anim { animation: flipTileIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes flipTileIn { 0% { transform: translateY(-4vw) scale(1.1) rotateY(-90deg); } 100% { transform: translateY(0) scale(1) rotateY(0deg); } }
 
-        /* Анимация ЗАКРЫТИЯ замка при промахе */
         .flip-anim-back { animation: flipTileOut 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes flipTileOut { 0% { transform: translateY(0) scale(1) rotateY(0deg); } 100% { transform: translateY(-4vw) scale(1.1) rotateY(90deg); } }
-
-        /* --- СИСТЕМА ОБУЧЕНИЯ --- */
-        #tutorial-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.75); z-index: 9000; pointer-events: none; transition: opacity 0.3s; }
-        #tutorial-finger { display: none; position: absolute; font-size: 60px; z-index: 9002; pointer-events: none; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8)); animation: poke 0.8s infinite alternate cubic-bezier(0.25, 0.46, 0.45, 0.94); }
-        @keyframes poke { 0% { transform: translate(-20%, 20%) scale(1); } 100% { transform: translate(-20%, -10%) scale(0.9); } }
-        .tutorial-highlight { z-index: 9001 !important; box-shadow: 0 0 35px #f1c40f, inset 3px 3px 6px rgba(255, 255, 255, 1), inset -4px -5px 8px rgba(0, 0, 0, 0.18) !important; filter: brightness(1.2); }
 
         /* --- СМАРТ-ЧАСТИЦЫ И КОРЗИНА --- */
         .css-basket-wrap { position: absolute; z-index: 9998; animation: popBasket 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; pointer-events: none; transform-origin: bottom center; }
@@ -256,61 +249,29 @@
             z-index: 15000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(8px);
             opacity: 0; transition: opacity 0.3s ease-out; overflow: hidden;
         }
-
         #level-complete-glow {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 150vw; height: 150vw; max-width: 600px; max-height: 600px;
             background: radial-gradient(circle, rgba(255,215,0,0.5) 0%, rgba(255,69,0,0.2) 40%, rgba(0,0,0,0) 70%);
             animation: spinGlow 4s linear infinite; z-index: 0; pointer-events: none;
         }
-        @keyframes spinGlow { 
-            0% { transform: translate(-50%, -50%) rotate(0deg) scale(0.8); } 
-            50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.1); } 
-            100% { transform: translate(-50%, -50%) rotate(360deg) scale(0.8); } 
-        }
-
+        @keyframes spinGlow { 0% { transform: translate(-50%, -50%) rotate(0deg) scale(0.8); } 50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.1); } 100% { transform: translate(-50%, -50%) rotate(360deg) scale(0.8); } }
         #level-complete-praise { 
             font-family: 'Russo One', sans-serif; font-size: clamp(32px, 8vw, 52px); 
             background: linear-gradient(180deg, #ffffff 0%, #ffdf00 40%, #ff8c00 100%); 
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-            text-align: center; letter-spacing: 4px; 
-            filter: drop-shadow(0 8px 10px rgba(0,0,0,0.9)) drop-shadow(0 0 30px rgba(255,215,0,0.8)); 
-            margin-bottom: 10px; transform: scale(0.3); opacity: 0; z-index: 1;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; letter-spacing: 4px; 
+            filter: drop-shadow(0 8px 10px rgba(0,0,0,0.9)) drop-shadow(0 0 30px rgba(255,215,0,0.8)); margin-bottom: 10px; transform: scale(0.3); opacity: 0; z-index: 1;
             transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s ease-out;
         }
-        
-        #level-complete-text { 
-            font-family: 'Russo One', sans-serif; font-size: 24px; color: #fff; 
-            letter-spacing: 2px; text-shadow: 0 2px 5px #000; opacity: 0; z-index: 1;
-            transition: opacity 0.5s ease-out; transition-delay: 0.4s;
-        }
-
-        .fw-particle { 
-            position: absolute; pointer-events: none; z-index: 15001; 
-            animation: fwExplode 1s ease-out forwards; 
-        }
-        @keyframes fwExplode { 
-            0% { transform: translate(0,0) scale(1); opacity: 1; } 
-            100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; } 
-        }
-
-        .epic-confetti { 
-            position: absolute; z-index: 15002; bottom: 0; left: 50%;
-            animation: epicFountain var(--dur) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
-        }
-        @keyframes epicFountain {
-            0% { transform: translate(-50%, 0) rotate(0deg) scale(1); opacity: 1; }
-            40% { transform: translate(calc(-50% + var(--tx)), var(--ty)) rotate(var(--rot1)); opacity: 1; }
-            100% { transform: translate(calc(-50% + var(--tx) * 1.5), 100vh) rotate(var(--rot2)) scale(0.5); opacity: 0; }
-        }
-
+        #level-complete-text { font-family: 'Russo One', sans-serif; font-size: 24px; color: #fff; letter-spacing: 2px; text-shadow: 0 2px 5px #000; opacity: 0; z-index: 1; transition: opacity 0.5s ease-out; transition-delay: 0.4s; }
+        .fw-particle { position: absolute; pointer-events: none; z-index: 15001; animation: fwExplode 1s ease-out forwards; }
+        @keyframes fwExplode { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; } }
+        .epic-confetti { position: absolute; z-index: 15002; bottom: 0; left: 50%; animation: epicFountain var(--dur) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+        @keyframes epicFountain { 0% { transform: translate(-50%, 0) rotate(0deg) scale(1); opacity: 1; } 40% { transform: translate(calc(-50% + var(--tx)), var(--ty)) rotate(var(--rot1)); opacity: 1; } 100% { transform: translate(calc(-50% + var(--tx) * 1.5), 100vh) rotate(var(--rot2)) scale(0.5); opacity: 0; } }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-
-    <div id="tutorial-overlay"></div>
-    <div id="tutorial-finger">👆</div>
 
     <!-- ОКНО ПОБЕДЫ -->
     <div id="level-complete-overlay">
@@ -366,6 +327,7 @@
 
     <div id="game-screen">
         <div id="top-bar">
+            <!-- Две раздельные кнопки звука в одном блоке -->
             <div style="display: flex; flex-direction: column; flex-basis: 75px;">
                 <button id="btn-menu" class="btn-small-top">🏠 Меню</button>
                 <div style="display: flex; gap: 4px;">
@@ -439,35 +401,16 @@
                     let output = noiseBuffer.getChannelData(0);
                     for (let i = 0; i < bufferSize; i++) { output[i] = Math.random() * 2 - 1; }
                     
-                    this.noiseSrc = this.ctx.createBufferSource();
-                    this.noiseSrc.buffer = noiseBuffer;
-                    this.noiseSrc.loop = true;
+                    this.noiseSrc = this.ctx.createBufferSource(); this.noiseSrc.buffer = noiseBuffer; this.noiseSrc.loop = true;
+                    this.noiseFilter = this.ctx.createBiquadFilter(); this.noiseFilter.type = 'bandpass'; this.noiseFilter.frequency.value = 600; this.noiseFilter.Q.value = 0.5;
+                    this.noiseGain = this.ctx.createGain(); this.noiseGain.gain.value = 0.05; 
+                    this.windLFO = this.ctx.createOscillator(); this.windLFO.type = 'sine'; this.windLFO.frequency.value = 0.15; 
+                    this.lfoGain = this.ctx.createGain(); this.lfoGain.gain.value = 0.04;
 
-                    this.noiseFilter = this.ctx.createBiquadFilter();
-                    this.noiseFilter.type = 'bandpass';
-                    this.noiseFilter.frequency.value = 600;
-                    this.noiseFilter.Q.value = 0.5;
+                    this.windLFO.connect(this.lfoGain); this.lfoGain.connect(this.noiseGain.gain);
+                    this.noiseSrc.connect(this.noiseFilter); this.noiseFilter.connect(this.noiseGain); this.noiseGain.connect(this.ctx.destination);
 
-                    this.noiseGain = this.ctx.createGain();
-                    this.noiseGain.gain.value = 0.05; 
-
-                    this.windLFO = this.ctx.createOscillator();
-                    this.windLFO.type = 'sine';
-                    this.windLFO.frequency.value = 0.15; 
-
-                    this.lfoGain = this.ctx.createGain();
-                    this.lfoGain.gain.value = 0.04;
-
-                    this.windLFO.connect(this.lfoGain);
-                    this.lfoGain.connect(this.noiseGain.gain);
-
-                    this.noiseSrc.connect(this.noiseFilter);
-                    this.noiseFilter.connect(this.noiseGain);
-                    this.noiseGain.connect(this.ctx.destination);
-
-                    this.noiseSrc.start();
-                    this.windLFO.start();
-                    this.ambientPlaying = true;
+                    this.noiseSrc.start(); this.windLFO.start(); this.ambientPlaying = true;
                 } catch(e) {}
             },
             
@@ -490,16 +433,10 @@
             
             playClick: function(isSelected) { let startFreq = isSelected ? 300 : 200; let endFreq = isSelected ? 80 : 60; this.playOsc('sine', startFreq, endFreq, 0.05, 0.4); },
             playUnlock: function() { 
-                try {
-                    this.playOsc('sine', 800, 1200, 0.15, 0.2); 
-                    setTimeout(() => this.playOsc('triangle', 300, 100, 0.1, 0.3), 50); 
-                } catch(e) {}
+                try { this.playOsc('sine', 800, 1200, 0.15, 0.2); setTimeout(() => this.playOsc('triangle', 300, 100, 0.1, 0.3), 50); } catch(e) {}
             },
             playLockClose: function() {
-                try {
-                    this.playOsc('triangle', 400, 200, 0.15, 0.3);
-                    setTimeout(() => this.playOsc('square', 200, 100, 0.1, 0.2), 80);
-                } catch(e) {}
+                try { this.playOsc('triangle', 400, 200, 0.15, 0.3); setTimeout(() => this.playOsc('square', 200, 100, 0.1, 0.2), 80); } catch(e) {}
             },
             playMatch: function() {
                 try { if (!this.enabled || !this.ctx || this.ctx.state !== 'running') return; let playTock = (delay, freq) => { setTimeout(() => { if (!this.ctx || this.ctx.state !== 'running') return; let osc = this.ctx.createOscillator(); let gain = this.ctx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(freq, this.ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(freq * 0.2, this.ctx.currentTime + 0.04); gain.gain.setValueAtTime(0.7, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.04); osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.05); }, delay); }; playTock(0, 250); playTock(35, 300); } catch(e) {}
@@ -516,28 +453,17 @@
             playBooster: function() { this.playOsc('triangle', 800, 200, 0.2, 0.3); },
             playError: function() { this.playOsc('sawtooth', 150, 100, 0.2, 0.3); },
             
-            toggleSound: function() { 
-                this.enabled = !this.enabled; SafeStorage.set('mahjong_sound', this.enabled);
-                const btn = document.getElementById('btn-sound'); if (btn) btn.innerText = this.enabled ? '🔊' : '🔇'; 
-            },
-            toggleMusic: function() {
-                this.musicEnabled = !this.musicEnabled; SafeStorage.set('mahjong_music', this.musicEnabled);
-                const btn = document.getElementById('btn-music'); if (btn) btn.innerText = this.musicEnabled ? '🍃' : '🔇';
-                if (this.musicEnabled) { if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); this.startAmbient(); } else { this.stopAmbient(); }
-            }
+            toggleSound: function() { this.enabled = !this.enabled; SafeStorage.set('mahjong_sound', this.enabled); const btn = document.getElementById('btn-sound'); if (btn) btn.innerText = this.enabled ? '🔊' : '🔇'; },
+            toggleMusic: function() { this.musicEnabled = !this.musicEnabled; SafeStorage.set('mahjong_music', this.musicEnabled); const btn = document.getElementById('btn-music'); if (btn) btn.innerText = this.musicEnabled ? '🍃' : '🔇'; if (this.musicEnabled) { if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); this.startAmbient(); } else { this.stopAmbient(); } }
         };
 
         document.addEventListener("DOMContentLoaded", () => {
             let savedMusic = SafeStorage.get('mahjong_music'); if (savedMusic !== null) AudioSys.musicEnabled = (savedMusic === 'true');
             let savedSound = SafeStorage.get('mahjong_sound'); if (savedSound !== null) AudioSys.enabled = (savedSound === 'true');
-            document.getElementById('btn-sound').innerText = AudioSys.enabled ? '🔊' : '🔇';
-            document.getElementById('btn-music').innerText = AudioSys.musicEnabled ? '🍃' : '🔇';
+            document.getElementById('btn-sound').innerText = AudioSys.enabled ? '🔊' : '🔇'; document.getElementById('btn-music').innerText = AudioSys.musicEnabled ? '🍃' : '🔇';
         });
 
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden) { if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend(); } 
-            else { if (AudioSys.ctx && AudioSys.ctx.state === 'suspended' && (AudioSys.enabled || AudioSys.musicEnabled)) AudioSys.ctx.resume(); }
-        });
+        document.addEventListener("visibilitychange", () => { if (document.hidden) { if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend(); } else { if (AudioSys.ctx && AudioSys.ctx.state === 'suspended' && (AudioSys.enabled || AudioSys.musicEnabled)) AudioSys.ctx.resume(); } });
         window.addEventListener("blur", () => { if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend(); });
         window.addEventListener("focus", () => { if (AudioSys.ctx && AudioSys.ctx.state === 'suspended' && (AudioSys.enabled || AudioSys.musicEnabled)) AudioSys.ctx.resume(); });
 
@@ -622,7 +548,7 @@
             ['🐻','🌲','🍯','🍞','🍄','🌾','🌻','🍎','🍓','🐿️','🦊','🦉','🐴','🦢','🦆','🦅','🐟','🪵','🛖','🔥']
         ];
         
-        // --- ТОЛЬКО ОДИН ЗАМОК ---
+        // --- 1. ТОЛЬКО ОДИН ЗАМОК ---
         const coverSymbols = ['🔒'];
         
         const materials = [
@@ -655,45 +581,126 @@
             else return { text: "🔴 ЭКСПЕРТ", color: "#e74c3c", maxLayers: 5, density: 0.95 };
         }
 
-        // --- ГЕНЕРАТОР МИНИ-ПРЕВЬЮ ---
+        // ========================================================================
+        // --- НОВАЯ СИСТЕМА КООРДИНАТ ДЛЯ 100% СОВПАДЕНИЯ (ИГРА = ПРЕВЬЮ) ---
+        // ========================================================================
+        function getLayoutCoords(level) {
+            let diff = getDifficultyParams(level);
+            let seed = level * 13371337;
+            function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
+
+            let layout = [];
+            let grid = {};
+            let shapeIndex = (level - 1) % 30; // 30 УНИКАЛЬНЫХ ФОРМ!
+
+            for (let z = 0; z < diff.maxLayers; z++) {
+                let offset = (z % 2 === 0) ? 0 : 1;
+                let shrink = Math.floor(z / 2) * 2 + offset;
+                
+                let currentLayerTiles = [];
+
+                for (let y = shrink; y <= 8 - shrink; y += 2) {
+                    for (let x = shrink; x <= 8 - shrink; x += 2) {
+                        let isSupported = (z === 0) ||
+                            grid[`${x-1},${y-1},${z-1}`] || grid[`${x+1},${y-1},${z-1}`] ||
+                            grid[`${x-1},${y+1},${z-1}`] || grid[`${x+1},${y+1},${z-1}`] ||
+                            grid[`${x},${y},${z-1}`];
+
+                        if (!isSupported) continue;
+
+                        let cx = x - 4, cy = y - 4;
+                        let isMasked = true;
+
+                        // 30 различных архитектур уровня
+                        switch (shapeIndex) {
+                            case 0: break; 
+                            case 1: if (Math.abs(cx)<=2 && Math.abs(cy)<=2 && z<2) isMasked = false; break; 
+                            case 2: if (Math.abs(cx)>2 && Math.abs(cy)>2) isMasked = false; break; 
+                            case 3: if (Math.abs(cx)<=1 || Math.abs(cy)<=1) isMasked = false; break; 
+                            case 4: if (Math.abs(cx)+Math.abs(cy)>5) isMasked = false; break; 
+                            case 5: if (Math.abs(cy)<=1) isMasked = false; break; 
+                            case 6: if (Math.abs(cx)<=1) isMasked = false; break; 
+                            case 7: if (Math.abs(cx)===Math.abs(cy) && z===0) isMasked = false; break; 
+                            case 8: if ((x+y)%4===0 && z===0) isMasked = false; break; 
+                            case 9: if (Math.abs(cx)>2) isMasked = false; break; 
+                            case 10: if (Math.abs(cy)>2) isMasked = false; break; 
+                            case 11: if (Math.abs(cx)===4 && Math.abs(cy)===4) isMasked = false; break; 
+                            case 12: if ((Math.abs(cx)===0 || Math.abs(cy)===0) && z<2) isMasked = false; break; 
+                            case 13: if (Math.abs(cy)===2) isMasked = false; break; 
+                            case 14: if (Math.abs(cx)===2) isMasked = false; break; 
+                            case 15: if (Math.abs(cx)>2 && Math.abs(cy)<3) isMasked = false; break; 
+                            case 16: if (Math.abs(cy)>2 && Math.abs(cx)<3) isMasked = false; break; 
+                            case 17: if (Math.abs(cx)!==Math.abs(cy)) isMasked = false; break; 
+                            case 18: if (z>0 && Math.abs(cx)+Math.abs(cy)<3) isMasked = false; break; 
+                            case 19: if (z===0 && Math.abs(cx)===2 && Math.abs(cy)===2) isMasked = false; break;
+                            case 20: if (x===y) isMasked = false; break;
+                            case 21: if (z>1 && Math.abs(cx)<2) isMasked = false; break;
+                            case 22: if (Math.abs(cx)+Math.abs(cy)===4) isMasked = false; break;
+                            case 23: if (z===0 && (cx===0 || cy===0)) isMasked = false; break;
+                            case 24: if (z>0 && x%4===0) isMasked = false; break;
+                            case 25: if (z>0 && y%4===0) isMasked = false; break;
+                            case 26: if (Math.abs(cx)>0 && Math.abs(cy)>0 && z===1) isMasked = false; break;
+                            case 27: if (z===0 && x===4) isMasked = false; break;
+                            case 28: if (z===0 && y===4) isMasked = false; break;
+                            case 29: if (Math.abs(cx)===4 || Math.abs(cy)===4) isMasked = false; break;
+                        }
+
+                        if (isMasked && rnd() < diff.density) {
+                            currentLayerTiles.push({x, y, z});
+                        }
+                    }
+                }
+
+                // Делаем идеальную симметрию (слева = справа)
+                currentLayerTiles.forEach(t => {
+                    let mx = 8 - t.x;
+                    if (!grid[`${t.x},${t.y},${t.z}`]) {
+                        layout.push({...t});
+                        grid[`${t.x},${t.y},${t.z}`] = true;
+                    }
+                    if (!grid[`${mx},${t.y},${t.z}`]) {
+                        layout.push({x: mx, y: t.y, z: t.z});
+                        grid[`${mx},${t.y},${t.z}`] = true;
+                    }
+                });
+            }
+
+            // Убеждаемся что фишек четное количество
+            if (layout.length % 2 !== 0) {
+                let idx = layout.findIndex(t => t.x === 4);
+                if (idx !== -1) layout.splice(idx, 1);
+                else layout.pop();
+            }
+
+            // Защита от слишком пустых уровней
+            if (layout.length < 8) {
+                layout = []; grid = {};
+                for(let i=0; i<12; i++) {
+                    let lx = (i%4)*2; let ly = Math.floor(i/4)*2;
+                    layout.push({x: lx, y: ly, z: 0});
+                }
+            }
+
+            return layout;
+        }
+
+        // --- РЕНДЕР ПРЕВЬЮ МИНИ-КАРТЫ ---
         function renderPreview(level) {
             let previewContainer = document.getElementById('menu-level-preview');
             if (!previewContainer) return;
             previewContainer.innerHTML = '';
             
-            let diff = getDifficultyParams(level);
-            let shapeIndex = (level - 1) % 8;
-            let maxCols = 8, maxRows = 8;
+            let layoutCoords = getLayoutCoords(level);
             
-            // Строим идеальную фигуру уровня для отрисовки в меню
-            for (let z = 0; z < diff.maxLayers; z++) {
-                let offset = (z % 2 === 0) ? 0 : 1;
-                let shrink = Math.floor(z / 2) * 2 + offset; 
-                for (let y = shrink; y <= maxRows - shrink; y += 2) {
-                    for (let x = shrink; x <= maxCols - shrink; x += 2) {
-                        let isMasked = true; let cx = x - 4, cy = y - 4; 
-                        switch(shapeIndex) {
-                            case 0: break; 
-                            case 1: if (Math.abs(cx) <= 2 && Math.abs(cy) <= 2 && z < 2) isMasked = false; break; 
-                            case 2: if (Math.abs(cx) > 2 && Math.abs(cy) > 2) isMasked = false; break; 
-                            case 3: if (Math.abs(cx) <= 1 || Math.abs(cy) <= 1) isMasked = false; break; 
-                            case 4: if (Math.abs(cx) + Math.abs(cy) > 5) isMasked = false; break; 
-                            case 5: if (Math.abs(cy) <= 1) isMasked = false; break; 
-                            case 6: if (Math.abs(cx) <= 1) isMasked = false; break; 
-                            case 7: if (Math.abs(cx) === Math.abs(cy) && z === 0) isMasked = false; break; 
-                        }
-                        if (isMasked) {
-                            let pt = document.createElement('div');
-                            pt.className = 'preview-tile';
-                            pt.style.setProperty('--x', x);
-                            pt.style.setProperty('--y', y);
-                            pt.style.setProperty('--z', z);
-                            pt.style.zIndex = (z * 10) + y;
-                            previewContainer.appendChild(pt);
-                        }
-                    }
-                }
-            }
+            layoutCoords.forEach(t => {
+                let pt = document.createElement('div');
+                pt.className = 'preview-tile';
+                pt.style.setProperty('--x', t.x);
+                pt.style.setProperty('--y', t.y);
+                pt.style.setProperty('--z', t.z);
+                pt.style.zIndex = (t.z * 100) + t.y;
+                previewContainer.appendChild(pt);
+            });
         }
 
         function updateMenuLevelText() { 
@@ -702,11 +709,10 @@
             let chapterTitle = getChapterName(currentLevel);
             document.getElementById('menu-chapter-title').innerText = chapterTitle;
             document.getElementById('hud-chapter-text').innerText = chapterTitle;
-            applyMaterial(currentLevel); 
-            renderPreview(currentLevel); // Обновляем мини-карту
+            applyMaterial(currentLevel);
+            renderPreview(currentLevel); // Отрисовка точной мини-карты
         }
-
-        // Запуск при старте
+        
         updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI();
         
         document.getElementById('btn-play').addEventListener('click', () => { AudioSys.init(); document.getElementById('main-menu').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; initGame(); });
@@ -787,57 +793,24 @@
             let diffBadge = document.getElementById('hud-difficulty'); diffBadge.innerText = diff.text; diffBadge.style.backgroundColor = diff.color; diffBadge.style.color = (diff.color === "#f1c40f") ? "#000" : "#fff"; 
             
             applyMaterial(currentLevel); 
+            
+            // ИСПОЛЬЗУЕМ ТОТ ЖЕ АЛГОРИТМ, ЧТО И ДЛЯ ПРЕВЬЮ
+            let finalLayout = getLayoutCoords(currentLevel);
+            
             let baseSymbols = getSymbolsForLevel(currentLevel);
-            
-            let seed = currentLevel * 13371337, attempt = 0, finalLayout = null;
-            function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
-            let shapeIndex = (currentLevel - 1) % 8; 
-            
-            let lastValidLayout = null, lastPairsPool = null;
-
-            while (!finalLayout && attempt < 200) {
-                attempt++; 
-                let layout = [], grid = {}, maxCols = 8, maxRows = 8;
-                for (let z = 0; z < diff.maxLayers; z++) {
-                    let offset = (z % 2 === 0) ? 0 : 1, shrink = Math.floor(z / 2) * 2 + offset; 
-                    for (let y = shrink; y <= maxRows - shrink; y += 2) {
-                        for (let x = shrink; x <= maxCols - shrink; x += 2) {
-                            let isSupported = (z === 0) || grid[`${x-1},${y-1},${z-1}`] || grid[`${x+1},${y-1},${z-1}`] || grid[`${x-1},${y+1},${z-1}`] || grid[`${x+1},${y+1},${z-1}`] || grid[`${x},${y},${z-1}`];
-                            let isMasked = true; let cx = x - 4, cy = y - 4; 
-                            switch(shapeIndex) {
-                                case 0: break; 
-                                case 1: if (Math.abs(cx) <= 2 && Math.abs(cy) <= 2 && z < 2) isMasked = false; break; 
-                                case 2: if (Math.abs(cx) > 2 && Math.abs(cy) > 2) isMasked = false; break; 
-                                case 3: if (Math.abs(cx) <= 1 || Math.abs(cy) <= 1) isMasked = false; break; 
-                                case 4: if (Math.abs(cx) + Math.abs(cy) > 5) isMasked = false; break; 
-                                case 5: if (Math.abs(cy) <= 1) isMasked = false; break; 
-                                case 6: if (Math.abs(cx) <= 1) isMasked = false; break; 
-                                case 7: if (Math.abs(cx) === Math.abs(cy) && z === 0) isMasked = false; break; 
-                            }
-                            if (isSupported && isMasked && rnd() < diff.density) { layout.push({x, y, z}); grid[`${x},${y},${z}`] = true; }
-                        }
-                    }
-                }
-                if (layout.length % 2 !== 0) layout.pop(); 
-                if (layout.length < 4) continue;
-                
-                lastValidLayout = layout.map(t => ({...t}));
-                let pairsPool = []; for(let i = 0; i < layout.length / 2; i++) pairsPool.push(baseSymbols[Math.floor(rnd() * baseSymbols.length)]);
-                lastPairsPool = [...pairsPool];
-
-                let prepared = assignSymbolsSmart(layout, pairsPool, rnd); 
-                if (prepared) finalLayout = prepared; 
+            let pairsPool = [];
+            for(let i=0; i<finalLayout.length/2; i++) {
+                pairsPool.push(baseSymbols[Math.floor(Math.random() * baseSymbols.length)]);
             }
 
-            if (!finalLayout) {
-                if (lastValidLayout && lastPairsPool) { finalLayout = forceSolvableAssignment(lastValidLayout, lastPairsPool); } 
-                else {
-                    let fallback = []; for(let i=0; i<12; i++) fallback.push({x: (i%4)*2, y: Math.floor(i/4)*2, z: 0});
-                    let pool = []; for(let i=0; i<6; i++) pool.push(baseSymbols[i]);
-                    finalLayout = forceSolvableAssignment(fallback, pool);
-                }
+            let prepared = assignSymbolsSmart(finalLayout, pairsPool, Math.random); 
+            if (prepared) {
+                finalLayout = prepared;
+            } else {
+                finalLayout = forceSolvableAssignment(finalLayout, pairsPool);
             }
 
+            // Механика закрытых фишек (Замков)
             let cyclePos = (currentLevel - 1) % 10;
             let hideCount = 0;
             if (cyclePos >= 3 && cyclePos <= 5) hideCount = 4;
@@ -849,10 +822,11 @@
 
             if (hideCount > 0) {
                 let hideIndices = Array.from({length: finalLayout.length}, (_, i) => i);
-                for (let i = hideIndices.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [hideIndices[i], hideIndices[j]] = [hideIndices[j], hideIndices[i]]; }
+                for (let i = hideIndices.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [hideIndices[i], hideIndices[j]] = [hideIndices[j], hideIndices[i]]; }
                 for(let i=0; i<hideCount; i++) {
                     finalLayout[hideIndices[i]].isHidden = true;
-                    finalLayout[hideIndices[i]].coverSymbol = coverSymbols[Math.floor(rnd() * coverSymbols.length)];
+                    // Всегда один классический замок 🔒
+                    finalLayout[hideIndices[i]].coverSymbol = coverSymbols[0];
                 }
             }
             
@@ -1094,6 +1068,7 @@
             finger.style.left = (rect.left + window.scrollX + rect.width / 2) + 'px'; finger.style.top = (rect.top + window.scrollY + rect.height / 2) + 'px';
         }
 
+        // --- УМНАЯ МЕХАНИКА "МЕМОРИ" (ЗАКРЫТИЕ ПРИ ПРОМАХЕ) ---
         function handleTileClick(t, event) { 
             if (window.isLevelCompleting || isGameLocked) return; 
             if (t.isMatched) return; 
@@ -1163,6 +1138,7 @@
                         levelComplete(); 
                     }
                 } else { 
+                    // 🛑 ЕСЛИ НЕ СОВПАЛО - ЗАКРЫВАЕМ ОБРАТНО!
                     if (!justUnlocked) AudioSys.playClick(true);
                     
                     if (firstTile && firstTile.el) {
