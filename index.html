@@ -22,7 +22,6 @@
             background: radial-gradient(circle at center, #6b1222 0%, #2a050b 100%);
             color: white; width: 100vw; height: 100vh; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-            /* ЗАЩИТА ДЛЯ ЯНДЕКС ИГР: БЛОКИРОВКА СКРОЛЛА И ВЫДЕЛЕНИЯ ТЕКСТА */
             user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: none;
         }
 
@@ -183,8 +182,13 @@
         .tile.is-hidden::after { content: attr(data-cover); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10vw; color: initial; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.8)); }
         @media (min-width: 400px) { .tile.is-hidden::after { font-size: 40px; } }
 
-        .flip-anim { animation: flipTileIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        @keyframes flipTileIn { 0% { transform: translateY(-4vw) scale(1.1) rotateY(-90deg); } 100% { transform: translateY(-4vw) scale(1.1) rotateY(0deg); } }
+        /* Анимация открытия замка */
+        .flip-anim { animation: flipTileIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes flipTileIn { 0% { transform: translateY(-4vw) scale(1.1) rotateY(-90deg); } 100% { transform: translateY(0) scale(1) rotateY(0deg); } }
+
+        /* Анимация ЗАКРЫТИЯ замка при промахе (Memory Mechanic) */
+        .flip-anim-back { animation: flipTileOut 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes flipTileOut { 0% { transform: translateY(0) scale(1) rotateY(0deg); } 100% { transform: translateY(-4vw) scale(1.1) rotateY(90deg); } }
 
         /* --- СИСТЕМА ОБУЧЕНИЯ --- */
         #tutorial-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.75); z-index: 9000; pointer-events: none; transition: opacity 0.3s; }
@@ -230,7 +234,7 @@
         #no-moves-modal h2 { font-size: 36px; color: #e74c3c; }
 
         /* ========================================================================================= */
-        /* --- ЭПИЧНЫЙ ЭКРАН ПОБЕДЫ (С АУРОЙ И ФЕЙЕРВЕРКАМИ) --- */
+        /* --- ЭПИЧНЫЙ ЭКРАН ПОБЕДЫ --- */
         /* ========================================================================================= */
         #level-complete-overlay { 
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
@@ -296,7 +300,6 @@
     <div id="tutorial-overlay"></div>
     <div id="tutorial-finger">👆</div>
 
-    <!-- ОКНО ПОБЕДЫ С ФЕЙЕРВЕРКАМИ -->
     <div id="level-complete-overlay">
         <div id="level-complete-glow"></div>
         <h2 id="level-complete-praise">ВЕЛИКОЛЕПНО!</h2>
@@ -335,7 +338,7 @@
         <h2>Как играть?</h2>
         <p>Находите пары одинаковых фишек, чтобы очистить поле.</p>
         <p>Фишка активна, если на ней <b>ничего не лежит</b>, и она <b>свободна слева ИЛИ справа</b>.</p>
-        <p>Замки: если вы выбрали открытую фишку с замком, но затем кликнули на другую, первая <b>закроется обратно</b>! Тренируйте память.</p>
+        <p>Замки: если вы открыли фишку с замком, но затем кликнули на другую, первая <b>закроется обратно</b>! Тренируйте память.</p>
         <button id="btn-close-rules" class="btn-massive" style="font-size:20px; padding:10px 30px; min-width:auto;">ПОНЯТНО</button>
     </div>
 
@@ -471,8 +474,25 @@
                 } catch(e) {}
             },
             
+            // --- ЗВУКОВЫЕ ЭФФЕКТЫ ---
             playClick: function(isSelected) { let startFreq = isSelected ? 300 : 200; let endFreq = isSelected ? 80 : 60; this.playOsc('sine', startFreq, endFreq, 0.05, 0.4); },
-            playUnlock: function() { this.playOsc('square', 600, 200, 0.1, 0.1); setTimeout(() => this.playOsc('square', 800, 300, 0.1, 0.1), 50); },
+            
+            // НОВЫЙ ЗВУК ОТКРЫТИЯ ЗАМКА (Магический перезвон + щелчок)
+            playUnlock: function() { 
+                try {
+                    this.playOsc('sine', 800, 1200, 0.15, 0.2); 
+                    setTimeout(() => this.playOsc('triangle', 300, 100, 0.1, 0.3), 50); 
+                } catch(e) {}
+            },
+
+            // НОВЫЙ ЗВУК ЗАКРЫТИЯ ЗАМКА (Тяжелый щелчок)
+            playLockClose: function() {
+                try {
+                    this.playOsc('triangle', 400, 200, 0.15, 0.3);
+                    setTimeout(() => this.playOsc('square', 200, 100, 0.1, 0.2), 80);
+                } catch(e) {}
+            },
+
             playMatch: function() {
                 try { if (!this.enabled || !this.ctx || this.ctx.state !== 'running') return; let playTock = (delay, freq) => { setTimeout(() => { if (!this.ctx || this.ctx.state !== 'running') return; let osc = this.ctx.createOscillator(); let gain = this.ctx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(freq, this.ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(freq * 0.2, this.ctx.currentTime + 0.04); gain.gain.setValueAtTime(0.7, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.04); osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.05); }, delay); }; playTock(0, 250); playTock(35, 300); } catch(e) {}
             },
@@ -522,7 +542,6 @@
             }
         };
 
-        // ВОССТАНОВЛЕНИЕ НАСТРОЕК ЗВУКА ИЗ ПАМЯТИ
         document.addEventListener("DOMContentLoaded", () => {
             let savedMusic = SafeStorage.get('mahjong_music');
             if (savedMusic !== null) AudioSys.musicEnabled = (savedMusic === 'true');
@@ -533,7 +552,6 @@
             document.getElementById('btn-music').innerText = AudioSys.musicEnabled ? '🍃' : '🔇';
         });
 
-        // ПАУЗА ЗВУКА ПРИ СВЕРТЫВАНИИ
         document.addEventListener("visibilitychange", () => {
             if (document.hidden) {
                 if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend();
@@ -624,7 +642,10 @@
             ['🪴','🌲','🌳','🌴','🪵','🌵','🌱','🌿','☘️','🍀','🎍','🎋','🍃','🍂','🍁','🍄','🌾','💐','🌷','🌹'],
             ['🐻','🌲','🍯','🍞','🍄','🌾','🌻','🍎','🍓','🐿️','🦊','🦉','🐴','🦢','🦆','🦅','🐟','🪵','🛖','🔥']
         ];
-        const coverSymbols = ['🔒', '🔐'];
+        
+        // --- 1. ОСТАВЛЕН ТОЛЬКО ОДИН ВИД ЗАМКА ---
+        const coverSymbols = ['🔒'];
+        
         const materials = [
             { tileBg: 'radial-gradient(circle at 30% 30%, #ffffff 0%, #f7ecd5 40%, #e0c89b 100%)', tileSide: '#b89d70', tileColor: '#2b1d0f' },
             { tileBg: 'radial-gradient(circle at 30% 30%, #f0fff4 0%, #c4e8cf 50%, #82ab91 100%)', tileSide: '#689679', tileColor: '#1a3320' },
@@ -665,6 +686,9 @@
         document.getElementById('btn-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'flex');
         document.getElementById('btn-close-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'none');
         document.getElementById('btn-menu').addEventListener('click', () => { document.getElementById('game-screen').style.display = 'none'; document.getElementById('main-menu').style.display = 'flex'; updateMenuLevelText(); });
+        
+        document.getElementById('btn-sound').addEventListener('click', () => { AudioSys.init(); AudioSys.toggleSound(); });
+        document.getElementById('btn-music').addEventListener('click', () => { AudioSys.init(); AudioSys.toggleMusic(); });
         
         document.getElementById('btn-hud-prev').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; SafeStorage.set('mahjong_level', currentLevel); initGame(); }});
         document.getElementById('btn-hud-next').addEventListener('click', () => { currentLevel++; SafeStorage.set('mahjong_level', currentLevel); initGame(); });
@@ -790,7 +814,6 @@
                 }
             }
 
-            // --- НОВАЯ СЛОЖНОСТЬ ЗАКРЫТЫХ ФИШЕК ---
             let cyclePos = (currentLevel - 1) % 10;
             let hideCount = 0;
             if (cyclePos >= 3 && cyclePos <= 5) hideCount = 4;
@@ -878,9 +901,6 @@
         document.getElementById('btn-modal-shuffle').addEventListener('click', () => { document.getElementById('no-moves-modal').style.display = 'none'; watchAdToShuffle(); });
         document.getElementById('btn-close-no-moves').addEventListener('click', () => { document.getElementById('no-moves-modal').style.display = 'none'; });
 
-        // ========================================================================
-        // --- 💥 ЭКРАН ПОБЕДЫ ---
-        // ========================================================================
         function levelComplete() {
             if (window.isLevelCompleting) return; 
             window.isLevelCompleting = true; 
@@ -1061,13 +1081,13 @@
 
             if (t.isHidden) { 
                 t.isHidden = false; 
-                t.isTempOpen = true; // Запоминаем, что фишка открыта "в кредит"
+                t.isTempOpen = true; // Запоминаем, что фишка открыта временно
                 t.el.classList.remove('is-hidden'); 
                 t.el.classList.add('flip-anim'); 
-                setTimeout(() => { if(t.el) t.el.classList.remove('flip-anim'); }, 400); 
+                setTimeout(() => { if(t.el) t.el.classList.remove('flip-anim'); }, 300); 
                 updateFreeState(); 
                 justUnlocked = true;
-                AudioSys.playUnlock(); 
+                AudioSys.playUnlock(); // 🎵 Уникальный звук открытия
             }
 
             if (!firstTile) { 
@@ -1120,15 +1140,26 @@
                         levelComplete(); 
                     }
                 } else { 
-                    // ЕСЛИ НЕ СОВПАЛО - ЗАКРЫВАЕМ ОБРАТНО!
+                    // 🛑 ЕСЛИ НЕ СОВПАЛО - ЗАКРЫВАЕМ ОБРАТНО!
                     if (!justUnlocked) AudioSys.playClick(true);
                     
                     if (firstTile && firstTile.el) {
                         firstTile.el.classList.remove('selected'); 
+                        // Если первая фишка была под замком - переворачиваем её обратно
                         if (firstTile.isTempOpen) {
                             firstTile.isHidden = true;
                             firstTile.isTempOpen = false;
-                            firstTile.el.classList.add('is-hidden');
+                            
+                            let closingEl = firstTile.el;
+                            closingEl.classList.add('flip-anim-back');
+                            AudioSys.playLockClose(); // 🎵 Звук закрытия замка
+                            
+                            setTimeout(() => {
+                                if (closingEl) {
+                                    closingEl.classList.remove('flip-anim-back');
+                                    closingEl.classList.add('is-hidden');
+                                }
+                            }, 300);
                         }
                     }
                     
@@ -1137,14 +1168,26 @@
                     if (tutorialMode) positionFingerOnTile(tutorialPair[0].isFree ? tutorialPair[0] : tutorialPair[1]);
                 } 
             } else { 
-                // Случайный двойной тап (или ручной сброс выбора)
+                // Сброс выбора при клике на саму себя
                 if (!justUnlocked) {
                     AudioSys.playClick(false);
                     t.el.classList.remove('selected');
+                    
+                    // Если фишка была под замком - переворачиваем её обратно
                     if (t.isTempOpen) {
                         t.isHidden = true;
                         t.isTempOpen = false;
-                        t.el.classList.add('is-hidden');
+                        
+                        let closingEl = t.el;
+                        closingEl.classList.add('flip-anim-back');
+                        AudioSys.playLockClose(); // 🎵 Звук закрытия замка
+                        
+                        setTimeout(() => {
+                            if (closingEl) {
+                                closingEl.classList.remove('flip-anim-back');
+                                closingEl.classList.add('is-hidden');
+                            }
+                        }, 300);
                     }
                     firstTile = null;
                 }
@@ -1178,7 +1221,10 @@
                     activeTiles.forEach((tile, index) => {
                         let pt = preparedTiles[index]; tile.x = pt.x; tile.y = pt.y; tile.z = pt.z;
                         tile.symbol = pt.symbol; tile.el.innerText = pt.symbol; tile.el.classList.remove('selected');
-                        tile.isTempOpen = false; // Сброс временных замков при миксе
+                        
+                        tile.isTempOpen = false; // Очищаем временные статусы при миксе
+                        tile.el.classList.remove('flip-anim-back');
+                        
                         tile.el.classList.add('flip-anim'); setTimeout(() => tile.el.classList.remove('flip-anim'), 400);
                         if (toHide.has(index)) { tile.isHidden = true; tile.el.classList.add('is-hidden'); tile.coverSymbol = coverSymbols[Math.floor(Math.random() * coverSymbols.length)]; tile.el.setAttribute('data-cover', tile.coverSymbol); } 
                         else { tile.isHidden = false; tile.el.classList.remove('is-hidden'); }
