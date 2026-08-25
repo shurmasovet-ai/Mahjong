@@ -2,10 +2,10 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="color-scheme" content="light only">
-    <title>Mahjong Deluxe - Infinity</title>
-    <!-- ПОДКЛЮЧЕНИЕ YANDEX SDK ДЛЯ ПУБЛИКАЦИИ -->
+    <title>Stickers Mahjong</title>
+    <!-- ПОДКЛЮЧЕНИЕ YANDEX SDK -->
     <script src="https://yandex.ru/games/sdk/v2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
     <style>
@@ -22,6 +22,8 @@
             background: radial-gradient(circle at center, #6b1222 0%, #2a050b 100%);
             color: white; width: 100vw; height: 100vh; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            /* ЗАЩИТА ДЛЯ ЯНДЕКС ИГР: БЛОКИРОВКА СКРОЛЛА И ВЫДЕЛЕНИЯ ТЕКСТА */
+            user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: none;
         }
 
         #main-menu {
@@ -42,7 +44,9 @@
         }
         
         #main-menu h1 {
-            font-family: 'Russo One', sans-serif; font-size: 48px; margin-bottom: 20px; 
+            font-family: 'Russo One', sans-serif; 
+            font-size: clamp(32px, 8vw, 48px); 
+            line-height: 1.1; margin-bottom: 20px; 
             background: linear-gradient(180deg, #fff3b0 0%, #f1c40f 50%, #b7950b 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             text-align: center; letter-spacing: 2px; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.8)); z-index: 2;
@@ -167,7 +171,6 @@
         .tile.selected { border-color: #fff !important; box-shadow: inset 3px 3px 8px rgba(255, 255, 255, 1), inset -3px -4px 6px rgba(0, 0, 0, 0.1), calc(0.5vw + var(--z) * 0.1vw) calc(2vw + var(--z) * 0.2vw) 0px var(--tileSide), 0 20px 40px rgba(0,0,0,0.9) !important; transform: translateY(-5vw) scale(1.1); z-index: 999 !important; filter: brightness(1.15) drop-shadow(0 0 12px rgba(241, 196, 15, 0.8)); }
         
         .tile.matched { opacity: 0; pointer-events: none !important; transform: scale(1.6); filter: brightness(2.5); }
-        
         .tile.hinted { animation: hintGlow 1s infinite alternate; }
         @keyframes hintGlow { 0% { filter: brightness(1) drop-shadow(0 0 0px #3498db); } 100% { filter: brightness(1.3) drop-shadow(0 0 20px #3498db); } }
         
@@ -193,13 +196,13 @@
         .css-basket { width: 60px; height: 40px; position: relative; background: repeating-linear-gradient(45deg, #c08b5c, #c08b5c 6px, #a87343 6px, #a87343 12px); border-radius: 5px 5px 20px 20px; border: 3px solid #4a2c17; border-top: 6px solid #4a2c17; box-shadow: 0 10px 15px rgba(0,0,0,0.6), inset 0 -5px 10px rgba(0,0,0,0.5); }
         .css-basket::before { content: ''; position: absolute; top: -24px; left: 8px; width: 38px; height: 24px; border: 5px solid #a87343; border-bottom: none; border-radius: 20px 20px 0 0; box-shadow: inset 0 2px 2px rgba(255,255,255,0.3); }
         @keyframes popBasket { 0% { transform: translate(-50%, -50%) scale(0) rotate(-15deg); opacity: 0; } 15% { transform: translate(-50%, -50%) scale(1.1) rotate(5deg); opacity: 1; } 30% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; } 100% { transform: translate(-50%, -30%) scale(0.5) rotate(0deg); opacity: 0; } }
+        
         .smart-particle { position: absolute; font-family: 'Noto Color Emoji', sans-serif; pointer-events: none; z-index: 9999; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6)); animation: fountainSpill 1s cubic-bezier(0.2, 0.8, 0.3, 1) forwards; }
         @keyframes fountainSpill { 0% { opacity: 1; transform: translate(-50%, -50%) scale(0.2) rotate(0deg); } 30% { opacity: 1; transform: translate(calc(-50% + var(--tx)*0.5), calc(-50% + var(--up-y))) scale(1.3) rotate(var(--rot1)); } 80% { opacity: 1; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty)*0.8)) scale(1) rotate(var(--rot2)); } 100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.5) rotate(var(--rot2)); } }
+        
         .floating-text { position: absolute; font-family: 'Russo One', sans-serif; font-size: 26px; color: #2ecc71; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 12px rgba(46, 204, 113, 0.9); pointer-events: none; z-index: 9999; animation: floatUpText 1s ease-out forwards; }
         .floating-text.combo { color: #f1c40f; font-size: 34px; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 18px rgba(241, 196, 15, 0.9); }
         @keyframes floatUpText { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 20% { transform: translateY(-20px) scale(1.2); opacity: 1; } 100% { transform: translateY(-60px) scale(1); opacity: 0; } }
-        .confetti { position: absolute; width: 10px; height: 10px; background-color: #f00; z-index: 2000; animation: fall linear forwards; }
-        @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
 
         /* --- ПАНЕЛЬ БУСТЕРОВ --- */
         #boosters-bar { display: flex; gap: 8px; margin-bottom: 20px; z-index: 10; align-items: center; justify-content: center; width: 100%; padding: 0 10px; }
@@ -211,8 +214,8 @@
         .b-lock { position: absolute; top: -8px; right: -8px; background: #e74c3c; font-size: 10px; padding: 2px 5px; border-radius: 10px; font-weight: bold; border: 1px solid white;}
 
         /* --- МОДАЛЬНЫЕ ОКНА --- */
-        #wheel-modal { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.95); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; }
-        #wheel-modal h2 { font-family: 'Russo One', sans-serif; font-size: 32px; color: #f1c40f; margin-bottom: 20px; text-shadow: 0 5px 10px rgba(0,0,0,1); cursor: pointer;}
+        #wheel-modal, #rules-modal, #ad-screen, #no-moves-modal { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.95); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px;}
+        #wheel-modal h2, #rules-modal h2, #ad-screen h2, #no-moves-modal h2 { font-family: 'Russo One', sans-serif; font-size: 32px; color: #f1c40f; margin-bottom: 20px; text-shadow: 0 5px 10px rgba(0,0,0,1); }
         .wheel-container { position: relative; width: 300px; height: 300px; border-radius: 50%; border: 6px solid #d4af37; overflow: hidden; box-shadow: 0 0 30px rgba(241, 196, 15, 0.5), inset 0 0 20px rgba(0,0,0,0.8); background: #222; }
         .wheel-spinner { width: 100%; height: 100%; position: relative; border-radius: 50%; transition: transform 4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .wheel-slice { position: absolute; top: 0; left: 0; width: 100%; height: 100%; clip-path: polygon(50% 50%, 100% 0, 100% 50%); transform-origin: 50% 50%; }
@@ -220,40 +223,70 @@
         .wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid #fff; z-index: 10; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.8)); }
         .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background: radial-gradient(circle, #fff, #d4af37); border-radius: 50%; z-index: 5; box-shadow: 0 0 10px black;}
         #btn-spin { margin-top: 30px; font-size: 22px; padding: 15px 40px; }
-        #btn-close-wheel { background: transparent; color: #95a5a6; border: none; font-size: 18px; text-decoration: underline; margin-top: 15px; cursor: pointer; }
-
-        #rules-modal, #ad-screen { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.95); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; }
-        #rules-modal h2, #ad-screen h2 { font-family: 'Russo One', sans-serif; font-size: 32px; color: #f1c40f; margin-bottom: 20px; }
-        #rules-modal p, #ad-screen p { font-size: 18px; line-height: 1.5; margin-bottom: 30px; max-width: 400px; }
+        #btn-close-wheel, #btn-close-no-moves { background: transparent; color: #95a5a6; border: none; font-size: 18px; text-decoration: underline; margin-top: 15px; cursor: pointer; }
+        #rules-modal p, #ad-screen p, #no-moves-modal p { font-size: 18px; line-height: 1.5; margin-bottom: 30px; max-width: 400px; }
         .loader { border: 6px solid #f3f3f3; border-top: 6px solid #e67e22; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
-        
-        /* --- ТАБЛИЧКА "НЕТ ХОДОВ" --- */
-        #no-moves-modal { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.85); z-index: 9500; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; backdrop-filter: blur(3px); }
-        #no-moves-modal h2 { font-family: 'Russo One', sans-serif; font-size: 36px; color: #e74c3c; margin-bottom: 10px; text-shadow: 0 5px 10px rgba(0,0,0,1); }
-        #no-moves-modal p { font-size: 16px; margin-bottom: 30px; color: #bdc3c7; max-width: 300px; line-height: 1.4;}
-        #btn-close-no-moves { background: transparent; color: #95a5a6; border: none; font-size: 16px; text-decoration: underline; margin-top: 20px; cursor: pointer; }
+        #no-moves-modal h2 { font-size: 36px; color: #e74c3c; }
 
-        /* --- БРОНЕБОЙНЫЙ ЭКРАН ПОХВАЛЫ (ТРАНЗИЦИИ ВМЕСТО КЛАССОВ) --- */
+        /* ========================================================================================= */
+        /* --- ЭПИЧНЫЙ ЭКРАН ПОБЕДЫ (С АУРОЙ И ФЕЙЕРВЕРКАМИ) --- */
+        /* ========================================================================================= */
         #level-complete-overlay { 
             display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
-            background: rgba(0, 0, 0, 0.85); z-index: 15000; flex-direction: column; 
-            align-items: center; justify-content: center; backdrop-filter: blur(5px);
-            opacity: 0; transition: opacity 0.3s ease-out;
+            background: radial-gradient(circle at center, rgba(60, 10, 20, 0.95) 0%, rgba(0, 0, 0, 0.98) 100%); 
+            z-index: 15000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(8px);
+            opacity: 0; transition: opacity 0.3s ease-out; overflow: hidden;
         }
+
+        #level-complete-glow {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 150vw; height: 150vw; max-width: 600px; max-height: 600px;
+            background: radial-gradient(circle, rgba(255,215,0,0.5) 0%, rgba(255,69,0,0.2) 40%, rgba(0,0,0,0) 70%);
+            animation: spinGlow 4s linear infinite; z-index: 0; pointer-events: none;
+        }
+        @keyframes spinGlow { 
+            0% { transform: translate(-50%, -50%) rotate(0deg) scale(0.8); } 
+            50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.1); } 
+            100% { transform: translate(-50%, -50%) rotate(360deg) scale(0.8); } 
+        }
+
         #level-complete-praise { 
-            font-family: 'Russo One', sans-serif; font-size: 42px; 
-            background: linear-gradient(180deg, #fff3b0 0%, #f1c40f 50%, #d4ac0d 100%); 
+            font-family: 'Russo One', sans-serif; font-size: clamp(32px, 8vw, 52px); 
+            background: linear-gradient(180deg, #ffffff 0%, #ffdf00 40%, #ff8c00 100%); 
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-            text-align: center; letter-spacing: 3px; 
-            filter: drop-shadow(0 5px 15px rgba(241,196,15,0.5)) drop-shadow(0 0 30px rgba(241,196,15,0.3)); 
-            margin-bottom: 10px; transform: scale(0.3); opacity: 0;
+            text-align: center; letter-spacing: 4px; 
+            filter: drop-shadow(0 8px 10px rgba(0,0,0,0.9)) drop-shadow(0 0 30px rgba(255,215,0,0.8)); 
+            margin-bottom: 10px; transform: scale(0.3); opacity: 0; z-index: 1;
             transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s ease-out;
         }
+        
         #level-complete-text { 
-            font-family: 'Russo One', sans-serif; font-size: 22px; color: #fff; 
-            letter-spacing: 2px; text-shadow: 0 2px 4px #000; opacity: 0; 
+            font-family: 'Russo One', sans-serif; font-size: 24px; color: #fff; 
+            letter-spacing: 2px; text-shadow: 0 2px 5px #000; opacity: 0; z-index: 1;
             transition: opacity 0.5s ease-out; transition-delay: 0.4s;
         }
+
+        /* Частицы Фейерверка */
+        .fw-particle { 
+            position: absolute; pointer-events: none; z-index: 15001; 
+            animation: fwExplode 1s ease-out forwards; 
+        }
+        @keyframes fwExplode { 
+            0% { transform: translate(0,0) scale(1); opacity: 1; } 
+            100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; } 
+        }
+
+        /* Фонтан Конфетти */
+        .epic-confetti { 
+            position: absolute; z-index: 15002; bottom: 0; left: 50%;
+            animation: epicFountain var(--dur) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; 
+        }
+        @keyframes epicFountain {
+            0% { transform: translate(-50%, 0) rotate(0deg) scale(1); opacity: 1; }
+            40% { transform: translate(calc(-50% + var(--tx)), var(--ty)) rotate(var(--rot1)); opacity: 1; }
+            100% { transform: translate(calc(-50% + var(--tx) * 1.5), 100vh) rotate(var(--rot2)) scale(0.5); opacity: 0; }
+        }
+
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -262,15 +295,16 @@
     <div id="tutorial-overlay"></div>
     <div id="tutorial-finger">👆</div>
 
-    <!-- ОКНО ПОХВАЛЫ -->
+    <!-- ОКНО ПОБЕДЫ С ФЕЙЕРВЕРКАМИ -->
     <div id="level-complete-overlay">
+        <div id="level-complete-glow"></div>
         <h2 id="level-complete-praise">ВЕЛИКОЛЕПНО!</h2>
         <p id="level-complete-text">УРОВЕНЬ ПРОЙДЕН</p>
     </div>
 
     <div id="main-menu">
         <div id="particles-container"></div>
-        <h1>МАДЖОНГ</h1>
+        <h1>STICKERS<br>MAHJONG</h1>
         <div id="level-controls">
             <button id="btn-prev-level" class="btn-arrow">◀</button>
             <div id="menu-level-badge">
@@ -335,7 +369,6 @@
         <div id="message"></div>
         <div id="game-board"></div>
 
-        <!-- КНОПКА МИКС ПЕРЕНЕСЕНА ВНИЗ -->
         <div id="boosters-bar">
             <button class="booster" id="btn-shuffle" style="background: linear-gradient(135deg, #e67e22, #d35400); border-color: #d35400;">
                 🎥<div class="b-cost" style="color:#fff; text-shadow: none; font-size: 10px;">МИКС</div>
@@ -353,64 +386,38 @@
     </div>
 
     <script>
-        // Инициализация Yandex Games SDK (Защищена от ошибок в Colab/Локально)
+        // Инициализация Yandex Games SDK (Скрываем загрузочный экран Яндекса)
         let ys = null;
-        try {
-            YaGames.init().then(ysdk => {
-                ys = ysdk;
-                if (ys.features && ys.features.LoadingAPI) {
-                    ys.features.LoadingAPI.ready(); // Сообщаем Яндексу, что игра загрузилась
-                }
-                console.log("Yandex SDK initialized");
-            }).catch(e => console.warn("Yandex SDK not found (playing outside Yandex)"));
+        try { 
+            YaGames.init().then(ysdk => { 
+                ys = ysdk; 
+                console.log("Yandex SDK initialized"); 
+            }).catch(e => console.warn("Yandex SDK not found")); 
         } catch(e) {}
 
-        // --- БЕЗОПАСНОЕ ХРАНИЛИЩЕ ---
         const SafeStorage = {
             get: function(key) { try { return localStorage.getItem(key); } catch(e) { return null; } },
             set: function(key, value) { try { localStorage.setItem(key, value); } catch(e) { console.warn("Storage blocked"); } },
             remove: function(key) { try { localStorage.removeItem(key); } catch(e) {} }
         };
 
-        // --- АСМР АУДИОСИСТЕМА ---
         const AudioSys = {
             ctx: null, enabled: true,
-            init: function() {
-                try {
-                    let AContext = window.AudioContext || window.webkitAudioContext;
-                    if (AContext && !this.ctx) this.ctx = new AContext();
-                    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
-                } catch(e) { this.enabled = false; }
-            },
+            init: function() { try { let AContext = window.AudioContext || window.webkitAudioContext; if (AContext && !this.ctx) this.ctx = new AContext(); if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); } catch(e) { this.enabled = false; } },
             playOsc: function(type, freq, dropFreq, duration, vol) {
                 try {
-                    if (!this.enabled || !this.ctx) return;
+                    if (!this.enabled || !this.ctx || this.ctx.state !== 'running') return;
                     const osc = this.ctx.createOscillator(); const gain = this.ctx.createGain();
                     osc.type = type; osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
                     if (dropFreq) osc.frequency.exponentialRampToValueAtTime(dropFreq, this.ctx.currentTime + duration);
                     gain.gain.setValueAtTime(vol, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
-                    osc.connect(gain); gain.connect(this.ctx.destination);
-                    osc.start(); osc.stop(this.ctx.currentTime + duration);
+                    osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + duration);
                 } catch(e) {}
             },
             playClick: function(isSelected) { let startFreq = isSelected ? 300 : 200; let endFreq = isSelected ? 80 : 60; this.playOsc('sine', startFreq, endFreq, 0.05, 0.4); },
             playUnlock: function() { this.playOsc('square', 600, 200, 0.1, 0.1); setTimeout(() => this.playOsc('square', 800, 300, 0.1, 0.1), 50); },
             playMatch: function() {
-                try {
-                    if (!this.enabled || !this.ctx) return;
-                    let playTock = (delay, freq) => {
-                        setTimeout(() => {
-                            if (!this.ctx) return;
-                            let osc = this.ctx.createOscillator(); let gain = this.ctx.createGain();
-                            osc.type = 'sine'; osc.frequency.setValueAtTime(freq, this.ctx.currentTime); 
-                            osc.frequency.exponentialRampToValueAtTime(freq * 0.2, this.ctx.currentTime + 0.04);
-                            gain.gain.setValueAtTime(0.7, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.04);
-                            osc.connect(gain); gain.connect(this.ctx.destination);
-                            osc.start(); osc.stop(this.ctx.currentTime + 0.05);
-                        }, delay);
-                    };
-                    playTock(0, 250); playTock(35, 300); 
-                } catch(e) {}
+                try { if (!this.enabled || !this.ctx || this.ctx.state !== 'running') return; let playTock = (delay, freq) => { setTimeout(() => { if (!this.ctx || this.ctx.state !== 'running') return; let osc = this.ctx.createOscillator(); let gain = this.ctx.createGain(); osc.type = 'sine'; osc.frequency.setValueAtTime(freq, this.ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(freq * 0.2, this.ctx.currentTime + 0.04); gain.gain.setValueAtTime(0.7, this.ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.04); osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.05); }, delay); }; playTock(0, 250); playTock(35, 300); } catch(e) {}
             },
             playWin: function() { let freqs = [392, 493.88, 587.33, 783.99]; freqs.forEach((f, i) => { setTimeout(() => { this.playOsc('sine', f, f * 0.95, 1.0, 0.3); this.playOsc('triangle', f * 2, f * 1.9, 0.8, 0.1); }, i * 100); }); },
             playShuffle: function() { for(let i = 0; i < 15; i++) { setTimeout(() => { let f = 150 + Math.random() * 200; this.playOsc('sine', f, f/2, 0.04, 0.3); }, Math.random() * 400); } },
@@ -420,32 +427,34 @@
             toggle: function() { this.enabled = !this.enabled; const btn = document.getElementById('btn-sound'); if (btn) btn.innerText = this.enabled ? '🔊' : '🔇'; }
         };
 
+        // ТРЕБОВАНИЕ ЯНДЕКСА: УПРАВЛЕНИЕ АУДИО ПРИ СВЕРТЫВАНИИ ВКЛАДКИ
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend();
+            } else {
+                if (AudioSys.ctx && AudioSys.ctx.state === 'suspended' && AudioSys.enabled) AudioSys.ctx.resume();
+            }
+        });
+        window.addEventListener("blur", () => { if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend(); });
+        window.addEventListener("focus", () => { if (AudioSys.ctx && AudioSys.ctx.state === 'suspended' && AudioSys.enabled) AudioSys.ctx.resume(); });
+
         function createParticles() {
             const container = document.getElementById('particles-container'); container.innerHTML = '';
-            for(let i=0; i<30; i++) {
-                let p = document.createElement('div'); p.classList.add('particle');
-                let size = Math.random() * 4 + 2; p.style.width = size + 'px'; p.style.height = size + 'px';
-                p.style.left = Math.random() * 100 + 'vw'; p.style.animationDuration = (Math.random() * 10 + 10) + 's'; p.style.animationDelay = (Math.random() * 10) + 's';
-                container.appendChild(p);
-            }
+            for(let i=0; i<30; i++) { let p = document.createElement('div'); p.classList.add('particle'); let size = Math.random() * 4 + 2; p.style.width = size + 'px'; p.style.height = size + 'px'; p.style.left = Math.random() * 100 + 'vw'; p.style.animationDuration = (Math.random() * 10 + 10) + 's'; p.style.animationDelay = (Math.random() * 10) + 's'; container.appendChild(p); }
         }
         createParticles();
 
-        // --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ---
         let currentLevel = 1, totalScore = 0, comboCount = 0, lastMatchTime = 0, totalTilesForLevel = 0;
         let activeTiles = [], firstTile = null; 
         let matchHistory = [];
         let tutorialMode = false, tutorialPair = [];
         let isGameLocked = false; 
-        window.isLevelCompleting = false; 
+        let isLevelCompleting = false; 
+        let isFirstLoad = true;
         const COMBO_TIME_LIMIT = 4000; 
 
-        // Защита от NaN при загрузке сохранения
-        let savedLvl = SafeStorage.get('mahjong_level'); 
-        if (savedLvl && !isNaN(parseInt(savedLvl))) currentLevel = parseInt(savedLvl); else currentLevel = 1;
-        
-        let savedScore = SafeStorage.get('mahjong_score'); 
-        if (savedScore && !isNaN(parseInt(savedScore))) totalScore = parseInt(savedScore); else totalScore = 0;
+        let savedLvl = SafeStorage.get('mahjong_level'); if (savedLvl && !isNaN(parseInt(savedLvl))) currentLevel = parseInt(savedLvl); else currentLevel = 1;
+        let savedScore = SafeStorage.get('mahjong_score'); if (savedScore && !isNaN(parseInt(savedScore))) totalScore = parseInt(savedScore); else totalScore = 0;
         
         const themeSets = [
             ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'],
@@ -615,7 +624,7 @@
         }
 
         function initGame() {
-            window.isLevelCompleting = false; 
+            isLevelCompleting = false; 
             
             const board = document.getElementById('game-board'); board.innerHTML = ''; activeTiles = []; firstTile = null; matchHistory = [];
             document.getElementById('message').innerHTML = ''; document.getElementById('btn-shuffle').classList.remove('btn-pulse'); document.getElementById('progress-bar').style.width = '0%';
@@ -699,6 +708,12 @@
             updateFreeState(); updateProgressBar();
 
             if (currentLevel === 1 && !SafeStorage.get('mahjong_tutorial_done')) { setTimeout(startTutorial, 600); }
+
+            // Требование Яндекс Игр (сообщаем, что игра загрузилась)
+            if (isFirstLoad && ys && ys.features && ys.features.LoadingAPI) {
+                ys.features.LoadingAPI.ready();
+                isFirstLoad = false;
+            }
         }
 
         function updateFreeState() {
@@ -717,7 +732,7 @@
         }
 
         function checkGameState() {
-            if (activeTiles.length === 0 || window.isLevelCompleting) return;
+            if (activeTiles.length === 0 || isLevelCompleting) return;
             
             let freeTiles = activeTiles.filter(t => t.isFree);
             let hasMoves = false;
@@ -749,10 +764,12 @@
         document.getElementById('btn-modal-shuffle').addEventListener('click', () => { document.getElementById('no-moves-modal').style.display = 'none'; watchAdToShuffle(); });
         document.getElementById('btn-close-no-moves').addEventListener('click', () => { document.getElementById('no-moves-modal').style.display = 'none'; });
 
-        // --- БРОНИРОВАННЫЙ, НЕУБИВАЕМЫЙ ПЕРЕХОД УРОВНЯ ---
+        // ========================================================================
+        // --- 💥 ЭКРАН ПОБЕДЫ, ФЕЙЕРВЕРКОВ И 100% ПЕРЕХОДА УРОВНЯ 💥 ---
+        // ========================================================================
         function levelComplete() {
-            if (window.isLevelCompleting) return; // Защита от дублей
-            window.isLevelCompleting = true; 
+            if (isLevelCompleting) return; 
+            isLevelCompleting = true; 
 
             try { AudioSys.playWin(); } catch(e){}
             
@@ -761,12 +778,13 @@
                 SafeStorage.set('mahjong_level', currentLevel);
             } catch(e){}
 
-            try { shootConfetti(); } catch(e){}
+            shootEpicConfetti();
+            launchFireworks();
             
-            // --- СТРАХОВКА: ДАЖЕ ЕСЛИ ОКНО ПОХВАЛЫ СЛОМАЕТСЯ, ИГРА ПЕРЕЙДЕТ НА СЛЕД. УРОВЕНЬ ---
-            setTimeout(() => {
+            // СТРАХОВКА (Если анимация зависнет, уровень всё равно загрузится через 3.5 секунды)
+            let fallbackTimer = setTimeout(() => {
                 const overlay = document.getElementById('level-complete-overlay');
-                if(overlay) overlay.style.display = 'none';
+                if(overlay) { overlay.style.opacity = '0'; setTimeout(() => { overlay.style.display = 'none'; }, 300); }
                 initGame(); 
             }, 3500);
 
@@ -775,7 +793,6 @@
                 const praiseEl = document.getElementById('level-complete-praise');
                 const textEl = document.getElementById('level-complete-text');
                 
-                // 20 разнообразных вариантов похвалы
                 const praiseWords = ["ВЕЛИКОЛЕПНО!", "БЛЕСТЯЩЕ!", "ГЕНИАЛЬНО!", "ИДЕАЛЬНО!", "ПРЕВОСХОДНО!", "МАСТЕРСКИ!", "ПОТРЯСАЮЩЕ!", "БЕЗУПРЕЧНО!", "НЕВЕРОЯТНО!", "ТАЛАНТЛИВО!", "ВОСХИТИТЕЛЬНО!", "ФЕНОМЕНАЛЬНО!", "ГРАНДИОЗНО!", "БЕСПОДОБНО!", "ШИКАРНО!", "ИСКУСНО!", "ТРИУМФ!", "НЕПРЕВЗОЙДЁННО!", "ЭКСТРАКЛАСС!", "ИЗУМИТЕЛЬНО!"];
                 if (praiseEl) praiseEl.innerText = praiseWords[Math.floor(Math.random() * praiseWords.length)];
                 
@@ -783,18 +800,94 @@
                     overlay.style.display = 'flex';
                     overlay.style.opacity = '1';
                 }
-                if (praiseEl) praiseEl.style.transform = 'scale(1)';
+                if (praiseEl) {
+                    praiseEl.style.transform = 'scale(1)';
+                    praiseEl.style.opacity = '1';
+                }
                 if (textEl) textEl.style.opacity = '1';
 
-                // Запуск таймера плавного исчезновения
+                // Запуск плавного исчезновения и сброса страховки
                 setTimeout(() => { 
                     if (overlay) overlay.style.opacity = '0';
                     if (praiseEl) praiseEl.style.transform = 'scale(0.8)';
+                    
+                    setTimeout(() => {
+                        if (overlay) overlay.style.display = 'none';
+                        clearTimeout(fallbackTimer);
+                        initGame(); // 100% ВЫЗОВ НОВОГО УРОВНЯ
+                    }, 500);
                 }, 3000); 
 
             } catch(e) {
-                console.error("Окно победы дало сбой, переход сработает по страховке", e);
+                console.error("Victory screen failed, proceeding to next level", e);
             }
+        }
+
+        // --- НОВЫЕ ФЕЙЕРВЕРКИ И КОНФЕТТИ ---
+        function shootEpicConfetti() {
+            try {
+                const colors = ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#ff00ff', '#00ffff'];
+                for(let i = 0; i < 150; i++) {
+                    let conf = document.createElement('div'); 
+                    conf.classList.add('epic-confetti');
+                    
+                    let size = Math.random() * 8 + 4;
+                    conf.style.width = size + 'px';
+                    conf.style.height = (Math.random() > 0.5 ? size * 2 : size) + 'px';
+                    conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    if(Math.random() > 0.5) conf.style.borderRadius = '50%';
+                    
+                    let angle = (Math.PI / 2) + (Math.random() * Math.PI - Math.PI / 2); // Вверх
+                    let velocity = 50 + Math.random() * 150;
+                    
+                    conf.style.setProperty('--tx', (Math.cos(angle) * velocity) + 'vw');
+                    conf.style.setProperty('--ty', (-Math.random() * 80 - 20) + 'vh');
+                    conf.style.setProperty('--rot1', (Math.random() * 360) + 'deg');
+                    conf.style.setProperty('--rot2', (Math.random() * 720) + 'deg');
+                    conf.style.setProperty('--dur', (Math.random() * 1.5 + 1.5) + 's');
+                    
+                    document.body.appendChild(conf); 
+                    setTimeout(() => { if(conf.parentNode) conf.parentNode.removeChild(conf); }, 3000);
+                }
+            } catch(e) {}
+        }
+
+        function launchFireworks() {
+            try {
+                const overlay = document.getElementById('level-complete-overlay');
+                const colors = ['#ffdf00', '#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#ff00ff'];
+                
+                let fwInterval = setInterval(() => {
+                    if(!isLevelCompleting) { clearInterval(fwInterval); return; }
+                    
+                    let startX = 20 + Math.random() * 60; 
+                    let startY = 20 + Math.random() * 50; 
+                    let amount = 30 + Math.random() * 20;
+                    let color = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    for(let i=0; i<amount; i++) {
+                        let p = document.createElement('div');
+                        p.className = 'fw-particle';
+                        p.style.left = startX + 'vw';
+                        p.style.top = startY + 'vh';
+                        p.style.width = '6px'; p.style.height = '6px';
+                        p.style.borderRadius = '50%';
+                        p.style.backgroundColor = (Math.random() > 0.3) ? color : '#ffffff';
+                        p.style.boxShadow = `0 0 8px ${color}`;
+                        
+                        let angle = Math.random() * Math.PI * 2;
+                        let velocity = 50 + Math.random() * 100;
+                        
+                        p.style.setProperty('--dx', (Math.cos(angle) * velocity) + 'px');
+                        p.style.setProperty('--dy', (Math.sin(angle) * velocity + 30) + 'px'); 
+                        
+                        if(overlay) overlay.appendChild(p);
+                        setTimeout(() => { if(p.parentNode) p.parentNode.removeChild(p); }, 1000);
+                    }
+                }, 350);
+                
+                setTimeout(() => clearInterval(fwInterval), 2500);
+            } catch(e) {}
         }
 
         function showFloatingText(element, points, isCombo) {
@@ -860,10 +953,10 @@
             finger.style.left = (rect.left + window.scrollX + rect.width / 2) + 'px'; finger.style.top = (rect.top + window.scrollY + rect.height / 2) + 'px';
         }
 
-        // --- УМНЫЙ ПЕРЕХВАТЧИК КЛИКОВ (Защита от залипаний и двойных тапов) ---
+        // --- УМНЫЙ ПЕРЕХВАТЧИК КЛИКОВ (СКВОЗНОЙ КЛИК) ---
         function handleTileClick(t, event) { 
-            if (window.isLevelCompleting || isGameLocked) return; 
-            if (t.isMatched) return; // <-- БРОНЯ: Игнорируем клик по уже собранной фишке!
+            if (isLevelCompleting || isGameLocked) return; 
+            if (t.isMatched) return; 
             if (tutorialMode) { if (t !== tutorialPair[0] && t !== tutorialPair[1]) return; }
             if (!t.isFree) return;
             
@@ -889,7 +982,6 @@
                 
                 if (firstTile.symbol === t.symbol) { 
                     
-                    // Блокируем фишки от повторных тапов сразу же
                     t.isMatched = true; 
                     firstTile.isMatched = true;
                     
@@ -925,10 +1017,9 @@
                     updateFreeState(); updateProgressBar();
                     
                     if (activeTiles.length === 0) { 
-                        levelComplete(); // <-- ВЫЗЫВАЕМ ПОБЕДУ
+                        levelComplete(); 
                     }
                 } else { 
-                    // СМЕНА ВЫБОРА БЕЗ ВТОРОГО КЛИКА (Моментально)
                     if (!justUnlocked) AudioSys.playClick(true);
                     if (firstTile && firstTile.el) firstTile.el.classList.remove('selected'); 
                     firstTile = t; 
@@ -936,16 +1027,14 @@
                     if (tutorialMode) positionFingerOnTile(tutorialPair[0].isFree ? tutorialPair[0] : tutorialPair[1]);
                 } 
             } else { 
-                // АНТИ-БАГ ДВОЙНОГО КЛИКА: если нажали на уже выбранную фишку, ничего не делаем.
                 return;
             }
         }
 
-        // КНОПКА МИКС
         document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
 
         function watchAdToShuffle() { 
-            if (activeTiles.length === 0 || tutorialMode || window.isLevelCompleting) return;
+            if (activeTiles.length === 0 || tutorialMode || isLevelCompleting) return;
             const ad = document.getElementById('ad-screen'); if(ad) ad.style.display = 'flex'; 
             setTimeout(() => { 
                 if(ad) ad.style.display = 'none'; 
@@ -984,7 +1073,7 @@
 
         function updateBoostersUI() {
             document.querySelectorAll('.booster').forEach(btn => {
-                if (btn.id === 'btn-shuffle') return; // ПРОПУСКАЕМ КНОПКУ МИКС
+                if (btn.id === 'btn-shuffle') return; 
                 
                 let unlockLvl = parseInt(btn.getAttribute('data-unlock')); let cost = parseInt(btn.getAttribute('data-cost')); let lockTag = btn.querySelector('.b-lock');
                 if (currentLevel < unlockLvl) {
@@ -1002,7 +1091,7 @@
         }
 
         function buyBooster(btnId, cost, action) {
-            if (tutorialMode || window.isLevelCompleting || (isGameLocked && btnId !== 'bst-undo' && btnId !== 'bst-bomb' && btnId !== 'bst-light')) return;
+            if (tutorialMode || isLevelCompleting || (isGameLocked && btnId !== 'bst-undo' && btnId !== 'bst-bomb' && btnId !== 'bst-light')) return;
             let btn = document.getElementById(btnId);
             if (btn.classList.contains('locked') || btn.classList.contains('disabled')) { AudioSys.playError(); let scoreEl = document.getElementById('hud-score'); scoreEl.style.color = '#e74c3c'; setTimeout(() => scoreEl.style.color = '#fff', 300); return; }
             totalScore -= cost; SafeStorage.set('mahjong_score', totalScore); updateScoreDisplay(); AudioSys.playBooster(); action();
@@ -1026,7 +1115,7 @@
                 let pair = matchHistory.pop(); 
                 pair[0].isMatched = false; pair[1].isMatched = false;
                 pair[0].el.classList.remove('matched', 'selected'); pair[1].el.classList.remove('matched', 'selected');
-                pair[0].el.style.display = 'flex'; pair[1].el.style.display = 'flex'; // Возвращаем из DOM
+                pair[0].el.style.display = 'flex'; pair[1].el.style.display = 'flex'; 
                 activeTiles.push(pair[0], pair[1]); comboCount = 0; updateFreeState(); updateProgressBar();
             });
         });
