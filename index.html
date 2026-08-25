@@ -70,6 +70,7 @@
             font-size: 13px; color: #f1c40f; margin-top: 5px; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,1); text-align: center;
         }
 
+        /* --- ПРЕВЬЮ МИНИ-КАРТЫ УРОВНЯ --- */
         #menu-level-preview {
             width: 100px; height: 100px; position: relative; margin-top: 15px; margin-bottom: 5px; transform-style: preserve-3d;
         }
@@ -177,14 +178,17 @@
 
         .flip-anim { animation: flipTileIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes flipTileIn { 0% { transform: translateY(-4vw) scale(1.1) rotateY(-90deg); } 100% { transform: translateY(0) scale(1) rotateY(0deg); } }
+
         .flip-anim-back { animation: flipTileOut 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes flipTileOut { 0% { transform: translateY(0) scale(1) rotateY(0deg); } 100% { transform: translateY(-4vw) scale(1.1) rotateY(90deg); } }
 
+        /* --- СИСТЕМА ОБУЧЕНИЯ --- */
         #tutorial-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.75); z-index: 9000; pointer-events: none; transition: opacity 0.3s; }
         #tutorial-finger { display: none; position: absolute; font-size: 60px; z-index: 9002; pointer-events: none; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8)); animation: poke 0.8s infinite alternate cubic-bezier(0.25, 0.46, 0.45, 0.94); }
         @keyframes poke { 0% { transform: translate(-20%, 20%) scale(1); } 100% { transform: translate(-20%, -10%) scale(0.9); } }
         .tutorial-highlight { z-index: 9001 !important; box-shadow: 0 0 35px #f1c40f, inset 3px 3px 6px rgba(255, 255, 255, 1), inset -4px -5px 8px rgba(0, 0, 0, 0.18) !important; filter: brightness(1.2); }
 
+        /* --- СМАРТ-ЧАСТИЦЫ И КОРЗИНА --- */
         .css-basket-wrap { position: absolute; z-index: 9998; animation: popBasket 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; pointer-events: none; transform-origin: bottom center; }
         .css-basket { width: 60px; height: 40px; position: relative; background: repeating-linear-gradient(45deg, #c08b5c, #c08b5c 6px, #a87343 6px, #a87343 12px); border-radius: 5px 5px 20px 20px; border: 3px solid #4a2c17; border-top: 6px solid #4a2c17; box-shadow: 0 10px 15px rgba(0,0,0,0.6), inset 0 -5px 10px rgba(0,0,0,0.5); }
         .css-basket::before { content: ''; position: absolute; top: -24px; left: 8px; width: 38px; height: 24px; border: 5px solid #a87343; border-bottom: none; border-radius: 20px 20px 0 0; box-shadow: inset 0 2px 2px rgba(255,255,255,0.3); }
@@ -205,9 +209,9 @@
         .b-cost { font-size: 11px; font-family: 'Russo One', sans-serif; color: #f1c40f; margin-top: 2px; text-shadow: 1px 1px 2px #000; }
         .b-lock { position: absolute; top: -8px; right: -8px; background: #e74c3c; font-size: 10px; padding: 2px 5px; border-radius: 10px; font-weight: bold; border: 1px solid white;}
 
-        /* --- МОДАЛЬНЫЕ ОКНА И РЕЙТИНГ --- */
-        #wheel-modal, #rules-modal, #ad-screen, #no-moves-modal, #leaderboard-modal { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.95); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px;}
-        #wheel-modal h2, #rules-modal h2, #ad-screen h2, #no-moves-modal h2, #leaderboard-modal h2 { font-family: 'Russo One', sans-serif; font-size: 32px; color: #f1c40f; margin-bottom: 20px; text-shadow: 0 5px 10px rgba(0,0,0,1); }
+        /* --- МОДАЛЬНЫЕ ОКНА --- */
+        #wheel-modal, #rules-modal, #ad-screen, #no-moves-modal, #leaderboard-modal, #settings-modal { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.95); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px;}
+        #wheel-modal h2, #rules-modal h2, #ad-screen h2, #no-moves-modal h2, #leaderboard-modal h2, #settings-modal h2 { font-family: 'Russo One', sans-serif; font-size: 32px; color: #f1c40f; margin-bottom: 20px; text-shadow: 0 5px 10px rgba(0,0,0,1); }
         .wheel-container { position: relative; width: 300px; height: 300px; border-radius: 50%; border: 6px solid #d4af37; overflow: hidden; box-shadow: 0 0 30px rgba(241, 196, 15, 0.5), inset 0 0 20px rgba(0,0,0,0.8); background: #222; }
         .wheel-spinner { width: 100%; height: 100%; position: relative; border-radius: 50%; transition: transform 4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .wheel-slice { position: absolute; top: 0; left: 0; width: 100%; height: 100%; clip-path: polygon(50% 50%, 100% 0, 100% 50%); transform-origin: 50% 50%; }
@@ -215,7 +219,7 @@
         .wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid #fff; z-index: 10; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.8)); }
         .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background: radial-gradient(circle, #fff, #d4af37); border-radius: 50%; z-index: 5; box-shadow: 0 0 10px black;}
         #btn-spin { margin-top: 30px; font-size: 22px; padding: 15px 40px; }
-        #btn-close-wheel, #btn-close-no-moves, #btn-close-leaderboard { background: transparent; color: #95a5a6; border: none; font-size: 18px; text-decoration: underline; margin-top: 15px; cursor: pointer; }
+        #btn-close-wheel, #btn-close-no-moves, #btn-close-leaderboard, #btn-close-settings { background: transparent; color: #95a5a6; border: none; font-size: 18px; text-decoration: underline; margin-top: 15px; cursor: pointer; }
         #rules-modal p, #ad-screen p, #no-moves-modal p { font-size: 18px; line-height: 1.5; margin-bottom: 30px; max-width: 400px; }
         .loader { border: 6px solid #f3f3f3; border-top: 6px solid #e67e22; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         #no-moves-modal h2 { font-size: 36px; color: #e74c3c; }
@@ -250,7 +254,6 @@
         }
         #level-complete-text { font-family: 'Russo One', sans-serif; font-size: 24px; color: #fff; letter-spacing: 2px; text-shadow: 0 2px 5px #000; opacity: 0; z-index: 1; transition: opacity 0.5s ease-out; transition-delay: 0.4s; }
         
-        /* НОВАЯ СТРОКА РЕЙТИНГА ПРИ ПОБЕДЕ */
         #level-complete-rating {
             font-family: 'Russo One', sans-serif; font-size: 20px; color: #f1c40f; margin-top: 20px;
             text-shadow: 0 2px 5px #000, 0 0 15px rgba(241,196,15,0.8); opacity: 0; z-index: 1;
@@ -269,7 +272,7 @@
     <div id="tutorial-overlay"></div>
     <div id="tutorial-finger">👆</div>
 
-    <!-- ОКНО ПОБЕДЫ С ФЕЙЕРВЕРКАМИ И РЕЙТИНГОМ -->
+    <!-- ОКНО ПОБЕДЫ -->
     <div id="level-complete-overlay">
         <div id="level-complete-glow"></div>
         <h2 id="level-complete-praise">ВЕЛИКОЛЕПНО!</h2>
@@ -284,6 +287,16 @@
         <button id="btn-close-leaderboard" class="btn-massive" style="font-size: 20px; padding: 10px 30px;">ЗАКРЫТЬ</button>
     </div>
 
+    <!-- НОВОЕ: МЕНЮ НАСТРОЕК -->
+    <div id="settings-modal">
+        <h2>⚙️ НАСТРОЙКИ</h2>
+        <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; width: 250px;">
+            <button id="btn-settings-sound" class="btn-wheel" style="margin:0; font-family: sans-serif;">🔊 Звуки: ВКЛ</button>
+            <button id="btn-settings-music" class="btn-wheel" style="margin:0; font-family: sans-serif; background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%); box-shadow: 0 6px 0 #1e8449, 0 10px 15px rgba(0,0,0,0.7); border-color: #2ecc71;">🍃 Фон: ВКЛ</button>
+        </div>
+        <button id="btn-close-settings" class="btn-massive" style="font-size: 20px; padding: 10px 30px;">ЗАКРЫТЬ</button>
+    </div>
+
     <div id="main-menu">
         <div id="particles-container"></div>
         <h1>STICKERS<br>MAHJONG</h1>
@@ -296,13 +309,15 @@
             </div>
             <button id="btn-next-level" class="btn-arrow">▶</button>
         </div>
+        
         <button id="btn-play" class="btn-massive">▶ ИГРАТЬ</button>
         <button id="btn-open-wheel" class="btn-wheel">🎁 Ежедневный бонус</button>
         
-        <!-- НОВЫЕ КНОПКИ В МЕНЮ -->
-        <div style="display: flex; gap: 10px; z-index: 2; margin-bottom: 10px;">
-            <button id="btn-rules" class="btn-menu-small" style="margin-bottom: 0;">Как играть?</button>
+        <!-- КНОПКИ В ОДИН ИДЕАЛЬНЫЙ СТОЛБИК -->
+        <div style="display: flex; flex-direction: column; gap: 10px; z-index: 2; margin-bottom: 10px; width: 220px;">
             <button id="btn-leaderboard" class="btn-menu-small" style="margin-bottom: 0; color: #f1c40f; border-color: #f1c40f;">🏆 Рейтинг</button>
+            <button id="btn-settings" class="btn-menu-small" style="margin-bottom: 0;">⚙️ Настройки</button>
+            <button id="btn-rules" class="btn-menu-small" style="margin-bottom: 0;">📖 Как играть?</button>
         </div>
 
         <div id="btn-reset">Сбросить весь прогресс</div>
@@ -445,14 +460,30 @@
             playWheelTick: function() { this.playOsc('square', 800, 600, 0.05, 0.05); },
             playBooster: function() { this.playOsc('triangle', 800, 200, 0.2, 0.3); },
             playError: function() { this.playOsc('sawtooth', 150, 100, 0.2, 0.3); },
-            toggleSound: function() { this.enabled = !this.enabled; SafeStorage.set('mahjong_sound', this.enabled); const btn = document.getElementById('btn-sound'); if (btn) btn.innerText = this.enabled ? '🔊' : '🔇'; },
-            toggleMusic: function() { this.musicEnabled = !this.musicEnabled; SafeStorage.set('mahjong_music', this.musicEnabled); const btn = document.getElementById('btn-music'); if (btn) btn.innerText = this.musicEnabled ? '🍃' : '🔇'; if (this.musicEnabled) { if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); this.startAmbient(); } else { this.stopAmbient(); } }
+            
+            toggleSound: function() { 
+                this.enabled = !this.enabled; 
+                SafeStorage.set('mahjong_sound', this.enabled); 
+                const btn = document.getElementById('btn-sound'); if (btn) btn.innerText = this.enabled ? '🔊' : '🔇'; 
+                const btnSet = document.getElementById('btn-settings-sound'); if (btnSet) btnSet.innerText = this.enabled ? '🔊 Звуки: ВКЛ' : '🔇 Звуки: ВЫКЛ';
+            },
+            toggleMusic: function() { 
+                this.musicEnabled = !this.musicEnabled; 
+                SafeStorage.set('mahjong_music', this.musicEnabled); 
+                const btn = document.getElementById('btn-music'); if (btn) btn.innerText = this.musicEnabled ? '🍃' : '🔇'; 
+                const btnSet = document.getElementById('btn-settings-music'); if (btnSet) btnSet.innerText = this.musicEnabled ? '🍃 Фон: ВКЛ' : '🔇 Фон: ВЫКЛ';
+                if (this.musicEnabled) { if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); this.startAmbient(); } else { this.stopAmbient(); } 
+            }
         };
 
         document.addEventListener("DOMContentLoaded", () => {
             let savedMusic = SafeStorage.get('mahjong_music'); if (savedMusic !== null) AudioSys.musicEnabled = (savedMusic === 'true');
             let savedSound = SafeStorage.get('mahjong_sound'); if (savedSound !== null) AudioSys.enabled = (savedSound === 'true');
-            document.getElementById('btn-sound').innerText = AudioSys.enabled ? '🔊' : '🔇'; document.getElementById('btn-music').innerText = AudioSys.musicEnabled ? '🍃' : '🔇';
+            
+            document.getElementById('btn-sound').innerText = AudioSys.enabled ? '🔊' : '🔇'; 
+            document.getElementById('btn-music').innerText = AudioSys.musicEnabled ? '🍃' : '🔇';
+            document.getElementById('btn-settings-sound').innerText = AudioSys.enabled ? '🔊 Звуки: ВКЛ' : '🔇 Звуки: ВЫКЛ';
+            document.getElementById('btn-settings-music').innerText = AudioSys.musicEnabled ? '🍃 Фон: ВКЛ' : '🔇 Фон: ВЫКЛ';
         });
 
         document.addEventListener("visibilitychange", () => { if (document.hidden) { if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend(); } else { if (AudioSys.ctx && AudioSys.ctx.state === 'suspended' && (AudioSys.enabled || AudioSys.musicEnabled)) AudioSys.ctx.resume(); } });
@@ -477,7 +508,6 @@
         let savedLvl = SafeStorage.get('mahjong_level'); if (savedLvl && !isNaN(parseInt(savedLvl))) currentLevel = parseInt(savedLvl); else currentLevel = 1;
         let savedScore = SafeStorage.get('mahjong_score'); if (savedScore && !isNaN(parseInt(savedScore))) totalScore = parseInt(savedScore); else totalScore = 0;
         
-        // --- 🤖 СИМУЛЯЦИЯ РЕЙТИНГА ИГРОКОВ (Для оффлайн/GitHub Pages) ---
         const botNames = ["Игрок777", "MahjongMaster", "Сенсей", "Дракон", "Тигр", "Катя99", "AlexPro", "Panda", "Ninja", "Lucky", "Shadow", "Samurai", "Fox", "Zen", "GamerX", "КиберКот", "Чемпион", "Маг", "Winner", "Alpha"];
         let mockLeaderboard = SafeStorage.get('mahjong_leaderboard');
         if (!mockLeaderboard) {
@@ -504,7 +534,6 @@
                 row.className = 'lb-row' + (p.isMe ? ' me' : '');
                 row.innerHTML = `<span class="lb-rank">#${idx + 1}</span><span class="lb-name">${p.name}</span><span class="lb-score">${p.score}</span>`;
                 container.appendChild(row);
-                // Авто-скролл к игроку
                 if (p.isMe) { setTimeout(() => { row.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100); }
             });
             document.getElementById('leaderboard-modal').style.display = 'flex';
@@ -512,6 +541,12 @@
         
         document.getElementById('btn-leaderboard').addEventListener('click', openLeaderboard);
         document.getElementById('btn-close-leaderboard').addEventListener('click', () => { document.getElementById('leaderboard-modal').style.display = 'none'; });
+
+        // ОТКРЫТИЕ И ЗАКРЫТИЕ НАСТРОЕК
+        document.getElementById('btn-settings').addEventListener('click', () => { AudioSys.init(); document.getElementById('settings-modal').style.display = 'flex'; });
+        document.getElementById('btn-close-settings').addEventListener('click', () => { document.getElementById('settings-modal').style.display = 'none'; });
+        document.getElementById('btn-settings-sound').addEventListener('click', () => { AudioSys.init(); AudioSys.toggleSound(); });
+        document.getElementById('btn-settings-music').addEventListener('click', () => { AudioSys.init(); AudioSys.toggleMusic(); });
 
         const themeSets = [
             ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'],
@@ -607,7 +642,6 @@
             else return { text: "🔴 ЭКСПЕРТ", color: "#e74c3c", maxLayers: 5, density: 0.95 };
         }
 
-        // --- ЕДИНЫЙ АЛГОРИТМ ГЕНЕРАЦИИ (ДЛЯ ПРЕВЬЮ И ИГРЫ) ---
         function getLayoutCoords(level) {
             let diff = getDifficultyParams(level);
             let seed = level * 13371337;
@@ -657,11 +691,7 @@
             }
 
             if (layout.length % 2 !== 0) { let idx = layout.findIndex(t => t.x === 4); if (idx !== -1) layout.splice(idx, 1); else layout.pop(); }
-
-            if (layout.length < 8) {
-                layout = []; grid = {};
-                for(let i=0; i<12; i++) { let lx = (i%4)*2; let ly = Math.floor(i/4)*2; layout.push({x: lx, y: ly, z: 0}); }
-            }
+            if (layout.length < 8) { layout = []; grid = {}; for(let i=0; i<12; i++) { let lx = (i%4)*2; let ly = Math.floor(i/4)*2; layout.push({x: lx, y: ly, z: 0}); } }
             return layout;
         }
 
