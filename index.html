@@ -70,7 +70,6 @@
             font-size: 13px; color: #f1c40f; margin-top: 5px; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,1); text-align: center;
         }
 
-        /* --- ПРЕВЬЮ МИНИ-КАРТЫ УРОВНЯ --- */
         #menu-level-preview {
             width: 100px; height: 100px; position: relative; margin-top: 15px; margin-bottom: 5px; transform-style: preserve-3d;
         }
@@ -125,7 +124,10 @@
         #hud-level { font-family: 'Russo One', sans-serif; font-size: 18px; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.8); white-space: nowrap; line-height: 1.1;}
         #hud-chapter-text { font-size: 10px; color: #a2d9ce; font-weight: bold; text-transform: uppercase; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); margin-bottom: 2px;}
 
-        #hud-score { font-family: 'Russo One', sans-serif; font-size: 18px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); margin-top: 2px; transition: color 0.3s; }
+        .stats-container { display: flex; gap: 15px; margin-top: 4px; align-items: center;}
+        #hud-score { font-family: 'Russo One', sans-serif; font-size: 15px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); transition: color 0.3s; }
+        #hud-coins { font-family: 'Russo One', sans-serif; font-size: 15px; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.8); transition: color 0.3s; }
+        
         #hud-difficulty { font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 10px; margin-top: 4px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); box-shadow: 0 2px 4px rgba(0,0,0,0.5); white-space: nowrap; }
 
         #progress-container { width: 90vw; max-width: 400px; height: 8px; background-color: rgba(0,0,0,0.5); border-radius: 4px; margin-bottom: 5px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.1); }
@@ -201,6 +203,7 @@
         .floating-text.combo { color: #f1c40f; font-size: 34px; text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 18px rgba(241, 196, 15, 0.9); }
         @keyframes floatUpText { 0% { transform: translateY(0) scale(0.5); opacity: 0; } 20% { transform: translateY(-20px) scale(1.2); opacity: 1; } 100% { transform: translateY(-60px) scale(1); opacity: 0; } }
 
+        /* --- ПАНЕЛЬ БУСТЕРОВ --- */
         #boosters-bar { display: flex; gap: 8px; margin-bottom: 20px; z-index: 10; align-items: center; justify-content: center; width: 100%; padding: 0 10px; }
         .booster { position: relative; width: 55px; height: 55px; border-radius: 12px; background: linear-gradient(135deg, #34495e, #2c3e50); border: 2px solid #7f8c8d; color: white; font-size: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; transition: all 0.2s; padding: 0;}
         .booster:active:not(.locked):not(.disabled) { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
@@ -209,15 +212,20 @@
         .b-cost { font-size: 11px; font-family: 'Russo One', sans-serif; color: #f1c40f; margin-top: 2px; text-shadow: 1px 1px 2px #000; }
         .b-lock { position: absolute; top: -8px; right: -8px; background: #e74c3c; font-size: 10px; padding: 2px 5px; border-radius: 10px; font-weight: bold; border: 1px solid white;}
 
-        /* --- МОДАЛЬНЫЕ ОКНА --- */
+        /* --- МОДАЛЬНЫЕ ОКНА И СТАБИЛИЗИРОВАННОЕ КОЛЕСО --- */
         #wheel-modal, #rules-modal, #ad-screen, #no-moves-modal, #leaderboard-modal, #settings-modal { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.95); z-index: 10000; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px;}
         #wheel-modal h2, #rules-modal h2, #ad-screen h2, #no-moves-modal h2, #leaderboard-modal h2, #settings-modal h2 { font-family: 'Russo One', sans-serif; font-size: 32px; color: #f1c40f; margin-bottom: 20px; text-shadow: 0 5px 10px rgba(0,0,0,1); }
-        .wheel-container { position: relative; width: 300px; height: 300px; border-radius: 50%; border: 6px solid #d4af37; overflow: hidden; box-shadow: 0 0 30px rgba(241, 196, 15, 0.5), inset 0 0 20px rgba(0,0,0,0.8); background: #222; }
-        .wheel-spinner { width: 100%; height: 100%; position: relative; border-radius: 50%; transition: transform 4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .wheel-slice { position: absolute; top: 0; left: 0; width: 100%; height: 100%; clip-path: polygon(50% 50%, 100% 0, 100% 50%); transform-origin: 50% 50%; }
-        .wheel-text { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); font-family: 'Russo One', sans-serif; font-size: 18px; color: white; text-shadow: 1px 1px 3px black; z-index: 2;}
+        
+        .wheel-container { position: relative; width: 300px; height: 300px; border-radius: 50%; border: 6px solid #d4af37; box-shadow: 0 0 30px rgba(241, 196, 15, 0.5), inset 0 0 20px rgba(0,0,0,0.8); background: #222; }
+        .wheel-spinner { width: 100%; height: 100%; border-radius: 50%; transition: transform 4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden; }
+        
+        /* ИДЕАЛЬНОЕ ПОЗИЦИОНИРОВАНИЕ ТЕКСТА НА КОЛЕСЕ */
+        .wheel-text-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: flex-start; transform-origin: center center; pointer-events: none; }
+        .wheel-text { margin-top: 25px; font-family: 'Russo One', sans-serif; font-size: 17px; color: white; text-shadow: 0 2px 4px rgba(0,0,0,1); white-space: nowrap; z-index: 2;}
+        
         .wheel-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid #fff; z-index: 10; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.8)); }
         .wheel-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background: radial-gradient(circle, #fff, #d4af37); border-radius: 50%; z-index: 5; box-shadow: 0 0 10px black;}
+        
         #btn-spin { margin-top: 30px; font-size: 22px; padding: 15px 40px; }
         #btn-close-wheel, #btn-close-no-moves, #btn-close-leaderboard, #btn-close-settings { background: transparent; color: #95a5a6; border: none; font-size: 18px; text-decoration: underline; margin-top: 15px; cursor: pointer; }
         #rules-modal p, #ad-screen p, #no-moves-modal p { font-size: 18px; line-height: 1.5; margin-bottom: 30px; max-width: 400px; }
@@ -272,7 +280,6 @@
     <div id="tutorial-overlay"></div>
     <div id="tutorial-finger">👆</div>
 
-    <!-- ОКНО ПОБЕДЫ -->
     <div id="level-complete-overlay">
         <div id="level-complete-glow"></div>
         <h2 id="level-complete-praise">ВЕЛИКОЛЕПНО!</h2>
@@ -280,14 +287,12 @@
         <p id="level-complete-rating">🏆 Ваше место: #1</p>
     </div>
 
-    <!-- ТАБЛИЦА ЛИДЕРОВ -->
     <div id="leaderboard-modal">
         <h2>🏆 РЕЙТИНГ</h2>
         <div id="lb-container"></div>
         <button id="btn-close-leaderboard" class="btn-massive" style="font-size: 20px; padding: 10px 30px;">ЗАКРЫТЬ</button>
     </div>
 
-    <!-- НОВОЕ: МЕНЮ НАСТРОЕК -->
     <div id="settings-modal">
         <h2>⚙️ НАСТРОЙКИ</h2>
         <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; width: 250px;">
@@ -313,7 +318,6 @@
         <button id="btn-play" class="btn-massive">▶ ИГРАТЬ</button>
         <button id="btn-open-wheel" class="btn-wheel">🎁 Ежедневный бонус</button>
         
-        <!-- КНОПКИ В ОДИН ИДЕАЛЬНЫЙ СТОЛБИК -->
         <div style="display: flex; flex-direction: column; gap: 10px; z-index: 2; margin-bottom: 10px; width: 220px;">
             <button id="btn-leaderboard" class="btn-menu-small" style="margin-bottom: 0; color: #f1c40f; border-color: #f1c40f;">🏆 Рейтинг</button>
             <button id="btn-settings" class="btn-menu-small" style="margin-bottom: 0;">⚙️ Настройки</button>
@@ -367,7 +371,12 @@
                     </div>
                     <button id="btn-hud-next" class="btn-hud-arrow">▶</button>
                 </div>
-                <div id="hud-score">🏆 0</div>
+                
+                <div class="stats-container">
+                    <div id="hud-score" title="Ваши Очки (Рейтинг)">🏆 0</div>
+                    <div id="hud-coins" title="Ваши Монеты (Для бустеров)">🪙 0</div>
+                </div>
+
                 <div id="hud-difficulty">🟢 Легко</div>
             </div>
             <div style="flex-basis: 75px;"></div>
@@ -496,7 +505,7 @@
         }
         createParticles();
 
-        let currentLevel = 1, totalScore = 0, comboCount = 0, lastMatchTime = 0, totalTilesForLevel = 0;
+        let currentLevel = 1, totalScore = 0, totalCoins = 0, comboCount = 0, lastMatchTime = 0, totalTilesForLevel = 0;
         let activeTiles = [], firstTile = null; 
         let matchHistory = [];
         let tutorialMode = false, tutorialPair = [];
@@ -507,6 +516,7 @@
 
         let savedLvl = SafeStorage.get('mahjong_level'); if (savedLvl && !isNaN(parseInt(savedLvl))) currentLevel = parseInt(savedLvl); else currentLevel = 1;
         let savedScore = SafeStorage.get('mahjong_score'); if (savedScore && !isNaN(parseInt(savedScore))) totalScore = parseInt(savedScore); else totalScore = 0;
+        let savedCoins = SafeStorage.get('mahjong_coins'); if (savedCoins && !isNaN(parseInt(savedCoins))) totalCoins = parseInt(savedCoins); else totalCoins = 0;
         
         const botNames = ["Игрок777", "MahjongMaster", "Сенсей", "Дракон", "Тигр", "Катя99", "AlexPro", "Panda", "Ninja", "Lucky", "Shadow", "Samurai", "Fox", "Zen", "GamerX", "КиберКот", "Чемпион", "Маг", "Winner", "Alpha"];
         let mockLeaderboard = SafeStorage.get('mahjong_leaderboard');
@@ -542,7 +552,6 @@
         document.getElementById('btn-leaderboard').addEventListener('click', openLeaderboard);
         document.getElementById('btn-close-leaderboard').addEventListener('click', () => { document.getElementById('leaderboard-modal').style.display = 'none'; });
 
-        // ОТКРЫТИЕ И ЗАКРЫТИЕ НАСТРОЕК
         document.getElementById('btn-settings').addEventListener('click', () => { AudioSys.init(); document.getElementById('settings-modal').style.display = 'flex'; });
         document.getElementById('btn-close-settings').addEventListener('click', () => { document.getElementById('settings-modal').style.display = 'none'; });
         document.getElementById('btn-settings-sound').addEventListener('click', () => { AudioSys.init(); AudioSys.toggleSound(); });
@@ -723,20 +732,29 @@
         document.getElementById('btn-play').addEventListener('click', () => { AudioSys.init(); document.getElementById('main-menu').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; initGame(); });
         document.getElementById('btn-prev-level').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; SafeStorage.set('mahjong_level', currentLevel); updateMenuLevelText(); updateBoostersUI(); }});
         document.getElementById('btn-next-level').addEventListener('click', () => { currentLevel++; SafeStorage.set('mahjong_level', currentLevel); updateMenuLevelText(); updateBoostersUI(); });
+        
         document.getElementById('btn-reset').addEventListener('click', () => {
-            if (confirm('Начать с 1 уровня? Весь прогресс будет удален.')) { currentLevel = 1; totalScore = 0; SafeStorage.set('mahjong_level', 1); SafeStorage.set('mahjong_score', 0); SafeStorage.remove('mahjong_tutorial_done'); updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI(); }
+            if (confirm('Начать с 1 уровня? Весь прогресс будет удален.')) { 
+                currentLevel = 1; totalScore = 0; totalCoins = 0; 
+                SafeStorage.set('mahjong_level', 1); SafeStorage.set('mahjong_score', 0); SafeStorage.set('mahjong_coins', 0); SafeStorage.remove('mahjong_tutorial_done'); 
+                updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI(); 
+            }
         });
-        document.getElementById('btn-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'flex');
+        
+        document.getElementById('btn-rules').addEventListener('click', () => { AudioSys.init(); document.getElementById('rules-modal').style.display = 'flex'; });
         document.getElementById('btn-close-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'none');
         document.getElementById('btn-menu').addEventListener('click', () => { document.getElementById('game-screen').style.display = 'none'; document.getElementById('main-menu').style.display = 'flex'; updateMenuLevelText(); });
-        
-        document.getElementById('btn-sound').addEventListener('click', () => { AudioSys.init(); AudioSys.toggleSound(); });
-        document.getElementById('btn-music').addEventListener('click', () => { AudioSys.init(); AudioSys.toggleMusic(); });
         
         document.getElementById('btn-hud-prev').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; SafeStorage.set('mahjong_level', currentLevel); initGame(); }});
         document.getElementById('btn-hud-next').addEventListener('click', () => { currentLevel++; SafeStorage.set('mahjong_level', currentLevel); initGame(); });
 
-        function updateScoreDisplay() { let el = document.getElementById('hud-score'); el.innerText = '🏆 ' + totalScore; updateBoostersUI(); }
+        function updateScoreDisplay() { 
+            let elScore = document.getElementById('hud-score'); 
+            let elCoins = document.getElementById('hud-coins');
+            if(elScore) elScore.innerText = '🏆 ' + totalScore; 
+            if(elCoins) elCoins.innerText = '🪙 ' + totalCoins; 
+            updateBoostersUI(); 
+        }
         
         function applyMaterial(level) {
             let root = document.documentElement; let matIndex = (level - 1) % materials.length; let mat = materials[matIndex];
@@ -912,7 +930,7 @@
                 if (praiseEl) praiseEl.innerText = praiseWords[Math.floor(Math.random() * praiseWords.length)];
                 
                 let rankData = getPlayerRank();
-                if (ratingEl) ratingEl.innerText = `🏆 Ваше место: #${rankData.rank} (Счет: ${totalScore})`;
+                if (ratingEl) ratingEl.innerText = `🏆 Ваше место: #${rankData.rank} (Очки: ${totalScore})`;
 
                 if (overlay) { overlay.style.display = 'flex'; overlay.style.opacity = '1'; }
                 if (praiseEl) { praiseEl.style.transform = 'scale(1)'; praiseEl.style.opacity = '1'; }
@@ -972,9 +990,9 @@
             } catch(e) {}
         }
 
-        function showFloatingText(element, points, isCombo) {
+        function showFloatingText(element, points) {
             let rect = element.getBoundingClientRect(); let floatEl = document.createElement('div'); floatEl.classList.add('floating-text');
-            if(isCombo) floatEl.classList.add('combo'); floatEl.innerText = isCombo ? `+${points} КОМБО!` : `+${points}`;
+            floatEl.innerText = `+${points} 🏆`;
             floatEl.style.left = (rect.left + window.scrollX + rect.width / 4) + 'px'; floatEl.style.top = (rect.top + window.scrollY - 30) + 'px';
             document.body.appendChild(floatEl); setTimeout(() => floatEl.remove(), 1000);
         }
@@ -1057,10 +1075,15 @@
                     let now = Date.now(); if (now - lastMatchTime < COMBO_TIME_LIMIT) comboCount++; else comboCount = 1; lastMatchTime = now;
                     AudioSys.playMatch(); matchHistory.push([firstTile, t]);
                     
-                    let earnedPoints = 10 * comboCount; totalScore += earnedPoints; 
-                    SafeStorage.set('mahjong_score', totalScore); updateScoreDisplay();
+                    let earnedScore = 10 * comboCount; 
+                    let earnedCoins = 10;
+                    totalScore += earnedScore; 
+                    totalCoins += earnedCoins;
+                    SafeStorage.set('mahjong_score', totalScore); 
+                    SafeStorage.set('mahjong_coins', totalCoins); 
+                    updateScoreDisplay();
                     
-                    showFloatingText(t.el, earnedPoints, comboCount > 1);
+                    showFloatingText(t.el, earnedScore);
                     spawnSmartBurst(firstTile.el, firstTile.symbol); spawnSmartBurst(t.el, t.symbol);
                     
                     t.el.classList.add('matched'); firstTile.el.classList.add('matched'); 
@@ -1149,7 +1172,7 @@
                     btn.classList.add('locked'); btn.classList.remove('disabled'); if(lockTag) lockTag.style.display = 'block';
                 } else {
                     btn.classList.remove('locked'); if(lockTag) lockTag.style.display = 'none';
-                    if (totalScore < cost || activeTiles.length === 0) { btn.classList.add('disabled'); } 
+                    if (totalCoins < cost || activeTiles.length === 0) { btn.classList.add('disabled'); } 
                     else {
                         btn.classList.remove('disabled');
                         if (btn.id === 'bst-undo' && matchHistory.length === 0) btn.classList.add('disabled');
@@ -1162,8 +1185,11 @@
         function buyBooster(btnId, cost, action) {
             if (tutorialMode || window.isLevelCompleting || (isGameLocked && btnId !== 'bst-undo' && btnId !== 'bst-bomb' && btnId !== 'bst-light')) return;
             let btn = document.getElementById(btnId);
-            if (btn.classList.contains('locked') || btn.classList.contains('disabled')) { AudioSys.playError(); let scoreEl = document.getElementById('hud-score'); scoreEl.style.color = '#e74c3c'; setTimeout(() => scoreEl.style.color = '#fff', 300); return; }
-            totalScore -= cost; SafeStorage.set('mahjong_score', totalScore); updateScoreDisplay(); AudioSys.playBooster(); action();
+            if (btn.classList.contains('locked') || btn.classList.contains('disabled')) { 
+                AudioSys.playError(); 
+                let coinsEl = document.getElementById('hud-coins'); coinsEl.style.color = '#e74c3c'; setTimeout(() => coinsEl.style.color = '#f1c40f', 300); return; 
+            }
+            totalCoins -= cost; SafeStorage.set('mahjong_coins', totalCoins); updateScoreDisplay(); AudioSys.playBooster(); action();
         }
 
         function getAvailablePairs() {
@@ -1226,11 +1252,27 @@
         });
 
         const wheelModal = document.getElementById('wheel-modal'); const wheelSpinner = document.getElementById('wheel-spinner'); const btnOpenWheel = document.getElementById('btn-open-wheel'); const btnSpin = document.getElementById('btn-spin'); const btnCloseWheel = document.getElementById('btn-close-wheel');
-        const wheelPrizes = [ { text: "+1000", val: 1000, color: "#e74c3c" }, { text: "+5000", val: 5000, color: "#f1c40f" }, { text: "+500", val: 500, color: "#3498db" }, { text: "+2000", val: 2000, color: "#2ecc71" }, { text: "ДЖЕКПОТ", val: 15000, color: "#9b59b6" }, { text: "+750", val: 750, color: "#e67e22" } ];
+        
+        const wheelPrizes = [ { text: "1000 🪙", val: 1000, color: "#e74c3c" }, { text: "5000 🪙", val: 5000, color: "#f1c40f" }, { text: "500 🪙", val: 500, color: "#3498db" }, { text: "2000 🪙", val: 2000, color: "#2ecc71" }, { text: "ДЖЕКПОТ", val: 15000, color: "#9b59b6" }, { text: "750 🪙", val: 750, color: "#e67e22" } ];
         let conicGradient = []; let sliceAngle = 360 / wheelPrizes.length;
+        
+        // --- ⚙️ НОВАЯ СТАБИЛИЗАЦИЯ ТЕКСТА КОЛЕСА ---
         wheelPrizes.forEach((prize, i) => {
             let start = i * sliceAngle; let end = (i + 1) * sliceAngle; conicGradient.push(`${prize.color} ${start}deg ${end}deg`);
-            let textEl = document.createElement('div'); textEl.className = 'wheel-text'; textEl.innerText = prize.text; textEl.style.transform = `translateX(-50%) rotate(${start + sliceAngle/2}deg)`; textEl.style.transformOrigin = `50% 150px`; wheelSpinner.appendChild(textEl);
+            
+            // Создаем невидимый капсульный контейнер (300х300)
+            let container = document.createElement('div'); 
+            container.className = 'wheel-text-container';
+            // Вращаем сам контейнер на центр сектора
+            container.style.transform = `rotate(${start + sliceAngle/2}deg)`;
+            
+            // Текст внутри выравнивается flexbox'ом сверху (align-items: flex-start)
+            let textEl = document.createElement('div'); 
+            textEl.className = 'wheel-text'; 
+            textEl.innerText = prize.text; 
+            
+            container.appendChild(textEl); 
+            wheelSpinner.appendChild(container);
         });
         wheelSpinner.style.background = `conic-gradient(${conicGradient.join(', ')})`;
 
@@ -1254,7 +1296,11 @@
             wheelSpinner.style.transform = `rotate(${rotateAngle}deg)`;
             let ticks = 0; let tickInterval = setInterval(() => { AudioSys.playWheelTick(); ticks++; if(ticks > 25) clearInterval(tickInterval); }, 150);
             setTimeout(() => {
-                AudioSys.playWin(); let wonPrize = wheelPrizes[prizeIndex]; totalScore += wonPrize.val; SafeStorage.set('mahjong_score', totalScore); SafeStorage.set('mahjong_last_spin', Date.now().toString());
+                AudioSys.playWin(); 
+                let wonPrize = wheelPrizes[prizeIndex]; 
+                totalCoins += wonPrize.val; 
+                SafeStorage.set('mahjong_coins', totalCoins); 
+                SafeStorage.set('mahjong_last_spin', Date.now().toString());
                 updateScoreDisplay(); alert(`ПОЗДРАВЛЯЕМ! Вы выиграли ${wonPrize.text}`);
                 isSpinning = false; wheelSpinner.style.transition = 'none'; wheelSpinner.style.transform = `rotate(${360 - targetSliceAngle}deg)`; setTimeout(() => wheelSpinner.style.transition = 'transform 4s cubic-bezier(0.175, 0.885, 0.32, 1.275)', 50); checkWheelTimer();
             }, 4000);
