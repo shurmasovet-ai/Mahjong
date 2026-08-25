@@ -123,6 +123,8 @@
 
         .btn-small-top { font-family: sans-serif; font-size: 13px; padding: 8px 10px; border-radius: 15px; background-color: #3498db; color: white; border: none; font-weight: bold; box-shadow: 0 4px 0 #2980b9, 0 5px 10px rgba(0,0,0,0.5); transition: all 0.2s; cursor: pointer; white-space: nowrap; margin-bottom: 5px;}
         .btn-small-top:active { transform: translateY(4px); box-shadow: 0 0 0 #2980b9; }
+        .btn-mix { background-color: #e67e22; box-shadow: 0 4px 0 #d35400, 0 5px 10px rgba(0,0,0,0.5); }
+        .btn-mix:active { box-shadow: 0 0 0 #d35400; }
         .btn-sound { background-color: #9b59b6; box-shadow: 0 4px 0 #8e44ad, 0 5px 10px rgba(0,0,0,0.5); font-size: 14px;}
         .btn-sound:active { box-shadow: 0 0 0 #8e44ad; }
 
@@ -164,7 +166,6 @@
         .tile.blocked::before { opacity: 0.2; }
         .tile.selected { border-color: #fff !important; box-shadow: inset 3px 3px 8px rgba(255, 255, 255, 1), inset -3px -4px 6px rgba(0, 0, 0, 0.1), calc(0.5vw + var(--z) * 0.1vw) calc(2vw + var(--z) * 0.2vw) 0px var(--tileSide), 0 20px 40px rgba(0,0,0,0.9) !important; transform: translateY(-5vw) scale(1.1); z-index: 999 !important; filter: brightness(1.15) drop-shadow(0 0 12px rgba(241, 196, 15, 0.8)); }
         
-        /* Броня от призрачных кликов - pointer-events: none !important; */
         .tile.matched { opacity: 0; pointer-events: none !important; transform: scale(1.6); filter: brightness(2.5); }
         
         .tile.hinted { animation: hintGlow 1s infinite alternate; }
@@ -232,15 +233,27 @@
         #no-moves-modal p { font-size: 16px; margin-bottom: 30px; color: #bdc3c7; max-width: 300px; line-height: 1.4;}
         #btn-close-no-moves { background: transparent; color: #95a5a6; border: none; font-size: 16px; text-decoration: underline; margin-top: 20px; cursor: pointer; }
 
-        /* --- РОСКОШНЫЙ ЭКРАН ПОХВАЛЫ (ЧИСТЫЙ CSS БЕЗ КЛАССОВ-ЗАВИСАНИЙ) --- */
-        #level-complete-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 15000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); opacity: 0; }
-        #level-complete-praise { font-family: 'Russo One', sans-serif; font-size: 42px; background: linear-gradient(180deg, #fff3b0 0%, #f1c40f 50%, #d4ac0d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; letter-spacing: 3px; filter: drop-shadow(0 5px 15px rgba(241,196,15,0.5)) drop-shadow(0 0 30px rgba(241,196,15,0.3)); margin-bottom: 10px; opacity: 0; transform: scale(0.5); }
-        #level-complete-text { font-family: 'Russo One', sans-serif; font-size: 22px; color: #fff; letter-spacing: 2px; text-shadow: 0 2px 4px #000; opacity: 0; }
-        
-        @keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes overlayFadeOut { from { opacity: 1; } to { opacity: 0; } }
-        @keyframes textFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes praisePop { 0% { transform: scale(0.3); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+        /* --- БЕЗОТКАЗНЫЙ ЭКРАН ПОХВАЛЫ (С ПРЯМЫМИ CSS ТРАНЗИЦИЯМИ) --- */
+        #level-complete-overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            background: rgba(0, 0, 0, 0.85); z-index: 15000; flex-direction: column; 
+            align-items: center; justify-content: center; backdrop-filter: blur(5px);
+            opacity: 0; transition: opacity 0.3s ease-out;
+        }
+        #level-complete-praise { 
+            font-family: 'Russo One', sans-serif; font-size: 42px; 
+            background: linear-gradient(180deg, #fff3b0 0%, #f1c40f 50%, #d4ac0d 100%); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            text-align: center; letter-spacing: 3px; 
+            filter: drop-shadow(0 5px 15px rgba(241,196,15,0.5)) drop-shadow(0 0 30px rgba(241,196,15,0.3)); 
+            margin-bottom: 10px; transform: scale(0.3); opacity: 0;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s ease-out;
+        }
+        #level-complete-text { 
+            font-family: 'Russo One', sans-serif; font-size: 22px; color: #fff; 
+            letter-spacing: 2px; text-shadow: 0 2px 4px #000; opacity: 0; 
+            transition: opacity 0.5s ease-out; transition-delay: 0.4s;
+        }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -339,14 +352,14 @@
     </div>
 
     <script>
-        // --- 1. БЕЗОПАСНОЕ ХРАНИЛИЩЕ ---
+        // --- БЕЗОПАСНОЕ ХРАНИЛИЩЕ ---
         const SafeStorage = {
             get: function(key) { try { return localStorage.getItem(key); } catch(e) { return null; } },
             set: function(key, value) { try { localStorage.setItem(key, value); } catch(e) { console.warn("Storage blocked"); } },
             remove: function(key) { try { localStorage.removeItem(key); } catch(e) {} }
         };
 
-        // --- 2. АСМР АУДИОСИСТЕМА (Неубиваемая оболочка) ---
+        // --- АСМР АУДИОСИСТЕМА ---
         const AudioSys = {
             ctx: null, enabled: true,
             init: function() {
@@ -405,19 +418,18 @@
         }
         createParticles();
 
-        // АБСОЛЮТНО ВСЕ ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+        // --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ---
         let currentLevel = 1, totalScore = 0, comboCount = 0, lastMatchTime = 0, totalTilesForLevel = 0;
         let activeTiles = [], firstTile = null; 
         let matchHistory = [];
         let tutorialMode = false, tutorialPair = [];
         let isGameLocked = false; 
-        window.isLevelCompleting = false; // Глобальная броня перехода уровня
+        window.isLevelCompleting = false; // Броня от множественных срабатываний перехода уровня
         const COMBO_TIME_LIMIT = 4000; 
 
         let savedLvl = SafeStorage.get('mahjong_level'); if (savedLvl) currentLevel = parseInt(savedLvl); 
         let savedScore = SafeStorage.get('mahjong_score'); if (savedScore) totalScore = parseInt(savedScore);
         
-        // --- 60 ИДЕАЛЬНЫХ НАБОРОВ (ПРОВЕРЕННАЯ ДЛИНА) ---
         const themeSets = [
             ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'],
             ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'],
@@ -487,7 +499,6 @@
             { tileBg: 'radial-gradient(circle at 30% 30%, #ffffff 0%, #fdfcfd 40%, #e8e3ec 80%, #dcd1e3 100%)', tileSide: '#9b92a3', tileColor: '#1e242b' }
         ];
 
-        // --- ГРАММАТИЧЕСКИ ПРАВИЛЬНЫЙ РУССКИЙ ЭПОС ---
         const baseChapters = ["Светлая роща", "Березовый край", "Тихий омут", "Златые купола", "Заповедный лес", "Русское поле", "Былинный сказ", "Щедрая нива", "Заря над рекой", "Отчие края"];
         const wordsA = ["Сказ", "Терем", "Край", "Свет", "Путь", "Венец", "Рассвет", "Закат", "Исток", "Колыбель", "Хоровод", "Очаг", "Родник", "Клад", "Завет", "Голос", "Песнь", "Дух", "Дар", "Узор", "Секрет", "Лес", "Дом", "Берег", "Клин", "Оберег", "Рубеж", "Простор", "Покров", "Зов"];
         const wordsB = ["Древних", "Забытых", "Скрытых", "Вечных", "Родных", "Небесных", "Светлых", "Истинных", "Добрых", "Святых", "Ясных", "Тайных", "Медовых", "Ледяных", "Золотых", "Вольных", "Щедрых", "Мудрых", "Спящих", "Славных", "Былинных", "Янтарных", "Зимних", "Чистых", "Великих", "Незримых", "Весенних", "Осенних", "Серебряных", "Звездных"];
@@ -548,7 +559,6 @@
             return [...themeSets[t1].slice(0, 7), ...themeSets[t2].slice(7, 14), ...themeSets[t3].slice(14, 20)];
         }
 
-        // --- ГАРАНТИЯ 14.5 МЛН УРОВНЕЙ БЕЗ ТУПИКОВ ---
         function forceSolvableAssignment(layout, pairsPool) {
             let sorted = [...layout].sort((a, b) => b.z - a.z || a.y - b.y || a.x - b.x);
             let pool = [...pairsPool];
@@ -588,7 +598,7 @@
         }
 
         function initGame() {
-            window.isLevelCompleting = false; // ЖЕСТКИЙ СБРОС БЛОКИРАТОРА УРОВНЯ
+            window.isLevelCompleting = false; 
             
             const board = document.getElementById('game-board'); board.innerHTML = ''; activeTiles = []; firstTile = null; matchHistory = [];
             document.getElementById('message').innerHTML = ''; document.getElementById('btn-shuffle').classList.remove('btn-pulse'); document.getElementById('progress-bar').style.width = '0%';
@@ -665,7 +675,7 @@
                 el.style.setProperty('--x', obj.x); el.style.setProperty('--y', obj.y); el.style.setProperty('--z', obj.z); el.style.zIndex = (obj.z * 100) + obj.y;
                 if (obj.isHidden) { el.classList.add('is-hidden'); el.setAttribute('data-cover', obj.coverSymbol); }
                 obj.el = el; 
-                obj.isMatched = false; // ФЛАГ ЗАЩИТЫ ОТ МЕРТВЫХ КЛИКОВ
+                obj.isMatched = false; // Броня: флаг, что фишка уже собрана
                 el.addEventListener('click', (e) => handleTileClick(obj, e));
                 board.appendChild(el); activeTiles.push(obj);
             });
@@ -723,8 +733,8 @@
         document.getElementById('btn-close-no-moves').addEventListener('click', () => { document.getElementById('no-moves-modal').style.display = 'none'; });
 
         // --- БРОНИРОВАННЫЙ, НЕУБИВАЕМЫЙ ПЕРЕХОД УРОВНЯ ---
-        function triggerWinSequence() {
-            if (window.isLevelCompleting) return; // Защита от дублей
+        function levelComplete() {
+            if (window.isLevelCompleting) return; // Запрещаем двойной вызов!
             window.isLevelCompleting = true; 
 
             try { AudioSys.playWin(); } catch(e){}
@@ -747,29 +757,34 @@
                 
                 overlay.style.display = 'flex';
                 
-                // Чистый перезапуск анимаций для надежности
-                overlay.style.animation = 'none';
-                praiseEl.style.animation = 'none';
-                textEl.style.animation = 'none';
+                // Сброс всех стилей для чистого перехода (Обход бага CSS в Colab)
+                overlay.style.opacity = '0';
+                praiseEl.style.opacity = '0';
+                praiseEl.style.transform = 'scale(0.3)';
+                textEl.style.opacity = '0';
                 
-                void overlay.offsetWidth; // Принудительный рефлоу DOM
+                void overlay.offsetWidth; // Принудительно заставляем браузер применить изменения
                 
-                // Запуск анимаций через прямой CSS, чтобы Colab не сбоил
-                overlay.style.animation = 'overlayFadeIn 0.3s ease-out forwards';
-                praiseEl.style.animation = 'praisePop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s forwards';
-                textEl.style.animation = 'textFadeIn 0.5s ease-out 0.8s forwards';
+                // Запуск плавного появления
+                overlay.style.opacity = '1';
+                praiseEl.style.opacity = '1';
+                praiseEl.style.transform = 'scale(1)';
+                textEl.style.opacity = '1';
 
-                // Запуск таймера исчезновения и загрузки уровня
+                // Ждем 3 секунды, затем плавно скрываем и грузим уровень
                 setTimeout(() => { 
-                    overlay.style.animation = 'overlayFadeOut 0.4s ease-in forwards';
+                    overlay.style.opacity = '0';
+                    praiseEl.style.transform = 'scale(0.8)';
+                    
                     setTimeout(() => {
                         overlay.style.display = 'none';
-                        initGame(); // 100% ВЫЗОВ НОВОГО УРОВНЯ ЗДЕСЬ
-                    }, 400);
+                        initGame(); // 100% ВЫЗОВ НОВОГО УРОВНЯ
+                    }, 500);
                 }, 3000); 
             } catch(e) {
-                console.error("Victory screen failed, forcing next level");
-                initGame(); // План Б: Если Colab сломал окно, уровень всё равно загрузится
+                // Если вдруг сломался HTML, всё равно грузим следующий уровень
+                console.error("Окно победы дало сбой, принудительный запуск", e);
+                initGame();
             }
         }
 
@@ -836,10 +851,10 @@
             finger.style.left = (rect.left + window.scrollX + rect.width / 2) + 'px'; finger.style.top = (rect.top + window.scrollY + rect.height / 2) + 'px';
         }
 
-        // --- УМНЫЙ ПЕРЕХВАТЧИК КЛИКОВ 2.0 (Защита от залипаний и двойных тапов) ---
+        // --- УМНЫЙ ПЕРЕХВАТЧИК КЛИКОВ (Защита от двойных нажатий) ---
         function handleTileClick(t, event) { 
             if (window.isLevelCompleting || isGameLocked) return; 
-            if (t.isMatched) return; // <-- БРОНЯ: Игнорируем клик по уже собранной фишке!
+            if (t.isMatched) return; // Игнорируем клик по уже исчезающей фишке!
             if (tutorialMode) { if (t !== tutorialPair[0] && t !== tutorialPair[1]) return; }
             if (!t.isFree) return;
             
@@ -901,10 +916,10 @@
                     updateFreeState(); updateProgressBar();
                     
                     if (activeTiles.length === 0) { 
-                        triggerWinSequence(); 
+                        levelComplete(); // УРОВЕНЬ ПРОЙДЕН
                     }
                 } else { 
-                    // СМЕНА ВЫБОРА БЕЗ ВТОРОГО КЛИКА (Моментально)
+                    // МГНОВЕННАЯ СМЕНА ВЫБОРА
                     if (!justUnlocked) AudioSys.playClick(true);
                     firstTile.el.classList.remove('selected'); 
                     firstTile = t; 
@@ -912,8 +927,7 @@
                     if (tutorialMode) positionFingerOnTile(tutorialPair[0].isFree ? tutorialPair[0] : tutorialPair[1]);
                 } 
             } else { 
-                // АНТИ-БАГ: Случайный тап по той же фишке. 
-                // Просто игнорируем его, фишка остается выбранной!
+                // Случайный тап по той же фишке
                 return;
             }
         }
@@ -1026,7 +1040,7 @@
                     }
                 });
                 matchHistory = []; updateFreeState(); updateProgressBar();
-                if (activeTiles.length === 0) { triggerWinSequence(); }
+                if (activeTiles.length === 0) { levelComplete(); }
             });
         });
 
@@ -1042,7 +1056,7 @@
                     setTimeout(() => { if(t.el) t.el.style.display = 'none'; }, 300);
                 });
                 activeTiles = activeTiles.filter(t => t.symbol !== randomTile.symbol); matchHistory = []; updateFreeState(); updateProgressBar();
-                if (activeTiles.length === 0) { triggerWinSequence(); }
+                if (activeTiles.length === 0) { levelComplete(); }
             });
         });
 
