@@ -123,13 +123,15 @@
 
         .btn-small-top { font-family: sans-serif; font-size: 13px; padding: 8px 10px; border-radius: 15px; background-color: #3498db; color: white; border: none; font-weight: bold; box-shadow: 0 4px 0 #2980b9, 0 5px 10px rgba(0,0,0,0.5); transition: all 0.2s; cursor: pointer; white-space: nowrap; margin-bottom: 5px;}
         .btn-small-top:active { transform: translateY(4px); box-shadow: 0 0 0 #2980b9; }
-        .btn-mix { background-color: #e67e22; box-shadow: 0 4px 0 #d35400, 0 5px 10px rgba(0,0,0,0.5); }
-        .btn-mix:active { box-shadow: 0 0 0 #d35400; }
         .btn-sound { background-color: #9b59b6; box-shadow: 0 4px 0 #8e44ad, 0 5px 10px rgba(0,0,0,0.5); font-size: 14px;}
         .btn-sound:active { box-shadow: 0 0 0 #8e44ad; }
 
-        @keyframes pulseBtnTop { 0% { transform: scale(1); box-shadow: 0 4px 0 #d35400, 0 0 0 0 rgba(231, 76, 60, 0.7); } 50% { transform: scale(1.05); box-shadow: 0 4px 0 #d35400, 0 0 0 10px rgba(231, 76, 60, 0); } 100% { transform: scale(1); box-shadow: 0 4px 0 #d35400, 0 0 0 0 rgba(231, 76, 60, 0); } }
-        .btn-pulse { animation: pulseBtnTop 1.5s infinite !important; background-color: #e74c3c !important; box-shadow: 0 4px 0 #c0392b !important;}
+        @keyframes pulseBtnTop { 
+            0% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 0 0 rgba(231, 76, 60, 0.7); } 
+            50% { transform: scale(1.05); box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 0 15px rgba(231, 76, 60, 0); } 
+            100% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 0 0 rgba(231, 76, 60, 0); } 
+        }
+        .btn-pulse { animation: pulseBtnTop 1.5s infinite !important; background: linear-gradient(135deg, #e74c3c, #c0392b) !important; border-color: #ff7675 !important; }
 
         #game-board { width: 90vw; flex-grow: 1; min-height: 400px; max-width: 400px; position: relative; perspective: 1000px; margin-bottom: 10px; }
         
@@ -178,7 +180,7 @@
         .flip-anim { animation: flipTileIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes flipTileIn { 0% { transform: translateY(-4vw) scale(1.1) rotateY(-90deg); } 100% { transform: translateY(-4vw) scale(1.1) rotateY(0deg); } }
 
-        /* --- СИСТЕМА ОБУЧЕНИЯ (TUTORIAL) --- */
+        /* --- СИСТЕМА ОБУЧЕНИЯ --- */
         #tutorial-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.75); z-index: 9000; pointer-events: none; transition: opacity 0.3s; }
         #tutorial-finger { display: none; position: absolute; font-size: 60px; z-index: 9002; pointer-events: none; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8)); animation: poke 0.8s infinite alternate cubic-bezier(0.25, 0.46, 0.45, 0.94); }
         @keyframes poke { 0% { transform: translate(-20%, 20%) scale(1); } 100% { transform: translate(-20%, -10%) scale(0.9); } }
@@ -198,8 +200,8 @@
         @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
 
         /* --- ПАНЕЛЬ БУСТЕРОВ --- */
-        #boosters-bar { display: flex; gap: 12px; margin-bottom: 20px; z-index: 10; align-items: center; justify-content: center; width: 100%; padding: 0 15px; }
-        .booster { position: relative; width: 60px; height: 60px; border-radius: 15px; background: linear-gradient(135deg, #34495e, #2c3e50); border: 2px solid #7f8c8d; color: white; font-size: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; transition: all 0.2s; padding: 0;}
+        #boosters-bar { display: flex; gap: 8px; margin-bottom: 20px; z-index: 10; align-items: center; justify-content: center; width: 100%; padding: 0 10px; }
+        .booster { position: relative; width: 55px; height: 55px; border-radius: 12px; background: linear-gradient(135deg, #34495e, #2c3e50); border: 2px solid #7f8c8d; color: white; font-size: 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; transition: all 0.2s; padding: 0;}
         .booster:active:not(.locked):not(.disabled) { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
         .booster.locked { filter: grayscale(1) brightness(0.5); cursor: not-allowed; }
         .booster.disabled { opacity: 0.5; cursor: not-allowed; }
@@ -229,7 +231,7 @@
         #no-moves-modal p { font-size: 16px; margin-bottom: 30px; color: #bdc3c7; max-width: 300px; line-height: 1.4;}
         #btn-close-no-moves { background: transparent; color: #95a5a6; border: none; font-size: 16px; text-decoration: underline; margin-top: 20px; cursor: pointer; }
 
-        /* --- РОСКОШНЫЙ ЭКРАН ПОХВАЛЫ (ЧИСТЫЙ CSS ДЛЯ COLAB/GITHUB) --- */
+        /* --- РОСКОШНЫЙ ЭКРАН ПОХВАЛЫ --- */
         #level-complete-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); z-index: 15000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         
         #level-complete-overlay.active { display: flex; animation: overlayFadeIn 0.3s ease-out forwards; }
@@ -302,7 +304,7 @@
 
     <div id="game-screen">
         <div id="top-bar">
-            <div style="display: flex; flex-direction: column;">
+            <div style="display: flex; flex-direction: column; flex-basis: 60px;">
                 <button id="btn-menu" class="btn-small-top">🏠 Меню</button>
                 <button id="btn-sound" class="btn-small-top btn-sound">🔊</button>
             </div>
@@ -318,7 +320,7 @@
                 <div id="hud-score">🏆 0</div>
                 <div id="hud-difficulty">🟢 Легко</div>
             </div>
-            <button id="btn-shuffle" class="btn-small-top btn-mix">🎥 Микс</button>
+            <div style="flex-basis: 60px;"></div> <!-- Placeholder -->
         </div>
         
         <div id="progress-container"><div id="progress-bar"></div></div>
@@ -326,6 +328,9 @@
         <div id="game-board"></div>
 
         <div id="boosters-bar">
+            <button class="booster" id="btn-shuffle" style="background: linear-gradient(135deg, #e67e22, #d35400); border-color: #d35400;">
+                🎥<div class="b-cost" style="color:#fff; text-shadow: none; font-size: 10px;">МИКС</div>
+            </button>
             <button class="booster" id="bst-hint" data-unlock="2" data-cost="50">🔍<div class="b-cost">50</div><div class="b-lock">Ур.2</div></button>
             <button class="booster" id="bst-undo" data-unlock="4" data-cost="100">↩️<div class="b-cost">100</div><div class="b-lock">Ур.4</div></button>
             <button class="booster" id="bst-bomb" data-unlock="7" data-cost="300">💣<div class="b-cost">300</div><div class="b-lock">Ур.7</div></button>
@@ -339,14 +344,14 @@
     </div>
 
     <script>
-        // --- 1. БЕЗОПАСНОЕ ХРАНИЛИЩЕ (Снимает краши в Colab и Github Pages) ---
+        // --- 1. БЕЗОПАСНОЕ ХРАНИЛИЩЕ ---
         const SafeStorage = {
             get: function(key) { try { return localStorage.getItem(key); } catch(e) { return null; } },
             set: function(key, value) { try { localStorage.setItem(key, value); } catch(e) { console.warn("Storage warning"); } },
             remove: function(key) { try { localStorage.removeItem(key); } catch(e) {} }
         };
 
-        // --- 2. АСМР АУДИОСИСТЕМА (Неубиваемая) ---
+        // --- 2. АСМР АУДИОСИСТЕМА ---
         const AudioSys = {
             ctx: null, enabled: true,
             init: function() {
@@ -411,13 +416,13 @@
         let tutorialMode = false;
         let tutorialPair = [];
         let isGameLocked = false; 
-        let isLevelCompleting = false; // ЖЕСТКИЙ БЛОКИРАТОР БАГОВ ПРИ ПЕРЕХОДЕ
+        let isLevelCompleting = false; 
         const COMBO_TIME_LIMIT = 4000; 
 
         let savedLvl = SafeStorage.get('mahjong_level'); if (savedLvl) currentLevel = parseInt(savedLvl); 
         let savedScore = SafeStorage.get('mahjong_score'); if (savedScore) totalScore = parseInt(savedScore);
         
-        // --- 60 ИДЕАЛЬНЫХ НАБОРОВ (МАТЕМАТИКА ПРОВЕРЕНА) ---
+        // --- 60 ИДЕАЛЬНЫХ НАБОРОВ ---
         const themeSets = [
             ['🍔','🍕','🌭','🍟','🥐','🥞','🥨','🧀','🌮','🌯','🍜','🍣','🍱','🥟','🍤','🥩','🥓','🍗','🥚','🍞'],
             ['🍹','🍸','🥤','🧊','🧉','🥛','☕','🍵','🧃','🍯','🍩','🍪','🍫','🍬','🍭','🧁','🍰','🍧','🍨','🍿'],
@@ -521,7 +526,7 @@
         document.getElementById('btn-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'flex');
         document.getElementById('btn-close-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'none');
         document.getElementById('btn-menu').addEventListener('click', () => { document.getElementById('game-screen').style.display = 'none'; document.getElementById('main-menu').style.display = 'flex'; updateMenuLevelText(); });
-        document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
+        
         document.getElementById('btn-sound').addEventListener('click', () => { AudioSys.init(); AudioSys.toggle(); });
         document.getElementById('btn-hud-prev').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; SafeStorage.set('mahjong_level', currentLevel); initGame(); }});
         document.getElementById('btn-hud-next').addEventListener('click', () => { currentLevel++; SafeStorage.set('mahjong_level', currentLevel); initGame(); });
@@ -547,7 +552,6 @@
             return [...themeSets[t1].slice(0, 7), ...themeSets[t2].slice(7, 14), ...themeSets[t3].slice(14, 20)];
         }
 
-        // --- ГАРАНТИЯ 14.5 МЛН УРОВНЕЙ БЕЗ ТУПИКОВ ---
         function forceSolvableAssignment(layout, pairsPool) {
             let sorted = [...layout].sort((a, b) => b.z - a.z || a.y - b.y || a.x - b.x);
             let pool = [...pairsPool];
@@ -587,7 +591,7 @@
         }
 
         function initGame() {
-            isLevelCompleting = false; // ЖЕСТКИЙ СБРОС БЛОКИРАТОРА
+            isLevelCompleting = false; 
             
             const board = document.getElementById('game-board'); board.innerHTML = ''; activeTiles = []; firstTile = null; matchHistory = [];
             document.getElementById('message').innerHTML = ''; document.getElementById('btn-shuffle').classList.remove('btn-pulse'); document.getElementById('progress-bar').style.width = '0%';
@@ -719,9 +723,9 @@
         document.getElementById('btn-modal-shuffle').addEventListener('click', () => { document.getElementById('no-moves-modal').style.display = 'none'; watchAdToShuffle(); });
         document.getElementById('btn-close-no-moves').addEventListener('click', () => { document.getElementById('no-moves-modal').style.display = 'none'; });
 
-        // --- 3. БРОНИРОВАННЫЙ, НЕУБИВАЕМЫЙ ПЕРЕХОД УРОВНЯ ---
+        // --- БРОНИРОВАННЫЙ ПЕРЕХОД УРОВНЯ ---
         function levelComplete() {
-            if (isLevelCompleting) return; // Запрещаем двойной вызов!
+            if (isLevelCompleting) return;
             isLevelCompleting = true; 
 
             AudioSys.playWin(); 
@@ -732,7 +736,6 @@
             const overlay = document.getElementById('level-complete-overlay');
             const praiseEl = document.getElementById('level-complete-praise');
             
-            // 20 разнообразных вариантов похвалы
             const praiseWords = [
                 "ВЕЛИКОЛЕПНО!", "БЛЕСТЯЩЕ!", "ГЕНИАЛЬНО!", "ИДЕАЛЬНО!", 
                 "ПРЕВОСХОДНО!", "МАСТЕРСКИ!", "ПОТРЯСАЮЩЕ!", "БЕЗУПРЕЧНО!",
@@ -747,14 +750,13 @@
             void overlay.offsetWidth; 
             overlay.classList.add('active');
 
-            // Запускаем железобетонный таймер перехода
             setTimeout(() => { 
                 overlay.classList.remove('active');
                 overlay.classList.add('fade-out');
                 setTimeout(() => {
                     overlay.style.display = 'none';
                     overlay.className = '';
-                    initGame(); // <-- ГАРАНТИЯ 100% ВЫЗОВА
+                    initGame(); // 100% ВЫЗОВ НОВОГО УРОВНЯ
                 }, 400);
             }, 3000); 
         }
@@ -822,9 +824,9 @@
             finger.style.left = (rect.left + window.scrollX + rect.width / 2) + 'px'; finger.style.top = (rect.top + window.scrollY + rect.height / 2) + 'px';
         }
 
-        // --- 4. СКВОЗНОЙ КЛИК 2.0 (Защита от двойных нажатий) ---
+        // --- УМНЫЙ ПЕРЕХВАТЧИК КЛИКОВ 2.0 ---
         function handleTileClick(t, event) { 
-            if (isGameLocked || isLevelCompleting) return; // Игнорируем клики при блокировке и загрузке
+            if (isGameLocked || isLevelCompleting) return; 
             if (tutorialMode) { if (t !== tutorialPair[0] && t !== tutorialPair[1]) return; }
             if (!t.isFree) return;
             
@@ -848,7 +850,6 @@
             
             } else if (firstTile !== t) { 
                 
-                // МГНОВЕННОЕ СОВПАДЕНИЕ
                 if (firstTile.symbol === t.symbol) { 
                     t.el.classList.add('selected'); 
                     if (tutorialMode) {
@@ -882,10 +883,10 @@
                     updateFreeState(); updateProgressBar();
                     
                     if (activeTiles.length === 0) { 
-                        levelComplete(); // <-- ВЫЗЫВАЕМ ПОБЕДУ
+                        levelComplete(); 
                     }
                 } else { 
-                    // СМЕНА ВЫБОРА БЕЗ ВТОРОГО КЛИКА (Моментально)
+                    // СМЕНА ВЫБОРА БЕЗ ВТОРОГО КЛИКА
                     if (!justUnlocked) AudioSys.playClick(true);
                     firstTile.el.classList.remove('selected'); 
                     firstTile = t; 
@@ -893,26 +894,13 @@
                     if (tutorialMode) positionFingerOnTile(tutorialPair[0].isFree ? tutorialPair[0] : tutorialPair[1]);
                 } 
             } else { 
-                // АНТИ-БАГ: Если игрок дважды кликнул на ту же самую фишку
-                // Мы ПРОСТО ИГНОРИРУЕМ второй клик. Фишка не сбрасывается.
-                // Это решает проблему "нажатия по 2 раза".
+                // АНТИ-БАГ ДВОЙНОГО КЛИКА: если нажали на уже выбранную фишку, ничего не делаем.
                 return;
             }
         }
 
-        // --- 5. НЕУБИВАЕМОЕ КОНФЕТТИ ---
-        function shootConfetti() {
-            try {
-                const colors = ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6'];
-                for(let i = 0; i < 60; i++) {
-                    let conf = document.createElement('div'); conf.classList.add('confetti');
-                    conf.style.left = Math.random() * 100 + 'vw'; conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                    conf.style.animationDuration = (Math.random() * 2 + 2) + 's'; conf.style.animationDelay = (Math.random() * 0.5) + 's';
-                    document.body.appendChild(conf); 
-                    setTimeout(() => { if(conf && conf.parentNode) conf.parentNode.removeChild(conf); }, 5000);
-                }
-            } catch(e) {}
-        }
+        // КНОПКА МИКС
+        document.getElementById('btn-shuffle').addEventListener('click', watchAdToShuffle);
 
         function watchAdToShuffle() { 
             if (activeTiles.length === 0 || tutorialMode || isLevelCompleting) return;
@@ -954,6 +942,8 @@
 
         function updateBoostersUI() {
             document.querySelectorAll('.booster').forEach(btn => {
+                if (btn.id === 'btn-shuffle') return; // ПРОПУСКАЕМ КНОПКУ МИКС
+                
                 let unlockLvl = parseInt(btn.getAttribute('data-unlock')); let cost = parseInt(btn.getAttribute('data-cost')); let lockTag = btn.querySelector('.b-lock');
                 if (currentLevel < unlockLvl) {
                     btn.classList.add('locked'); btn.classList.remove('disabled'); if(lockTag) lockTag.style.display = 'block';
