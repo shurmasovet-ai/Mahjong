@@ -101,18 +101,16 @@
         .tile.blocked { filter: brightness(0.65) contrast(1.1) saturate(0.85); cursor: not-allowed; }
         .tile.blocked::before { opacity: 0.2; }
         
-        /* НОВАЯ АНИМАЦИЯ ВЫБРАННОЙ ФИШКИ (СИЯНИЕ БЕЗ ПРЫЖКА) */
+        /* НОВАЯ АНИМАЦИЯ ВЫБРАННОЙ ФИШКИ (ПЛАВНОЕ ПАРЕНИЕ БЕЗ СВЕЧЕНИЯ) */
         .tile.selected { 
-            border-color: #f1c40f !important; 
-            box-shadow: 
-                inset 3px 3px 8px rgba(255, 255, 255, 1), 
-                inset -3px -4px 6px rgba(0, 0, 0, 0.1), 
-                calc(0.5vw + var(--z) * 0.1vw) calc(0.9vw + var(--z) * 0.2vw) 0px var(--tileSide), 
-                0 0 25px rgba(241, 196, 15, 0.9), 
-                0 0 50px rgba(255, 215, 0, 0.6) !important; 
-            transform: scale(1.03); 
+            border-color: #fff !important; 
             z-index: 999 !important; 
-            filter: brightness(1.25); 
+            animation: tileFloat 1.5s ease-in-out infinite !important;
+        }
+        @keyframes tileFloat { 
+            0%   { transform: translateY(0px) scale(1.02); filter: brightness(1.05); } 
+            50%  { transform: translateY(-8px) scale(1.02); filter: brightness(1.1); } 
+            100% { transform: translateY(0px) scale(1.02); filter: brightness(1.05); } 
         }
         
         .tile.matched { opacity: 0; pointer-events: none !important; transform: scale(1.6); filter: brightness(2.5); }
@@ -273,7 +271,6 @@
         
         <button id="btn-play" class="btn-massive">▶ ИГРАТЬ</button>
         
-        <!-- КНОПКИ В МЕНЮ -->
         <div style="display: flex; flex-direction: column; gap: 10px; z-index: 2; margin-bottom: 10px; width: 220px;">
             <button id="btn-open-shop" class="btn-menu-small" style="margin-bottom: 0; background: rgba(155, 89, 182, 0.3); color: #e0aaff; border-color: #9b59b6;">🛒 Магазин & Бонусы</button>
             <button id="btn-leaderboard" class="btn-menu-small" style="margin-bottom: 0; color: #f1c40f; border-color: #f1c40f;">🏆 Рейтинг</button>
@@ -387,7 +384,6 @@
             ]
         };
 
-        // Загрузка инвентаря
         let userInventory = JSON.parse(SafeStorage.get('mahjong_inventory') || '["bg0", "bg1", "bg2", "snd0", "snd1", "snd2"]');
         let eqBg = SafeStorage.get('mahjong_eq_bg') || 'bg0';
         let eqSnd = SafeStorage.get('mahjong_eq_snd') || 'snd0';
@@ -736,17 +732,13 @@
             let seed = level * 13371337;
             function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
 
-            let shapeIndex = (level - 1) % 30;
-            let layout = [];
+            let layout = []; let grid = {}; let shapeIndex = (level - 1) % 30;
 
             for (let attempt = 0; attempt < 500; attempt++) {
-                layout = [];
-                let grid = {};
+                layout = []; let grid = {};
 
                 for (let z = 0; z < diff.maxLayers; z++) {
-                    let offset = (z % 2 === 0) ? 0 : 1;
-                    let shrink = Math.floor(z / 2) * 2 + offset;
-                    let currentLayerTiles = [];
+                    let offset = (z % 2 === 0) ? 0 : 1; let shrink = Math.floor(z / 2) * 2 + offset; let currentLayerTiles = [];
 
                     for (let y = shrink; y <= 8 - shrink; y += 2) {
                         for (let x = shrink; x <= 8 - shrink; x += 2) {
@@ -785,7 +777,6 @@
                 }
 
                 if (layout.length % 2 !== 0) { let idx = layout.findIndex(t => t.x === 4); if (idx !== -1) layout.splice(idx, 1); else layout.pop(); }
-
                 if (layout.length < 8) continue;
 
                 let initialFreeCount = 0;
@@ -796,16 +787,13 @@
                         let overlapX = Math.abs(tile.x - other.x) < 2, overlapY = Math.abs(tile.y - other.y) < 2;
                         if (other.z > tile.z && overlapX && overlapY) blockedTop = true;
                         if (other.z === tile.z && overlapY) {
-                            if (other.x === tile.x - 2) blockedLeft = true;
-                            if (other.x === tile.x + 2) blockedRight = true;
+                            if (other.x === tile.x - 2) blockedLeft = true; if (other.x === tile.x + 2) blockedRight = true;
                         }
                     }
                     if (!blockedTop && (!blockedLeft || !blockedRight)) initialFreeCount++;
                 });
 
-                if (initialFreeCount >= 2) {
-                    return layout;
-                }
+                if (initialFreeCount >= 2) return layout;
             }
 
             layout = [];
@@ -814,26 +802,15 @@
         }
 
         function renderPreview(level) {
-            let previewContainer = document.getElementById('menu-level-preview');
-            if (!previewContainer) return;
-            previewContainer.innerHTML = '';
-            
+            let previewContainer = document.getElementById('menu-level-preview'); if (!previewContainer) return; previewContainer.innerHTML = '';
             let layoutCoords = getLayoutCoords(level);
-            layoutCoords.forEach(t => {
-                let pt = document.createElement('div'); pt.className = 'preview-tile';
-                pt.style.setProperty('--x', t.x); pt.style.setProperty('--y', t.y); pt.style.setProperty('--z', t.z);
-                pt.style.zIndex = (t.z * 100) + t.y; previewContainer.appendChild(pt);
-            });
+            layoutCoords.forEach(t => { let pt = document.createElement('div'); pt.className = 'preview-tile'; pt.style.setProperty('--x', t.x); pt.style.setProperty('--y', t.y); pt.style.setProperty('--z', t.z); pt.style.zIndex = (t.z * 100) + t.y; previewContainer.appendChild(pt); });
         }
 
         function updateMenuLevelText() { 
-            document.getElementById('menu-level-text').innerText = 'УРОВЕНЬ ' + currentLevel; 
-            document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
-            let chapterTitle = getChapterName(currentLevel);
-            document.getElementById('menu-chapter-title').innerText = chapterTitle;
-            document.getElementById('hud-chapter-text').innerText = chapterTitle;
-            applyMaterial(currentLevel);
-            renderPreview(currentLevel); 
+            document.getElementById('menu-level-text').innerText = 'УРОВЕНЬ ' + currentLevel; document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
+            let chapterTitle = getChapterName(currentLevel); document.getElementById('menu-chapter-title').innerText = chapterTitle; document.getElementById('hud-chapter-text').innerText = chapterTitle;
+            applyMaterial(currentLevel); renderPreview(currentLevel); 
         }
         
         updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI();
@@ -859,10 +836,8 @@
         document.getElementById('btn-hud-next').addEventListener('click', () => { currentLevel++; SafeStorage.set('mahjong_level', currentLevel); initGame(); });
 
         function updateScoreDisplay() { 
-            let elScore = document.getElementById('hud-score'); 
-            let elCoins = document.getElementById('hud-coins');
-            if(elScore) elScore.innerText = '🏆 ' + totalScore; 
-            if(elCoins) elCoins.innerText = '💰 ' + totalCoins; 
+            let elScore = document.getElementById('hud-score'); let elCoins = document.getElementById('hud-coins');
+            if(elScore) elScore.innerText = '🏆 ' + totalScore; if(elCoins) elCoins.innerText = '💰 ' + totalCoins; 
             updateBoostersUI(); 
         }
         
@@ -932,12 +907,8 @@
             let pairsPool = [];
             for(let i=0; i<finalLayout.length/2; i++) { pairsPool.push(baseSymbols[Math.floor(Math.random() * baseSymbols.length)]); }
 
-            let prepared = null;
-            let attemptMix = 0;
-            while (!prepared && attemptMix < 100) {
-                attemptMix++;
-                prepared = assignSymbolsSmart(finalLayout, pairsPool, Math.random);
-            }
+            let prepared = null; let attemptMix = 0;
+            while (!prepared && attemptMix < 100) { attemptMix++; prepared = assignSymbolsSmart(finalLayout, pairsPool, Math.random); }
 
             if (prepared) { finalLayout = prepared; } else { finalLayout = forceSolvableAssignment(finalLayout, pairsPool); }
 
