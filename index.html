@@ -138,10 +138,6 @@
 
         .btn-small-top { font-family: sans-serif; font-size: 13px; padding: 8px 10px; border-radius: 15px; background-color: #3498db; color: white; border: none; font-weight: bold; box-shadow: 0 4px 0 #2980b9, 0 5px 10px rgba(0,0,0,0.5); transition: all 0.2s; cursor: pointer; white-space: nowrap; margin-bottom: 5px;}
         .btn-small-top:active { transform: translateY(4px); box-shadow: 0 0 0 #2980b9; }
-        .btn-sound { background-color: #9b59b6; box-shadow: 0 4px 0 #8e44ad, 0 5px 10px rgba(0,0,0,0.5); font-size: 14px;}
-        .btn-sound:active { box-shadow: 0 0 0 #8e44ad; }
-        .btn-music { background-color: #27ae60; box-shadow: 0 4px 0 #2ecc71, 0 5px 10px rgba(0,0,0,0.5); font-size: 14px;}
-        .btn-music:active { box-shadow: 0 0 0 #2ecc71; }
 
         @keyframes pulseBtnTop { 0% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 0 0 rgba(231, 76, 60, 0.7); } 50% { transform: scale(1.05); box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 0 15px rgba(231, 76, 60, 0); } 100% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.5), 0 0 0 0 rgba(231, 76, 60, 0); } }
         .btn-pulse { animation: pulseBtnTop 1.5s infinite !important; background: linear-gradient(135deg, #e74c3c, #c0392b) !important; border-color: #ff7675 !important; }
@@ -355,12 +351,9 @@
 
     <div id="game-screen">
         <div id="top-bar">
-            <div style="display: flex; flex-direction: column; flex-basis: 75px;">
+            <div style="display: flex; flex-direction: column; flex-basis: 90px;">
                 <button id="btn-menu" class="btn-small-top">🏠 Меню</button>
-                <div style="display: flex; gap: 4px;">
-                    <button id="btn-sound" class="btn-small-top btn-sound" style="flex: 1; padding: 8px 0; margin-bottom: 0;" title="Эффекты">🔊</button>
-                    <button id="btn-music" class="btn-small-top btn-music" style="flex: 1; padding: 8px 0; margin-bottom: 0;" title="Фон">🍃</button>
-                </div>
+                <button id="btn-game-settings" class="btn-small-top" style="background-color: #7f8c8d; box-shadow: 0 4px 0 #34495e, 0 5px 10px rgba(0,0,0,0.5); padding: 8px 5px;">⚙️ Настройки</button>
             </div>
             <div class="hud-center">
                 <div class="level-switcher">
@@ -379,7 +372,7 @@
 
                 <div id="hud-difficulty">🟢 Легко</div>
             </div>
-            <div style="flex-basis: 75px;"></div>
+            <div style="flex-basis: 90px;"></div>
         </div>
         
         <div id="progress-container"><div id="progress-bar"></div></div>
@@ -473,13 +466,11 @@
             toggleSound: function() { 
                 this.enabled = !this.enabled; 
                 SafeStorage.set('mahjong_sound', this.enabled); 
-                const btn = document.getElementById('btn-sound'); if (btn) btn.innerText = this.enabled ? '🔊' : '🔇'; 
                 const btnSet = document.getElementById('btn-settings-sound'); if (btnSet) btnSet.innerText = this.enabled ? '🔊 Звуки: ВКЛ' : '🔇 Звуки: ВЫКЛ';
             },
             toggleMusic: function() { 
                 this.musicEnabled = !this.musicEnabled; 
                 SafeStorage.set('mahjong_music', this.musicEnabled); 
-                const btn = document.getElementById('btn-music'); if (btn) btn.innerText = this.musicEnabled ? '🍃' : '🔇'; 
                 const btnSet = document.getElementById('btn-settings-music'); if (btnSet) btnSet.innerText = this.musicEnabled ? '🍃 Фон: ВКЛ' : '🔇 Фон: ВЫКЛ';
                 if (this.musicEnabled) { if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); this.startAmbient(); } else { this.stopAmbient(); } 
             }
@@ -489,8 +480,6 @@
             let savedMusic = SafeStorage.get('mahjong_music'); if (savedMusic !== null) AudioSys.musicEnabled = (savedMusic === 'true');
             let savedSound = SafeStorage.get('mahjong_sound'); if (savedSound !== null) AudioSys.enabled = (savedSound === 'true');
             
-            document.getElementById('btn-sound').innerText = AudioSys.enabled ? '🔊' : '🔇'; 
-            document.getElementById('btn-music').innerText = AudioSys.musicEnabled ? '🍃' : '🔇';
             document.getElementById('btn-settings-sound').innerText = AudioSys.enabled ? '🔊 Звуки: ВКЛ' : '🔇 Звуки: ВЫКЛ';
             document.getElementById('btn-settings-music').innerText = AudioSys.musicEnabled ? '🍃 Фон: ВКЛ' : '🔇 Фон: ВЫКЛ';
         });
@@ -554,7 +543,11 @@
         document.getElementById('btn-leaderboard').addEventListener('click', openLeaderboard);
         document.getElementById('btn-close-leaderboard').addEventListener('click', () => { document.getElementById('leaderboard-modal').style.display = 'none'; });
 
+        // ОТКРЫТИЕ НАСТРОЕК (МЕНЮ)
         document.getElementById('btn-settings').addEventListener('click', () => { AudioSys.init(); document.getElementById('settings-modal').style.display = 'flex'; });
+        // ОТКРЫТИЕ НАСТРОЕК (ИГРА)
+        document.getElementById('btn-game-settings').addEventListener('click', () => { AudioSys.init(); document.getElementById('settings-modal').style.display = 'flex'; });
+        
         document.getElementById('btn-close-settings').addEventListener('click', () => { document.getElementById('settings-modal').style.display = 'none'; });
         document.getElementById('btn-settings-sound').addEventListener('click', () => { AudioSys.init(); AudioSys.toggleSound(); });
         document.getElementById('btn-settings-music').addEventListener('click', () => { AudioSys.init(); AudioSys.toggleMusic(); });
@@ -653,14 +646,12 @@
             else return { text: "🔴 ЭКСПЕРТ", color: "#e74c3c", maxLayers: 5, density: 0.95 };
         }
 
-        // --- БРОНИРОВАННЫЙ ГЕНЕРАТОР (Исключает тупики с 1 фишкой на старте) ---
         function getLayoutCoords(level) {
             let diff = getDifficultyParams(level);
             let seed = level * 13371337;
             function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
 
-            let shapeIndex = (level - 1) % 30;
-            let layout = [];
+            let layout = []; let grid = {}; let shapeIndex = (level - 1) % 30;
 
             for (let attempt = 0; attempt < 500; attempt++) {
                 layout = [];
@@ -711,7 +702,6 @@
 
                 if (layout.length < 8) continue;
 
-                // --- ПРОВЕРКА НА ТУПИКИ (МИНИМУМ 2 ФИШКИ НА СТАРТЕ) ---
                 let initialFreeCount = 0;
                 layout.forEach(tile => {
                     let blockedTop = false, blockedLeft = false, blockedRight = false;
@@ -727,13 +717,11 @@
                     if (!blockedTop && (!blockedLeft || !blockedRight)) initialFreeCount++;
                 });
 
-                // Строгий фильтр: Уровень должен начинаться минимум с 2 свободных фишек!
                 if (initialFreeCount >= 2) {
                     return layout;
                 }
             }
 
-            // Заглушка, если алгоритм 500 раз собрал плохую форму
             layout = [];
             for(let i=0; i<12; i++) { let lx = (i%4)*2; let ly = Math.floor(i/4)*2; layout.push({x: lx, y: ly, z: 0}); }
             return layout;
@@ -858,7 +846,6 @@
             let pairsPool = [];
             for(let i=0; i<finalLayout.length/2; i++) { pairsPool.push(baseSymbols[Math.floor(Math.random() * baseSymbols.length)]); }
 
-            // Двойная защита от тупиков - 100 попыток раздать фишки умно!
             let prepared = null;
             let attemptMix = 0;
             while (!prepared && attemptMix < 100) {
@@ -1207,7 +1194,6 @@
             }, 1000); 
         }
 
-        // БУСТЕРЫ
         function updateBoostersUI() {
             document.querySelectorAll('.booster').forEach(btn => {
                 if (btn.id === 'btn-shuffle') return; 
@@ -1334,7 +1320,6 @@
 
         const wheelModal = document.getElementById('wheel-modal'); const wheelSpinner = document.getElementById('wheel-spinner'); const btnOpenWheel = document.getElementById('btn-open-wheel'); const btnSpin = document.getElementById('btn-spin'); const btnCloseWheel = document.getElementById('btn-close-wheel');
         
-        // --- 7 СЕКТОРОВ: ДЕНЬГИ И БУСТЕРЫ ---
         const wheelPrizes = [ 
             { type: 'coins', text: "500 💰", val: 500, color: "#3498db" }, 
             { type: 'booster', id: 'hint', text: "🔍 Поиск", color: "#9b59b6" }, 
