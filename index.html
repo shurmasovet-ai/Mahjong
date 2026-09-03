@@ -24,7 +24,6 @@
             background-size: 200% 200%;
             color: white; width: 100vw; height: 100vh; overflow: hidden;
             display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-            /* ЗАЩИТА UI (Отключение выделения и лупы iOS/Android) */
             user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: none;
             transition: background 0.5s ease;
         }
@@ -150,7 +149,7 @@
         
         #btn-spin { margin-top: 30px; font-size: 22px; padding: 15px 40px; }
         #btn-close-wheel, #btn-close-no-moves, #btn-close-leaderboard, #btn-close-settings, #btn-close-shop { background: transparent; color: #95a5a6; border: none; font-size: 18px; text-decoration: underline; margin-top: 15px; cursor: pointer; }
-        #rules-modal p, #ad-screen p, #no-moves-modal p { font-size: 18px; line-height: 1.5; margin-bottom: 30px; max-width: 400px; }
+        #rules-modal p, #ad-screen p, #no-moves-modal p { font-size: 16px; line-height: 1.5; margin-bottom: 20px; max-width: 420px; text-align: left; }
         .loader { border: 6px solid #f3f3f3; border-top: 6px solid #e67e22; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 20px; }
         #no-moves-modal h2 { font-size: 36px; color: #e74c3c; }
 
@@ -162,7 +161,6 @@
         .lb-name { flex: 1; text-align: left; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;}
         .lb-score { font-family: 'Russo One', sans-serif; color: #2ecc71; text-align: right;}
 
-        /* МАГАЗИН */
         #shop-content { width: 100%; max-width: 400px; height: 60vh; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 20px; }
         .shop-section-title { font-family: 'Russo One', sans-serif; font-size: 20px; color: #fff; text-align: left; border-bottom: 2px solid #d4af37; padding-bottom: 5px; margin-bottom: 10px;}
         .shop-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.6); border: 1px solid #7f8c8d; border-radius: 12px; padding: 12px; transition: all 0.2s;}
@@ -177,7 +175,6 @@
         .btn-equipped { background: transparent; color: #2ecc71; border: 2px solid #2ecc71; padding: 6px 13px; cursor: default;}
         #shop-coins-header { font-family: 'Russo One', sans-serif; font-size: 22px; color: #f1c40f; margin-bottom: 15px; text-shadow: 0 2px 4px #000; }
 
-        /* ЭКРАН ПОБЕДЫ */
         #level-complete-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, rgba(60, 10, 20, 0.95) 0%, rgba(0, 0, 0, 0.98) 100%); z-index: 15000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s ease-out; overflow: hidden; }
         #level-complete-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 150vw; height: 150vw; max-width: 600px; max-height: 600px; background: radial-gradient(circle, rgba(255,215,0,0.5) 0%, rgba(255,69,0,0.2) 40%, rgba(0,0,0,0) 70%); animation: spinGlow 4s linear infinite; z-index: 0; pointer-events: none; }
         @keyframes spinGlow { 0% { transform: translate(-50%, -50%) rotate(0deg) scale(0.8); } 50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.1); } 100% { transform: translate(-50%, -50%) rotate(360deg) scale(0.8); } }
@@ -205,14 +202,14 @@
     </div>
 
     <div id="leaderboard-modal">
-        <h2>🏆 РЕЙТИНГ</h2>
+        <h2 id="txt-lb-title">🏆 РЕЙТИНГ</h2>
         <div id="lb-container"></div>
         <button id="btn-close-leaderboard" class="btn-massive" style="font-size: 20px; padding: 10px 30px;">ЗАКРЫТЬ</button>
     </div>
 
     <!-- МАГАЗИН И БОНУСЫ -->
     <div id="shop-modal">
-        <h2>🛒 МАГАЗИН</h2>
+        <h2 id="txt-shop-title">🛒 МАГАЗИН</h2>
         <div id="shop-coins-header">Ваши монеты: 💰 0</div>
         
         <button id="btn-open-wheel" class="btn-wheel" style="background: linear-gradient(180deg, #e74c3c, #c0392b); border-color: #ff7675; box-shadow: 0 6px 0 #962d22, 0 10px 15px rgba(0,0,0,0.7); margin-bottom: 20px;">
@@ -220,19 +217,21 @@
         </button>
 
         <div id="shop-content">
-            <div class="shop-section-title">🎨 Красивые Фоны</div>
+            <div class="shop-section-title" id="txt-shop-bg-title">🎨 Красивые Фоны</div>
             <div id="shop-bgs-container"></div>
-            <div class="shop-section-title" style="margin-top: 15px;">🎵 Звуки Природы</div>
+            <div class="shop-section-title" id="txt-shop-snd-title" style="margin-top: 15px;">🎵 Звуки Природы</div>
             <div id="shop-sounds-container"></div>
         </div>
         <button id="btn-close-shop" class="btn-massive" style="font-size: 20px; padding: 10px 30px; margin-top: 10px;">ЗАКРЫТЬ</button>
     </div>
 
     <div id="settings-modal">
-        <h2>⚙️ НАСТРОЙКИ</h2>
+        <h2 id="txt-settings-title">⚙️ НАСТРОЙКИ</h2>
         <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; width: 250px;">
             <button id="btn-settings-sound" class="btn-wheel" style="margin:0; font-family: sans-serif;">🔊 Звуки: ВКЛ</button>
             <button id="btn-settings-music" class="btn-wheel" style="margin:0; font-family: sans-serif; background: linear-gradient(180deg, #2ecc71 0%, #27ae60 100%); box-shadow: 0 6px 0 #1e8449, 0 10px 15px rgba(0,0,0,0.7); border-color: #2ecc71;">🍃 Фон: ВКЛ</button>
+            <!-- ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА -->
+            <button id="btn-settings-lang" class="btn-wheel" style="margin:0; font-family: sans-serif; background: linear-gradient(180deg, #3498db 0%, #2980b9 100%); box-shadow: 0 6px 0 #1c5982, 0 10px 15px rgba(0,0,0,0.7); border-color: #3498db;">🌐 Язык: Русский</button>
         </div>
         <button id="btn-close-settings" class="btn-massive" style="font-size: 20px; padding: 10px 30px;">ЗАКРЫТЬ</button>
     </div>
@@ -263,7 +262,7 @@
     </div>
 
     <div id="wheel-modal">
-        <h2 id="wheel-cheat-reset">Колесо Фортуны</h2>
+        <h2 id="txt-wheel-title">Колесо Фортуны</h2>
         <div class="wheel-container">
             <div class="wheel-pointer"></div>
             <div class="wheel-center"></div>
@@ -274,16 +273,18 @@
     </div>
 
     <div id="rules-modal">
-        <h2>Как играть?</h2>
-        <p>Находите пары одинаковых фишек, чтобы очистить поле.</p>
-        <p>Фишка активна, если на ней <b>ничего не лежит</b>, и она <b>свободна слева ИЛИ справа</b>.</p>
-        <p>Замки: если вы открыли фишку с замком, но затем кликнули на другую, первая <b>закроется обратно</b>! Тренируйте память.</p>
+        <h2 id="txt-rules-title">Как играть?</h2>
+        <div id="txt-rules-body">
+            <p>Находите пары одинаковых фишек, чтобы очистить поле.</p>
+            <p>Фишка активна, если на ней <b>ничего не лежит</b>, и она <b>свободна слева ИЛИ справа</b>.</p>
+            <p>Замки: если вы открыли фишку с замком, но затем кликнули на другую, первая <b>закроется обратно</b>! Тренируйте память.</p>
+        </div>
         <button id="btn-close-rules" class="btn-massive" style="font-size:20px; padding:10px 30px; min-width:auto;">ПОНЯТНО</button>
     </div>
 
     <div id="no-moves-modal">
-        <h2>НЕТ ХОДОВ!</h2>
-        <p>На столе больше нет доступных пар. Перемешайте фишки или воспользуйтесь бустером.</p>
+        <h2 id="txt-nomoves-title">НЕТ ХОДОВ!</h2>
+        <p id="txt-nomoves-body">На столе больше нет доступных пар. Перемешайте фишки или воспользуйтесь бустером.</p>
         <button id="btn-modal-shuffle" class="btn-massive" style="font-size:22px; padding:15px 40px; margin-bottom:0;">🎥 МИКС</button>
         <button id="btn-close-no-moves">Я использую бустер</button>
     </div>
@@ -319,39 +320,290 @@
 
         <div id="boosters-bar">
             <button class="booster" id="btn-shuffle" style="background: linear-gradient(135deg, #e67e22, #d35400); border-color: #d35400;">
-                🎥<div class="b-cost" style="color:#fff; text-shadow: none; font-size: 10px;">МИКС</div>
+                🎥<div class="b-cost" id="txt-booster-mix" style="color:#fff; text-shadow: none; font-size: 10px;">МИКС</div>
             </button>
-            <button class="booster" id="bst-hint" data-unlock="2" data-cost="50">🔍<div class="b-cost">50</div><div class="b-lock">Ур.2</div></button>
-            <button class="booster" id="bst-undo" data-unlock="4" data-cost="100">↩️<div class="b-cost">100</div><div class="b-lock">Ур.4</div></button>
-            <button class="booster" id="bst-bomb" data-unlock="7" data-cost="300">💣<div class="b-cost">300</div><div class="b-lock">Ур.7</div></button>
-            <button class="booster" id="bst-light" data-unlock="10" data-cost="600">⚡<div class="b-cost">600</div><div class="b-lock">Ур.10</div></button>
+            <button class="booster" id="bst-hint" data-unlock="2" data-cost="50">🔍<div class="b-cost">50</div><div class="b-lock" id="txt-lock-2">Ур.2</div></button>
+            <button class="booster" id="bst-undo" data-unlock="4" data-cost="100">↩️<div class="b-cost">100</div><div class="b-lock" id="txt-lock-4">Ур.4</div></button>
+            <button class="booster" id="bst-bomb" data-unlock="7" data-cost="300">💣<div class="b-cost">300</div><div class="b-lock" id="txt-lock-7">Ур.7</div></button>
+            <button class="booster" id="bst-light" data-unlock="10" data-cost="600">⚡<div class="b-cost">600</div><div class="b-lock" id="txt-lock-10">Ур.10</div></button>
         </div>
     </div>
 
     <div id="ad-screen">
         <div class="loader"></div>
-        <h2>Рекламная пауза</h2><p>Подождите...</p>
+        <h2 id="txt-ad-title">Рекламная пауза</h2><p id="txt-ad-body">Подождите...</p>
     </div>
 
     <script>
+        // --- 🌐 МУЛЬТИЯЗЫЧНОСТЬ (I18N) ---
+        const I18N = {
+            ru: {
+                langName: "Русский",
+                play: "▶ ИГРАТЬ",
+                shopBtn: "🛒 Магазин & Бонусы",
+                leaderboard: "🏆 Рейтинг",
+                settings: "⚙️ Настройки",
+                howToPlay: "📖 Как играть?",
+                resetProgress: "Сбросить весь прогресс",
+                resetConfirm: "Начать с 1 уровня? Весь прогресс будет удален.",
+                level: "УРОВЕНЬ",
+                levelShort: "Ур.",
+                chapter: "ГЛАВА",
+                soundOn: "🔊 Звуки: ВКЛ",
+                soundOff: "🔇 Звуки: ВЫКЛ",
+                musicOn: "🍃 Фон: ВКЛ",
+                musicOff: "🔇 Фон: ВЫКЛ",
+                close: "ЗАКРЫТЬ",
+                understood: "ПОНЯТНО",
+                menuHome: "🏠 Меню",
+                yourScore: "🏆 Очки: ",
+                yourCoins: "Ваши монеты: 💰 ",
+                wheelTitle: "Колесо Фортуны",
+                wheelDaily: "🎡 Колесо Фортуны",
+                spin: "КРУТИТЬ",
+                spinning: "ВРАЩЕНИЕ...",
+                waitHours: (h, m) => `ОЖИДАНИЕ (${h}ч ${m}м)`,
+                backToShop: "Назад в магазин",
+                congrats: "ПОЗДРАВЛЯЕМ!",
+                youWon: (item) => `Вы выиграли: ${item}`,
+                boosterWon: (icon, name) => `Вы выиграли бесплатный бустер:\n${icon} ${name}`,
+                noMovesTitle: "НЕТ ХОДОВ!",
+                noMovesDesc: "На столе больше нет доступных пар. Перемешайте фишки или воспользуйтесь бустером.",
+                noMovesNotice: "НЕТ ХОДОВ! Нажмите Микс ➔",
+                shuffledNotice: "Фишки перемешаны! ✨",
+                useBoosterBtn: "Я использую бустер",
+                mix: "МИКС",
+                levelComplete: "УРОВЕНЬ ПРОЙДЕН",
+                yourRank: (rank, score) => `🏆 Ваше место: #${rank} (Очки: ${score})`,
+                adTitle: "Рекламная пауза",
+                adDesc: "Подождите...",
+                shopTitle: "🛒 МАГАЗИН",
+                shopBgTitle: "🎨 Красивые Фоны",
+                shopSndTitle: "🎵 Звуки Природы",
+                equipped: "ВЫБРАНО",
+                equip: "Выбрать",
+                pieces: "шт.",
+                rulesTitle: "Как играть?",
+                rules1: "Находите пары одинаковых фишек, чтобы очистить поле.",
+                rules2: "Фишка активна, если на ней <b>ничего не лежит</b>, и она <b>свободна слева ИЛИ справа</b>.",
+                rules3: "Замки: если вы открыли фишку с замком, но затем кликнули на другую, первая <b>закроется обратно</b>! Тренируйте память.",
+                notEnoughCoins: "Недостаточно монет! Крутите Колесо Фортуны.",
+                diffEasy: "🟢 Легко",
+                diffMedium: "🟡 Средне",
+                diffHard: "🟠 Сложно",
+                diffExpert: "🔴 ЭКСПЕРТ",
+                praises: ["ВЕЛИКОЛЕПНО!", "БЛЕСТЯЩЕ!", "ГЕНИАЛЬНО!", "ИДЕАЛЬНО!", "ПРЕВОСХОДНО!", "МАСТЕРСКИ!", "ПОТРЯСАЮЩЕ!", "БЕЗУПРЕЧНО!"]
+            },
+            en: {
+                langName: "English",
+                play: "▶ PLAY",
+                shopBtn: "🛒 Shop & Bonuses",
+                leaderboard: "🏆 Leaderboard",
+                settings: "⚙️ Settings",
+                howToPlay: "📖 How to play?",
+                resetProgress: "Reset all progress",
+                resetConfirm: "Start from level 1? All progress will be deleted.",
+                level: "LEVEL",
+                levelShort: "Lvl.",
+                chapter: "CHAPTER",
+                soundOn: "🔊 Sounds: ON",
+                soundOff: "🔇 Sounds: OFF",
+                musicOn: "🍃 Ambient: ON",
+                musicOff: "🔇 Ambient: OFF",
+                close: "CLOSE",
+                understood: "GOT IT",
+                menuHome: "🏠 Menu",
+                yourScore: "🏆 Score: ",
+                yourCoins: "Your coins: 💰 ",
+                wheelTitle: "Wheel of Fortune",
+                wheelDaily: "🎡 Daily Wheel",
+                spin: "SPIN",
+                spinning: "SPINNING...",
+                waitHours: (h, m) => `WAIT (${h}h ${m}m)`,
+                backToShop: "Back to Shop",
+                congrats: "CONGRATULATIONS!",
+                youWon: (item) => `You won: ${item}`,
+                boosterWon: (icon, name) => `You won a free booster:\n${icon} ${name}`,
+                noMovesTitle: "NO MOVES!",
+                noMovesDesc: "No more matching pairs available. Shuffle tiles or use a booster.",
+                noMovesNotice: "NO MOVES! Press Shuffle ➔",
+                shuffledNotice: "Tiles shuffled! ✨",
+                useBoosterBtn: "I'll use a booster",
+                mix: "MIX",
+                levelComplete: "LEVEL COMPLETE",
+                yourRank: (rank, score) => `🏆 Your rank: #${rank} (Score: ${score})`,
+                adTitle: "Ad Break",
+                adDesc: "Please wait...",
+                shopTitle: "🛒 SHOP",
+                shopBgTitle: "🎨 Beautiful Backgrounds",
+                shopSndTitle: "🎵 Nature Sounds",
+                equipped: "EQUIPPED",
+                equip: "Equip",
+                pieces: "pcs",
+                rulesTitle: "How to Play?",
+                rules1: "Find matching pairs of tiles to clear the board.",
+                rules2: "A tile is playable if <b>nothing is on top</b> and it is <b>free on the left OR right</b>.",
+                rules3: "Locks: revealing a locked tile and clicking elsewhere will <b>lock it back</b>! Train your memory.",
+                notEnoughCoins: "Not enough coins! Spin the Wheel of Fortune.",
+                diffEasy: "🟢 Easy",
+                diffMedium: "🟡 Medium",
+                diffHard: "🟠 Hard",
+                diffExpert: "🔴 EXPERT",
+                praises: ["MAGNIFICENT!", "BRILLIANT!", "GENIUS!", "PERFECT!", "EXCELLENT!", "MASTERFUL!", "STUNNING!", "FLAWLESS!"]
+            },
+            tr: {
+                langName: "Türkçe",
+                play: "▶ OYNA",
+                shopBtn: "🛒 Mağaza & Bonus",
+                leaderboard: "🏆 Sıralama",
+                settings: "⚙️ Ayarlar",
+                howToPlay: "📖 Nasıl Oynanır?",
+                resetProgress: "İlerlemeyi sıfırla",
+                resetConfirm: "1. seviyeden başlansın mı? Tüm ilerleme silinecek.",
+                level: "SEVİYE",
+                levelShort: "Sev.",
+                chapter: "BÖLÜM",
+                soundOn: "🔊 Ses: AÇIK",
+                soundOff: "🔇 Ses: KAPALI",
+                musicOn: "🍃 Ortam: AÇIK",
+                musicOff: "🔇 Ortam: KAPALI",
+                close: "KAPAT",
+                understood: "ANLADIM",
+                menuHome: "🏠 Menü",
+                yourScore: "🏆 Puan: ",
+                yourCoins: "Paralarınız: 💰 ",
+                wheelTitle: "Şans Çarkı",
+                wheelDaily: "🎡 Günlük Çark",
+                spin: "ÇEVİR",
+                spinning: "DÖNÜYOR...",
+                waitHours: (h, m) => `BEKLE (${h}s ${m}d)`,
+                backToShop: "Mağazaya Dön",
+                congrats: "TEBRİKLER!",
+                youWon: (item) => `Kazandınız: ${item}`,
+                boosterWon: (icon, name) => `Ücretsiz güçlendirici kazandınız:\n${icon} ${name}`,
+                noMovesTitle: "HAMLE YOK!",
+                noMovesDesc: "Eşleşen taş kalmadı. Taşları karıştırın veya güçlendirici kullanın.",
+                noMovesNotice: "HAMLE YOK! Karıştır'a basın ➔",
+                shuffledNotice: "Taşlar karıştırıldı! ✨",
+                useBoosterBtn: "Güçlendirici kullanacağım",
+                mix: "KARIŞTIR",
+                levelComplete: "SEVİYE TAMAMLANDI",
+                yourRank: (rank, score) => `🏆 Sıranız: #${rank} (Puan: ${score})`,
+                adTitle: "Reklam Arası",
+                adDesc: "Lütfen bekleyin...",
+                shopTitle: "🛒 MAĞAZA",
+                shopBgTitle: "🎨 Güzel Arka Planlar",
+                shopSndTitle: "🎵 Doğa Sesleri",
+                equipped: "SEÇİLDİ",
+                equip: "Seç",
+                pieces: "adet",
+                rulesTitle: "Nasıl Oynanır?",
+                rules1: "Tahtayı temizlemek için eşleşen taş çiftlerini bulun.",
+                rules2: "Üzerinde <b>başka taş yoksa</b> ve <b>solu VEYA sağı boşsa</b> taş seçilebilir.",
+                rules3: "Kilitler: Kilitli bir taşı açıp başka bir yere tıklarsanız taş <b>tekrar kilitlenir</b>!",
+                notEnoughCoins: "Yetersiz jeton! Şans Çarkını çevirin.",
+                diffEasy: "🟢 Kolay",
+                diffMedium: "🟡 Orta",
+                diffHard: "🟠 Zor",
+                diffExpert: "🔴 UZMAN",
+                praises: ["HARİKA!", "MÜKEMMEL!", "KUSURSUZ!", "MUHTEŞEM!", "USTACA!", "PARLAK!", "İNANILMAZ!"]
+            },
+            es: {
+                langName: "Español",
+                play: "▶ JUGAR",
+                shopBtn: "🛒 Tienda y Bonos",
+                leaderboard: "🏆 Clasificación",
+                settings: "⚙️ Ajustes",
+                howToPlay: "📖 ¿Cómo jugar?",
+                resetProgress: "Reiniciar progreso",
+                resetConfirm: "¿Empezar desde el nivel 1? Se perderá todo el progreso.",
+                level: "NIVEL",
+                levelShort: "Niv.",
+                chapter: "CAPÍTULO",
+                soundOn: "🔊 Sonidos: SÍ",
+                soundOff: "🔇 Sonidos: NO",
+                musicOn: "🍃 Ambiente: SÍ",
+                musicOff: "🔇 Ambiente: NO",
+                close: "CERRAR",
+                understood: "ENTENDIDO",
+                menuHome: "🏠 Menú",
+                yourScore: "🏆 Puntos: ",
+                yourCoins: "Tus monedas: 💰 ",
+                wheelTitle: "Rueda de la Fortuna",
+                wheelDaily: "🎡 Rueda Diaria",
+                spin: "GIRAR",
+                spinning: "GIRANDO...",
+                waitHours: (h, m) => `ESPERA (${h}h ${m}m)`,
+                backToShop: "Volver a la tienda",
+                congrats: "¡FELICITACIONES!",
+                youWon: (item) => `Has ganado: ${item}`,
+                boosterWon: (icon, name) => `Has ganado un potenciador gratis:\n${icon} ${name}`,
+                noMovesTitle: "¡SIN MOVIMIENTOS!",
+                noMovesDesc: "No quedan parejas disponibles. Mezcla las fichas o usa un potenciador.",
+                noMovesNotice: "¡SIN MOVIMIENTOS! Pulsa Mezclar ➔",
+                shuffledNotice: "¡Fichas mezcladas! ✨",
+                useBoosterBtn: "Usaré un potenciador",
+                mix: "MEZCLAR",
+                levelComplete: "NIVEL COMPLETADO",
+                yourRank: (rank, score) => `🏆 Tu puesto: #${rank} (Puntos: ${score})`,
+                adTitle: "Pausa publicitaria",
+                adDesc: "Por favor espere...",
+                shopTitle: "🛒 TIENDA",
+                shopBgTitle: "🎨 Fondos Hermosos",
+                shopSndTitle: "🎵 Sonidos de la Naturaleza",
+                equipped: "EQUIPADO",
+                equip: "Equipar",
+                pieces: "uds",
+                rulesTitle: "¿Cómo jugar?",
+                rules1: "Encuentra parejas de fichas idénticas para despejar el tablero.",
+                rules2: "Una ficha está libre si <b>no tiene nada encima</b> y está <b>libre a la izquierda O derecha</b>.",
+                rules3: "Candados: Si abres una ficha bloqueada y tocas otra, <b>¡se volverá a cerrar!</b>",
+                notEnoughCoins: "¡No tienes suficientes monedas! Gira la Rueda.",
+                diffEasy: "🟢 Fácil",
+                diffMedium: "🟡 Medio",
+                diffHard: "🟠 Difícil",
+                diffExpert: "🔴 EXPERTO",
+                praises: ["¡MAGNÍFICO!", "¡BRILLANTE!", "¡GENIAL!", "¡PERFECTO!", "¡EXCELENTE!", "¡MAJESTUOSO!", "¡FANTÁSTICO!"]
+            }
+        };
+
+        const SUPPORTED_LANGS = ['ru', 'en', 'tr', 'es'];
+        let currentLang = 'ru';
+
+        function t(key) {
+            return (I18N[currentLang] && I18N[currentLang][key]) || (I18N['ru'][key]) || key;
+        }
+
         // --- 🔒 YANDEX SDK & PLAYER API INITIALIZATION ---
         let ys = null;
         window.ysPlayer = null;
-        let isFirstLoad = true;
 
-        // Отключение контекстного меню мыши
         document.addEventListener('contextmenu', event => event.preventDefault());
 
         try { 
             YaGames.init().then(ysdk => { 
                 ys = ysdk; 
                 
-                // Вызываем LoadingAPI.ready() как только SDK загружен (П. 1.19.2)
                 if (ys.features && ys.features.LoadingAPI) { 
                     ys.features.LoadingAPI.ready(); 
                 }
                 
-                // Инициализация Player API (П. 1.9)
+                // Автоопределение языка через SDK (П. 2.14 требований)
+                if (ys.environment && ys.environment.i18n && ys.environment.i18n.lang) {
+                    let userLang = ys.environment.i18n.lang.toLowerCase();
+                    if (SUPPORTED_LANGS.includes(userLang)) {
+                        setLanguage(userLang, false);
+                    } else if (userLang.startsWith('tr')) {
+                        setLanguage('tr', false);
+                    } else if (userLang.startsWith('es')) {
+                        setLanguage('es', false);
+                    } else if (userLang.startsWith('ru') || userLang.startsWith('be') || userLang.startsWith('uk') || userLang.startsWith('kk')) {
+                        setLanguage('ru', false);
+                    } else {
+                        setLanguage('en', false);
+                    }
+                }
+                
                 ys.getPlayer({ scopes: false }).then(_player => {
                     window.ysPlayer = _player;
                     return _player.getData();
@@ -363,7 +615,6 @@
             }).catch(e => console.warn("Yandex SDK not found")); 
         } catch(e) {}
 
-        // --- ГИБРИДНОЕ ХРАНИЛИЩЕ ПРОГРЕССА ---
         const SafeStorage = {
             data: {},
             get: function(key) { 
@@ -371,26 +622,40 @@
             },
             set: function(key, value) { 
                 this.data[key] = String(value);
-                try { localStorage.setItem(key, value); } catch(e) {}
+                try { localStorage.setItem(key, value); } catch(e) { console.warn("Storage error", e); }
                 if (window.ysPlayer) window.ysPlayer.setData(this.data).catch(() => {});
             },
             remove: function(key) { 
                 delete this.data[key];
-                try { localStorage.removeItem(key); } catch(e) {}
+                try { localStorage.removeItem(key); } catch(e) { console.warn("Storage error", e); }
                 if (window.ysPlayer) window.ysPlayer.setData(this.data).catch(() => {});
             },
             syncFromCloud: function(cloudData) {
                 if(cloudData) this.data = Object.assign(this.data, cloudData);
                 
-                // Обновляем переменные после подгрузки облака
                 let sLvl = this.get('mahjong_level'); if (sLvl && !isNaN(parseInt(sLvl))) currentLevel = parseInt(sLvl);
                 let sSco = this.get('mahjong_score'); if (sSco && !isNaN(parseInt(sSco))) totalScore = parseInt(sSco);
                 let sCoi = this.get('mahjong_coins'); if (sCoi && !isNaN(parseInt(sCoi))) totalCoins = parseInt(sCoi);
-                let sBst = this.get('mahjong_free_boosters'); if (sBst) freeBoosters = JSON.parse(sBst);
-                let sInv = this.get('mahjong_inventory'); if (sInv) userInventory = JSON.parse(sInv);
+                
+                let sLang = this.get('mahjong_lang');
+                if (sLang && SUPPORTED_LANGS.includes(sLang)) {
+                    currentLang = sLang;
+                }
+
+                let sBst = this.get('mahjong_free_boosters'); 
+                if (sBst) {
+                    try { freeBoosters = JSON.parse(sBst); } catch(e) { freeBoosters = {"hint":0, "undo":0, "bomb":0, "light":0}; }
+                }
+                
+                let sInv = this.get('mahjong_inventory'); 
+                if (sInv) {
+                    try { userInventory = JSON.parse(sInv); } catch(e) { userInventory = ["bg0", "bg1", "bg2", "snd0", "snd1", "snd2"]; }
+                }
+
                 let sBg = this.get('mahjong_eq_bg'); if (sBg) eqBg = sBg;
                 let sSnd = this.get('mahjong_eq_snd'); if (sSnd) eqSnd = sSnd;
                 
+                applyLanguageUI();
                 updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI(); applyEquippedBg(); AudioSys.restartAmbient();
             }
         };
@@ -398,27 +663,27 @@
         // --- ДАННЫЕ МАГАЗИНА ---
         const ShopData = {
             bgs: [
-                { id: 'bg0', name: 'Багровый закат', desc: 'Классика', price: 0, css: 'radial-gradient(circle at center, #6b1222 0%, #2a050b 100%)' },
-                { id: 'bg1', name: 'Темная ночь', desc: 'Глубокий синий', price: 0, css: 'radial-gradient(circle at center, #1b2735 0%, #090a0f 100%)' },
-                { id: 'bg2', name: 'Изумрудный лес', desc: 'Спокойствие', price: 0, css: 'radial-gradient(circle at center, #115938 0%, #061c11 100%)' },
-                { id: 'bg3', name: 'Золотая осень', desc: 'Теплые тона', price: 1000, css: 'radial-gradient(circle at center, #b9770e 0%, #4a2300 100%)' },
-                { id: 'bg4', name: 'Неоновый город', desc: 'Киберпанк', price: 2500, css: 'radial-gradient(circle at center, #8e44ad 0%, #2c3e50 100%)' },
-                { id: 'bg5', name: 'Магия вселенной', desc: 'Анимация', price: 5000, isAnim: true, css: 'linear-gradient(45deg, #0f2027, #203a43, #2c5364)' }
+                { id: 'bg0', name: { ru: 'Багровый закат', en: 'Crimson Sunset', tr: 'Kızıl Gün Batımı', es: 'Atardecer Carmesí' }, desc: { ru: 'Классика', en: 'Classic', tr: 'Klasik', es: 'Clásico' }, price: 0, css: 'radial-gradient(circle at center, #6b1222 0%, #2a050b 100%)' },
+                { id: 'bg1', name: { ru: 'Темная ночь', en: 'Dark Night', tr: 'Karanlık Gece', es: 'Noche Oscura' }, desc: { ru: 'Глубокий синий', en: 'Deep blue', tr: 'Derin mavi', es: 'Azul profundo' }, price: 0, css: 'radial-gradient(circle at center, #1b2735 0%, #090a0f 100%)' },
+                { id: 'bg2', name: { ru: 'Изумрудный лес', en: 'Emerald Forest', tr: 'Zümrüt Ormanı', es: 'Bosque Esmeralda' }, desc: { ru: 'Спокойствие', en: 'Calm', tr: 'Huzur', es: 'Calma' }, price: 0, css: 'radial-gradient(circle at center, #115938 0%, #061c11 100%)' },
+                { id: 'bg3', name: { ru: 'Золотая осень', en: 'Golden Autumn', tr: 'Altın Sonbahar', es: 'Otoño Dorado' }, desc: { ru: 'Теплые тона', en: 'Warm tones', tr: 'Sıcak tonlar', es: 'Tonos cálidos' }, price: 1000, css: 'radial-gradient(circle at center, #b9770e 0%, #4a2300 100%)' },
+                { id: 'bg4', name: { ru: 'Неоновый город', en: 'Neon City', tr: 'Neon Şehir', es: 'Ciudad Neón' }, desc: { ru: 'Киберпанк', en: 'Cyberpunk', tr: 'Siberpunk', es: 'Ciberpunk' }, price: 2500, css: 'radial-gradient(circle at center, #8e44ad 0%, #2c3e50 100%)' },
+                { id: 'bg5', name: { ru: 'Магия вселенной', en: 'Cosmic Magic', tr: 'Evren Büyüsü', es: 'Magia Cósmica' }, desc: { ru: 'Анимация', en: 'Animated', tr: 'Animasyonlu', es: 'Animado' }, price: 5000, isAnim: true, css: 'linear-gradient(45deg, #0f2027, #203a43, #2c5364)' }
             ],
             sounds: [
-                { id: 'snd0', name: 'Шум листвы', desc: 'Легкий ветерок', price: 0, type: 'leaves' },
-                { id: 'snd1', name: 'Тихий дождь', desc: 'Белый шум', price: 0, type: 'rain' },
-                { id: 'snd2', name: 'Морской прибой', desc: 'Волны', price: 0, type: 'ocean' },
-                { id: 'snd3', name: 'Пещера гномов', desc: 'Эхо земли', price: 1500, type: 'cave' },
-                { id: 'snd4', name: 'Космический гул', desc: 'Атмосфера', price: 3000, type: 'space' },
-                { id: 'snd5', name: 'Трель птиц', desc: 'Утренний лес', price: 4500, type: 'birds' },
-                { id: 'snd6', name: 'Звенящие сосульки', desc: 'Зимняя сказка', price: 6000, type: 'icicles' }
+                { id: 'snd0', name: { ru: 'Шум листвы', en: 'Rustling Leaves', tr: 'Yaprak Hışırtısı', es: 'Susurro de Hojas' }, desc: { ru: 'Легкий ветерок', en: 'Light breeze', tr: 'Hafif rüzgar', es: 'Brisa suave' }, price: 0, type: 'leaves' },
+                { id: 'snd1', name: { ru: 'Тихий дождь', en: 'Gentle Rain', tr: 'Sakin Yağmur', es: 'Lluvia Suave' }, desc: { ru: 'Белый шум', en: 'White noise', tr: 'Beyaz gürültü', es: 'Ruido blanco' }, price: 0, type: 'rain' },
+                { id: 'snd2', name: { ru: 'Морской прибой', en: 'Ocean Surf', tr: 'Deniz Dalgası', es: 'Olas del Mar' }, desc: { ru: 'Волны', en: 'Waves', tr: 'Dalgalar', es: 'Olas' }, price: 0, type: 'ocean' },
+                { id: 'snd3', name: { ru: 'Пещера гномов', en: 'Dwarf Cave', tr: 'Cüce Mağarası', es: 'Cueva de Enanos' }, desc: { ru: 'Эхо земли', en: 'Earth echo', tr: 'Yer yankısı', es: 'Eco profundo' }, price: 1500, type: 'cave' },
+                { id: 'snd4', name: { ru: 'Космический гул', en: 'Space Drone', tr: 'Uzay Uğultusu', es: 'Zumbido Espacial' }, desc: { ru: 'Атмосфера', en: 'Atmospheric', tr: 'Atmosferik', es: 'Atmósfera' }, price: 3000, type: 'space' },
+                { id: 'snd5', name: { ru: 'Трель птиц', en: 'Birdsong', tr: 'Kuş Cıvıltısı', es: 'Canto de Pájaros' }, desc: { ru: 'Утренний лес', en: 'Morning forest', tr: 'Sabah ormanı', es: 'Bosque matutino' }, price: 4500, type: 'birds' },
+                { id: 'snd6', name: { ru: 'Звенящие сосульки', en: 'Crystal Icicles', tr: 'Buz Çanları', es: 'Carámbanos de Cristal' }, desc: { ru: 'Зимняя сказка', en: 'Winter tale', tr: 'Kış masalı', es: 'Cuento de invierno' }, price: 6000, type: 'icicles' }
             ]
         };
 
-        let userInventory = JSON.parse(SafeStorage.get('mahjong_inventory') || '["bg0", "bg1", "bg2", "snd0", "snd1", "snd2"]');
-        let eqBg = SafeStorage.get('mahjong_eq_bg') || 'bg0';
-        let eqSnd = SafeStorage.get('mahjong_eq_snd') || 'snd0';
+        let userInventory = ["bg0", "bg1", "bg2", "snd0", "snd1", "snd2"];
+        let eqBg = 'bg0';
+        let eqSnd = 'snd0';
 
         function applyEquippedBg() {
             let bgObj = ShopData.bgs.find(b => b.id === eqBg) || ShopData.bgs[0];
@@ -426,7 +691,6 @@
             if(bgObj.isAnim) document.body.classList.add('animated-bg');
             else document.body.classList.remove('animated-bg');
         }
-        applyEquippedBg();
 
         const AudioSys = {
             ctx: null, enabled: true, musicEnabled: true, ambientPlaying: false,
@@ -555,24 +819,93 @@
             
             toggleSound: function() { 
                 this.enabled = !this.enabled; SafeStorage.set('mahjong_sound', this.enabled); 
-                const btnSet = document.getElementById('btn-settings-sound'); if (btnSet) btnSet.innerText = this.enabled ? '🔊 Звуки: ВКЛ' : '🔇 Звуки: ВЫКЛ';
+                const btnSet = document.getElementById('btn-settings-sound'); if (btnSet) btnSet.innerText = this.enabled ? t('soundOn') : t('soundOff');
             },
             toggleMusic: function() { 
                 this.musicEnabled = !this.musicEnabled; SafeStorage.set('mahjong_music', this.musicEnabled); 
-                const btnSet = document.getElementById('btn-settings-music'); if (btnSet) btnSet.innerText = this.musicEnabled ? '🍃 Фон: ВКЛ' : '🔇 Фон: ВЫКЛ';
+                const btnSet = document.getElementById('btn-settings-music'); if (btnSet) btnSet.innerText = this.musicEnabled ? t('musicOn') : t('musicOff');
                 if (this.musicEnabled) { if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); this.startAmbient(); } else { this.stopAmbient(); } 
             }
         };
 
+        // --- УПРАВЛЕНИЕ ЯЗЫКОМ И ОБНОВЛЕНИЕ UI ---
+        function setLanguage(langKey, save = true) {
+            if (!SUPPORTED_LANGS.includes(langKey)) return;
+            currentLang = langKey;
+            if (save) SafeStorage.set('mahjong_lang', currentLang);
+            applyLanguageUI();
+            updateMenuLevelText();
+            updateBoostersUI();
+            renderShop();
+            renderWheel();
+        }
+
+        function cycleLanguage() {
+            let nextIndex = (SUPPORTED_LANGS.indexOf(currentLang) + 1) % SUPPORTED_LANGS.length;
+            setLanguage(SUPPORTED_LANGS[nextIndex], true);
+        }
+
+        function applyLanguageUI() {
+            document.getElementById('btn-play').innerText = t('play');
+            document.getElementById('btn-open-shop').innerText = t('shopBtn');
+            document.getElementById('btn-leaderboard').innerText = t('leaderboard');
+            document.getElementById('btn-settings').innerText = t('settings');
+            document.getElementById('btn-rules').innerText = t('howToPlay');
+            document.getElementById('btn-reset').innerText = t('resetProgress');
+
+            document.getElementById('txt-settings-title').innerText = t('settings');
+            document.getElementById('btn-settings-sound').innerText = AudioSys.enabled ? t('soundOn') : t('soundOff');
+            document.getElementById('btn-settings-music').innerText = AudioSys.musicEnabled ? t('musicOn') : t('musicOff');
+            document.getElementById('btn-settings-lang').innerText = `🌐 ${t('langName')}`;
+            document.getElementById('btn-close-settings').innerText = t('close');
+
+            document.getElementById('txt-lb-title').innerText = t('leaderboard');
+            document.getElementById('btn-close-leaderboard').innerText = t('close');
+
+            document.getElementById('txt-shop-title').innerText = t('shopTitle');
+            document.getElementById('txt-shop-bg-title').innerText = t('shopBgTitle');
+            document.getElementById('txt-shop-snd-title').innerText = t('shopSndTitle');
+            document.getElementById('btn-open-wheel').innerText = t('wheelDaily');
+            document.getElementById('btn-close-shop').innerText = t('close');
+
+            document.getElementById('txt-wheel-title').innerText = t('wheelTitle');
+            document.getElementById('btn-close-wheel').innerText = t('backToShop');
+
+            document.getElementById('txt-rules-title').innerText = t('rulesTitle');
+            document.getElementById('txt-rules-body').innerHTML = `<p>${t('rules1')}</p><p>${t('rules2')}</p><p>${t('rules3')}</p>`;
+            document.getElementById('btn-close-rules').innerText = t('understood');
+
+            document.getElementById('txt-nomoves-title').innerText = t('noMovesTitle');
+            document.getElementById('txt-nomoves-body').innerText = t('noMovesDesc');
+            document.getElementById('btn-modal-shuffle').innerText = `🎥 ${t('mix')}`;
+            document.getElementById('btn-close-no-moves').innerText = t('useBoosterBtn');
+
+            document.getElementById('btn-menu').innerText = t('menuHome');
+            document.getElementById('btn-game-settings').innerText = t('settings');
+            document.getElementById('txt-booster-mix').innerText = t('mix');
+
+            document.getElementById('txt-ad-title').innerText = t('adTitle');
+            document.getElementById('txt-ad-body').innerText = t('adDesc');
+            document.getElementById('level-complete-text').innerText = t('levelComplete');
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
+            applyEquippedBg();
             let savedMusic = SafeStorage.get('mahjong_music'); if (savedMusic !== null) AudioSys.musicEnabled = (savedMusic === 'true');
             let savedSound = SafeStorage.get('mahjong_sound'); if (savedSound !== null) AudioSys.enabled = (savedSound === 'true');
             
-            document.getElementById('btn-settings-sound').innerText = AudioSys.enabled ? '🔊 Звуки: ВКЛ' : '🔇 Звуки: ВЫКЛ';
-            document.getElementById('btn-settings-music').innerText = AudioSys.musicEnabled ? '🍃 Фон: ВКЛ' : '🔇 Фон: ВЫКЛ';
+            let savedLang = SafeStorage.get('mahjong_lang');
+            if (savedLang && SUPPORTED_LANGS.includes(savedLang)) {
+                currentLang = savedLang;
+            } else {
+                let navLang = (navigator.language || navigator.userLanguage || 'ru').toLowerCase().slice(0, 2);
+                if (SUPPORTED_LANGS.includes(navLang)) currentLang = navLang;
+                else currentLang = 'ru';
+            }
+
+            applyLanguageUI();
         });
 
-        // --- УЛУЧШЕННАЯ ОБРАБОТКА ФОКУСА (П. 1.3) ---
         document.addEventListener("visibilitychange", () => { 
             if (document.hidden) { if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend(); } 
             else { if (AudioSys.ctx && AudioSys.ctx.state === 'suspended' && (AudioSys.enabled || AudioSys.musicEnabled)) AudioSys.ctx.resume(); } 
@@ -589,22 +922,33 @@
         let currentLevel = 1, totalScore = 0, totalCoins = 0, comboCount = 0, lastMatchTime = 0, totalTilesForLevel = 0;
         let activeTiles = [], firstTile = null; let matchHistory = []; let tutorialMode = false, tutorialPair = [];
         let isGameLocked = false; window.isLevelCompleting = false; const COMBO_TIME_LIMIT = 4000; 
+        let isAnimating = false;
 
         let savedLvl = SafeStorage.get('mahjong_level'); if (savedLvl && !isNaN(parseInt(savedLvl))) currentLevel = parseInt(savedLvl); else currentLevel = 1;
         let savedScore = SafeStorage.get('mahjong_score'); if (savedScore && !isNaN(parseInt(savedScore))) totalScore = parseInt(savedScore); else totalScore = 0;
         let savedCoins = SafeStorage.get('mahjong_coins'); if (savedCoins && !isNaN(parseInt(savedCoins))) totalCoins = parseInt(savedCoins); else totalCoins = 0;
         
-        let freeBoosters = JSON.parse(SafeStorage.get('mahjong_free_boosters') || '{"hint":0, "undo":0, "bomb":0, "light":0}');
+        let freeBoosters = {hint:0, undo:0, bomb:0, light:0};
+        try { let storedBoosters = SafeStorage.get('mahjong_free_boosters'); if(storedBoosters) freeBoosters = JSON.parse(storedBoosters); } catch(e) {}
 
-        const botNames = ["Игрок777", "MahjongMaster", "Сенсей", "Дракон", "Тигр", "Катя99", "AlexPro", "Panda", "Ninja", "Lucky", "Shadow", "Samurai", "Fox", "Zen", "GamerX", "КиберКот", "Чемпион", "Маг", "Winner", "Alpha"];
-        let mockLeaderboard = SafeStorage.get('mahjong_leaderboard');
-        if (!mockLeaderboard) {
-            mockLeaderboard = [];
+        const botNames = ["Master777", "MahjongPro", "Sensei", "Dragon", "Tiger", "LuckyStar", "AlexPro", "Panda", "Ninja", "Shadow", "Samurai", "Fox", "Zen", "GamerX", "Champion", "Alpha"];
+        let mockLeaderboard = [];
+        try { 
+            let ml = SafeStorage.get('mahjong_leaderboard');
+            if (ml) mockLeaderboard = JSON.parse(ml);
+            else throw new Error("no lb");
+        } catch(e) {
             for(let i=0; i<49; i++) { mockLeaderboard.push({ name: botNames[Math.floor(Math.random() * botNames.length)] + Math.floor(Math.random() * 999), score: Math.floor(Math.random() * 25000) + 500 }); }
             SafeStorage.set('mahjong_leaderboard', JSON.stringify(mockLeaderboard));
-        } else { mockLeaderboard = JSON.parse(mockLeaderboard); }
+        }
 
-        function getPlayerRank() { let allPlayers = [...mockLeaderboard, { name: "ВЫ", score: totalScore, isMe: true }]; allPlayers.sort((a, b) => b.score - a.score); let rank = allPlayers.findIndex(p => p.isMe) + 1; return { rank, list: allPlayers }; }
+        function getPlayerRank() { 
+            let meLabel = currentLang === 'ru' ? 'ВЫ' : (currentLang === 'tr' ? 'SEN' : (currentLang === 'es' ? 'TÚ' : 'YOU'));
+            let allPlayers = [...mockLeaderboard, { name: meLabel, score: totalScore, isMe: true }]; 
+            allPlayers.sort((a, b) => b.score - a.score); 
+            let rank = allPlayers.findIndex(p => p.isMe) + 1; 
+            return { rank, list: allPlayers }; 
+        }
 
         function openLeaderboard() {
             AudioSys.init(); AudioSys.playClick(true);
@@ -621,20 +965,24 @@
         document.getElementById('btn-close-settings').addEventListener('click', () => { document.getElementById('settings-modal').style.display = 'none'; });
         document.getElementById('btn-settings-sound').addEventListener('click', () => { AudioSys.init(); AudioSys.toggleSound(); });
         document.getElementById('btn-settings-music').addEventListener('click', () => { AudioSys.init(); AudioSys.toggleMusic(); });
+        document.getElementById('btn-settings-lang').addEventListener('click', () => { AudioSys.init(); cycleLanguage(); });
 
         function renderShop() {
-            document.getElementById('shop-coins-header').innerText = `Ваши монеты: 💰 ${totalCoins}`;
+            document.getElementById('shop-coins-header').innerText = `${t('yourCoins')}${totalCoins}`;
             
             let bgContainer = document.getElementById('shop-bgs-container'); bgContainer.innerHTML = '';
             ShopData.bgs.forEach(item => {
                 let isOwned = userInventory.includes(item.id);
                 let isEquipped = eqBg === item.id;
                 let btnHtml = '';
-                if (isEquipped) btnHtml = `<button class="btn-shop btn-equipped">ВЫБРАНО</button>`;
-                else if (isOwned) btnHtml = `<button class="btn-shop btn-equip" onclick="equipItem('${item.id}', 'bg')">Выбрать</button>`;
+                if (isEquipped) btnHtml = `<button class="btn-shop btn-equipped">${t('equipped')}</button>`;
+                else if (isOwned) btnHtml = `<button class="btn-shop btn-equip" onclick="equipItem('${item.id}', 'bg')">${t('equip')}</button>`;
                 else btnHtml = `<button class="btn-shop btn-buy" onclick="buyItem('${item.id}', 'bg', ${item.price})">💰 ${item.price}</button>`;
 
-                bgContainer.innerHTML += `<div class="shop-item ${isEquipped ? 'equipped' : ''}"> <div class="shop-item-info"> <span class="shop-item-name">${item.name}</span> <span class="shop-item-desc">${item.desc}</span> </div> ${btnHtml} </div>`;
+                let name = item.name[currentLang] || item.name['en'] || item.name['ru'];
+                let desc = item.desc[currentLang] || item.desc['en'] || item.desc['ru'];
+
+                bgContainer.innerHTML += `<div class="shop-item ${isEquipped ? 'equipped' : ''}"> <div class="shop-item-info"> <span class="shop-item-name">${name}</span> <span class="shop-item-desc">${desc}</span> </div> ${btnHtml} </div>`;
             });
 
             let sndContainer = document.getElementById('shop-sounds-container'); sndContainer.innerHTML = '';
@@ -642,11 +990,14 @@
                 let isOwned = userInventory.includes(item.id);
                 let isEquipped = eqSnd === item.id;
                 let btnHtml = '';
-                if (isEquipped) btnHtml = `<button class="btn-shop btn-equipped">ВЫБРАНО</button>`;
-                else if (isOwned) btnHtml = `<button class="btn-shop btn-equip" onclick="equipItem('${item.id}', 'snd')">Выбрать</button>`;
+                if (isEquipped) btnHtml = `<button class="btn-shop btn-equipped">${t('equipped')}</button>`;
+                else if (isOwned) btnHtml = `<button class="btn-shop btn-equip" onclick="equipItem('${item.id}', 'snd')">${t('equip')}</button>`;
                 else btnHtml = `<button class="btn-shop btn-buy" onclick="buyItem('${item.id}', 'snd', ${item.price})">💰 ${item.price}</button>`;
 
-                sndContainer.innerHTML += `<div class="shop-item ${isEquipped ? 'equipped' : ''}"> <div class="shop-item-info"> <span class="shop-item-name">${item.name}</span> <span class="shop-item-desc">${item.desc}</span> </div> ${btnHtml} </div>`;
+                let name = item.name[currentLang] || item.name['en'] || item.name['ru'];
+                let desc = item.desc[currentLang] || item.desc['en'] || item.desc['ru'];
+
+                sndContainer.innerHTML += `<div class="shop-item ${isEquipped ? 'equipped' : ''}"> <div class="shop-item-info"> <span class="shop-item-name">${name}</span> <span class="shop-item-desc">${desc}</span> </div> ${btnHtml} </div>`;
             });
         }
 
@@ -656,7 +1007,7 @@
                 totalCoins -= price; SafeStorage.set('mahjong_coins', totalCoins);
                 userInventory.push(id); SafeStorage.set('mahjong_inventory', JSON.stringify(userInventory));
                 updateScoreDisplay(); AudioSys.playWin(); renderShop();
-            } else { AudioSys.playError(); alert('Недостаточно монет! Крутите Колесо Фортуны.'); }
+            } else { AudioSys.playError(); alert(t('notEnoughCoins')); }
         };
 
         window.equipItem = function(id, type) {
@@ -678,58 +1029,8 @@
             ['⚽','🏀','🏈','⚾','🎾','🏐','🎱','🏓','🏸','🏒','⛳','🪁','🏹','🎣','🤿','🎽','🥋','🛹','🛼','⛸️'],
             ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥒'],
             ['🌲','🌳','🌴','🌵','🌾','🌿','🍀','🍁','🍂','🍃','🌷','🌹','🌻','🌼','🌸','🌺','🪴','🍄','🪷','💐'],
-            ['🔨','🪜','⛏️','🛠️','🪚','🔧','🪛','🔩','⚙️','🧲','🧱','🧰','🛡️','🧹','🧺','🧯','🧭','⚓','🪝','⚖️'],
             ['💎','🔮','🪄','🧿','👑','💍','🪙','💰','🪬','⏳','💧','🧪','🧬','🔭','🔬','🛸','🚀','🛰️','🪐','👽'],
-            ['🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🦭','🐊','🐸','🐢','🦦','🦪','🐚','🪸'],
-            ['🦅','🦆','🦉','🦇','🐝','🐛','🦋','🐌','🐞','🐜','🦗','🐢','🕷️','🕸️','🐚','🦟','🪰','🪱','🦜','🦚'],
-            ['👕','👖','👔','👗','👙','👘','💄','💋','🧦','🥾','👟','👞','👢','👠','🩴','🎒','🧳','👓','🕶️','🧣'],
-            ['🎸','🎹','🎷','🎺','🎻','🪕','🥁','🪘','🪗','🎧','🎤','🎙️','📻','🎚️','🎛️','🔈','💿','📼','🎼','🎵'],
-            ['🚪','🛏️','🛋️','🪑','🚽','🚿','🛁','🪒','🧴','🧹','🧺','🧻','🧼','🧽','🛒','🪞','🪟','🖼️','🧸','🗑️'],
-            ['🌍','🌞','🌝','🌛','✨','⚡','🔥','🌪️','🌈','☁️','🌤️','⛅','🌥️','🌦️','🌧️','🌨️','🌩️','☔','☂️','❄️'],
-            ['✏️','✒️','🖋️','🖊️','🖌️','🖍️','📝','💼','📁','📂','🗂️','📅','📆','🗒️','🗓️','📇','📈','📉','📊','📋'],
-            ['📕','📖','📗','📘','📙','📚','📓','📒','📃','📜','📄','📰','🗞️','🔖','🏷️','✉️','📧','📨','📩','📤'],
-            ['📥','📦','📫','📪','📬','📭','📮','🗳️','📌','📍','📎','🖇️','📏','📐','✂️','🗑️','🔒','🔓','🔏','🔐'],
-            ['🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨','🏪','🏫','🏩','💒','🏛️','⛪','🕌'],
-            ['🕍','🛕','🕋','⛩️','🛤️','🛣️','🗾','🎑','🏞️','🌅','🌄','🌠','🎇','🎆','🌇','🌆','🏙️','🌃','🌌','🌉'],
-            ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','☺️','😚'],
-            ['😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄'],
-            ['😎','🤓','🧐','🥸','🤩','🥳','🤠','😇','🥰','😍','🤩','😘','😗','☺️','😚','😙','😋','😛','😜','🤪'],
-            ['👈','👉','☝️','👆','👏','👇','✌️','🤞','🖖','🤘','🤙','🖐️','✋','👌','👍','🤝','✊','👊','🤛','🤜'],
-            ['🧗','🤺','🏇','⛷️','🏂','🏌️','🏄','🚣','🏊','🤽','🧜','🧚','🧞','🦸','🦹','🧝','🧙','🧜‍♂️','🧚‍♀️','👼'],
-            ['🐮','🐂','🐃','🐄','🐖','🐏','🐑','🐐','🐪','🐫','🦙','🦘','🐎','🐴','🐔','🐓','🐣','🐤','🐥','🐦'],
-            ['🐧','🦅','🦆','🦢','🦉','🦤','🪶','🦩','🦚','🦜','🐸','🐊','🐢','🦎','🐍','🐲','🐉','🦕','🐳','🐋'],
-            ['🥣','🥄','🍴','🍽️','🥣','🥡','🥢','🍶','🥂','🍻','🍺','🍹','🍷','🥃','🍸','🧉','🍾','🧊','🥤','🧋'],
-            ['💈','✂️','🗑️','🛢️','🧴','🧷','🧹','🧺','🧻','🧼','🧽','🚿','🛁','🛀','🪥','🪒','🪞','🚽','🪠','🧯'],
-            ['🎨','🧵','🪡','🧶','🪢','🛍️','🎒','🩴','👓','🕶️','🧣','🧤','🧥','🧦','👗','👘','🥻','🩱','🩲','🩳'],
-            ['🎮','🕹️','🎰','🎲','🧩','🧸','🪀','🪅','🪄','🔮','🧿','🪩','🪆','🪁','🎯','🎳','🥏','🏑','🥍','🏏'],
-            ['🌵','🎄','🌲','🌳','🌴','🪵','🌱','🌿','☘️','🍀','🎍','🪴','🎋','🍃','🍂','🍁','🍄','🌾','💐','🌷'],
-            ['💧','🩹','💊','🩹','🩺','🩻','🧪','🧫','🧬','🔬','🔭','📡','🌡️','🧹','🗑️','⚖️','🛡️','🪄','🔮','🧿'],
-            ['🚂','🚃','🚄','🚅','🚆','🚇','🚈','🚉','🚊','🚝','🚞','🚋','🚌','🚍','🚎','🚐','🚑','🚒','🚓','🚔'],
-            ['🕰️','🧱','🪨','🪵','🛖','🏕️','⛺','🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨'],
-            ['🍉','🍊','🍋','🍌','🍍','🥭','🍎','🍏','🍐','🍑','🍒','🍓','🫐','🥝','🍅','🫒','🥥','🥑','🍆','🥔'],
-            ['✈️','🛫','🛬','🛩️','🚁','🛸','🛶','⛵','🚤','🛥️','🛳️','⛴️','🚢','⚓','🚀','🚟','🚠','🚡','🚜','🛺'],
-            ['😺','😸','😹','😻','😼','😽','🙀','😿','😾','🙈','🙉','🙊','🐵','🐒','🦍','🦧','🐶','🐕','🐩','🐺'],
-            ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💖','❣️','💕','💞','💓','💗','💖','💘','💝','💟','💌'],
-            ['🔈','🔉','🔊','🔇','📢','📣','📯','🔔','🔕','🎙️','🎚️','🎛️','🎤','🎧','📻','🎷','🪗','🎸','🎹','🎺'],
-            ['👮','🕵️','💂','🥷','👷','🤴','👸','👳','👲','🧕','🤵','👰','🧑‍🚀','🎅','🤶','🦸','🦹','🧙','🧚','🧜'],
-            ['🥋','🎽','🎣','🤿','🥌','🎯','🪀','🪁','🎱','🔮','🧿','🎮','🕹️','🎰','🎲','🧩','🧸','🪅','🪆','🖼️'],
-            ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓','⛎','🌌','☄️','🪐','🌞','🌝','🌛','🌜'],
-            ['🟢','🔵','🟣','🟡','♻️','⚜️','🔱','📛','🔰','⭕','✅','☑️','✔️','❌','❎','〽️','❇️','✳️','💠','🌀'],
-            ['🔴','🟠','🟡','🟢','🔵','🟣','🟤','⚫','⚪','🟥','🟧','🟨','🟩','🟦','🟪','🟫','⬛','⬜','🔶','🔷'],
-            ['🛍️','🛒','🎁','🎈','🎏','🎀','🎊','🎉','🎎','🏮','🎐','🧧','✉️','📩','📨','📧','💌','📥','📤','📦'],
-            ['🍦','🍧','🍨','🍩','🍪','🎂','🍰','🧁','🥧','🍫','🍬','🍭','🍮','🍯','🍼','🥛','☕','🫖','🍵','🍶'],
-            ['🥢','🍽️','🍴','🥄','🥣','🏺','🍷','🍸','🍹','🍺','🍻','🥂','🥃','🥤','🧋','🧃','🧉','🧊','🧂','🥫'],
-            ['👀','👁️','👅','👄','🧠','🫀','🫁','🦷','🦴','🦵','🦶','👂','🦻','👃','👣','🦾','🦿','🤞','🖖','🤟'],
-            ['🎨','🖌️','🖍️','📝','✏️','✒️','🖋️','🖊️','🧵','🧶','🪡','🎼','🎵','🎶','🎹','🎷','🎺','🎸','🪕','🎻'],
-            ['🌋','🗻','⛰️','🏔️','🏕️','🏖️','🏜️','🏝️','🏞️','🏟️','🏗️','🧱','🪨','🪵','🛖','🏘️','🏚️','🏠','🏡','🏢'],
-            ['👑','👒','🎩','🎓','🧢','🪖','⛑️','🎒','🧳','💼','👜','👛','👝','👞','👟','🥾','🥿','👠','👡','🩰'],
-            ['⌚','📱','📲','💻','⌨️','🖥️','🖨️','🖱️','🖲️','🕹️','🗜️','💽','💾','💿','📀','📼','📷','📸','📹','🎥'],
-            ['📽️','🎞️','📞','☎️','📟','📠','📺','📻','🎙️','🎚️','🎛️','🧭','⏱️','⏲️','⏰','🕰️','⏳','⌛','📡','🔋'],
-            ['🦋','🐛','🐜','🐝','🪲','🐞','🦗','🐢','🐌','🕸️','🐚','🦟','🪰','🪱','🦠','🐾','🐲','🌵','🪴','🌿'],
-            ['🗽','🗼','🏰','🏯','🏟️','🎡','🎢','🎠','⛲','⛱️','🏖️','🏝️','🏜️','🌋','⛰️','🏔️','🗻','🏕️','⛺','🛖'],
-            ['🧯','🛒','🦽','🦼','🛴','🚲','🛵','🏍️','🛺','🚔','🚍','🚘','🚖','🚠','🚡','🚀','🛸','🛰️','🚁','🛶'],
-            ['🪴','🌲','🌳','🌴','🪵','🌵','🌱','🌿','☘️','🍀','🎍','🎋','🍃','🍂','🍁','🍄','🌾','💐','🌷','🌹'],
-            ['🐻','🌲','🍯','🍞','🍄','🌾','🌻','🍎','🍓','🐿️','🦊','🦉','🐴','🦢','🦆','🦅','🐟','🪵','🛖','🔥']
+            ['🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🦭','🐊','🐸','🐢','🦦','🦪','🐚','🪸']
         ];
         
         const coverSymbols = ['🔒'];
@@ -739,79 +1040,63 @@
             { tileBg: 'radial-gradient(circle at 30% 30%, #ffffff 0%, #fdfcfd 40%, #e8e3ec 80%, #dcd1e3 100%)', tileSide: '#9b92a3', tileColor: '#1e242b' }
         ];
 
-        const baseChapters = ["Светлая роща", "Березовый край", "Тихий омут", "Златые купола", "Заповедный лес", "Русское поле", "Былинный сказ", "Щедрая нива", "Заря над рекой", "Отчие края"];
-        const wordsA = ["Сказ", "Терем", "Край", "Свет", "Путь", "Венец", "Рассвет", "Закат", "Исток", "Колыбель", "Хоровод", "Очаг", "Родник", "Клад", "Завет", "Голос", "Песнь", "Дух", "Дар", "Узор", "Секрет", "Лес", "Дом", "Берег", "Клин", "Оберег", "Рубеж", "Простор", "Покров", "Зов"];
-        const wordsB = ["Древних", "Забытых", "Скрытых", "Вечных", "Родных", "Небесных", "Светлых", "Истинных", "Добрых", "Святых", "Ясных", "Тайных", "Медовых", "Ледяных", "Золотых", "Вольных", "Щедрых", "Мудрых", "Спящих", "Славных", "Былинных", "Янтарных", "Зимних", "Чистых", "Великих", "Незримых", "Весенних", "Осенних", "Серебряных", "Звездных"];
-        const wordsC = ["Чудес", "Сказок", "Миров", "Звезд", "Времен", "Князей", "Лесов", "Истин", "Далей", "Рек", "Творцов", "Снов", "Героев", "Предков", "Берегинь", "Морей", "Судеб", "Надежд", "Озер", "Ветров", "Царств", "Легенд", "Тайн", "Преданий", "Мудрецов", "Мастеров", "Странников", "Богатырей", "Узоров", "Песен"];
+        const baseChapters = {
+            ru: ["Светлая роща", "Березовый край", "Тихий омут", "Златые купола", "Заповедный лес", "Русское поле", "Былинный сказ", "Щедрая нива", "Заря над рекой", "Отчие края"],
+            en: ["Sunlit Grove", "Birch Realm", "Quiet Lagoon", "Golden Domes", "Sacred Forest", "Breezy Plains", "Ancient Legend", "Bountiful Fields", "Dawn by River", "Native Haven"],
+            tr: ["Aydınlık Koru", "Huş Diyarı", "Sessiz Göl", "Altın Kubbeler", "Kutsal Orman", "Geniş Bozkır", "Eski Efsane", "Bereketli Vadi", "Nehir Şafağı", "Huzurlu Liman"],
+            es: ["Arboleda Brillante", "Tierra de Abedules", "Laguna Serena", "Cúpulas Doradas", "Bosque Sagrado", "Campos Vastedad", "Leyenda Antigua", "Tierra Próspera", "Amanecer en Río", "Refugio Cálido"]
+        };
 
         function getChapterName(level) {
-            let chapterIndex = Math.floor((level - 1) / 10); let chapterNum = chapterIndex + 1; let title = "";
-            if (chapterIndex < baseChapters.length) { title = baseChapters[chapterIndex]; } 
-            else {
-                let s = (chapterIndex * 2654435761) % 4294967296; function rndC() { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }
-                let a = wordsA[Math.floor(rndC() * wordsA.length)]; let b = wordsB[Math.floor(rndC() * wordsB.length)]; let c = wordsC[Math.floor(rndC() * wordsC.length)];
-                title = a + " " + b + " " + c;
-            }
-            return `ГЛАВА ${chapterNum}: ${title}`;
+            let chapterIndex = Math.floor((level - 1) / 10);
+            let chapterNum = chapterIndex + 1;
+            let list = baseChapters[currentLang] || baseChapters['en'];
+            let title = list[chapterIndex % list.length];
+            return `${t('chapter')} ${chapterNum}: ${title}`;
         }
 
         function getDifficultyParams(level) {
             let cyclePos = (level - 1) % 10;
-            if (cyclePos >= 0 && cyclePos <= 2) return { text: "🟢 Легко", color: "#2ecc71", maxLayers: 2, density: 0.55 };
-            else if (cyclePos >= 3 && cyclePos <= 5) return { text: "🟡 Средне", color: "#f1c40f", maxLayers: 3, density: 0.6 };
-            else if (cyclePos >= 6 && cyclePos <= 8) return { text: "🟠 Сложно", color: "#e67e22", maxLayers: 4, density: 0.8 };
-            else return { text: "🔴 ЭКСПЕРТ", color: "#e74c3c", maxLayers: 5, density: 0.95 };
+            if (cyclePos >= 0 && cyclePos <= 2) return { text: t('diffEasy'), color: "#2ecc71", maxLayers: 2, density: 0.55 };
+            else if (cyclePos >= 3 && cyclePos <= 5) return { text: t('diffMedium'), color: "#f1c40f", maxLayers: 3, density: 0.6 };
+            else if (cyclePos >= 6 && cyclePos <= 8) return { text: t('diffHard'), color: "#e67e22", maxLayers: 4, density: 0.8 };
+            else return { text: t('diffExpert'), color: "#e74c3c", maxLayers: 5, density: 0.95 };
         }
 
         function getLayoutCoords(level) {
             let diff = getDifficultyParams(level);
             let seed = level * 13371337;
             function rnd() { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }
+            let shapeIndex = (level - 1) % 30;
+            let layout = [];
 
-            let layout = []; let grid = {}; let shapeIndex = (level - 1) % 30;
-
-            for (let attempt = 0; attempt < 500; attempt++) {
+            for (let attempt = 0; attempt < 150; attempt++) {
                 layout = []; let grid = {};
-
                 for (let z = 0; z < diff.maxLayers; z++) {
                     let offset = (z % 2 === 0) ? 0 : 1; let shrink = Math.floor(z / 2) * 2 + offset; let currentLayerTiles = [];
-
                     for (let y = shrink; y <= 8 - shrink; y += 2) {
                         for (let x = shrink; x <= 8 - shrink; x += 2) {
                             let isSupported = (z === 0) || grid[`${x-1},${y-1},${z-1}`] || grid[`${x+1},${y-1},${z-1}`] || grid[`${x-1},${y+1},${z-1}`] || grid[`${x+1},${y+1},${z-1}`] || grid[`${x},${y},${z-1}`];
                             if (!isSupported) continue;
 
                             let cx = x - 4, cy = y - 4; let isMasked = true;
-
                             switch (shapeIndex) {
                                 case 0: break; case 1: if (Math.abs(cx)<=2 && Math.abs(cy)<=2 && z<2) isMasked = false; break; 
                                 case 2: if (Math.abs(cx)>2 && Math.abs(cy)>2) isMasked = false; break; case 3: if (Math.abs(cx)<=1 || Math.abs(cy)<=1) isMasked = false; break; 
                                 case 4: if (Math.abs(cx)+Math.abs(cy)>5) isMasked = false; break; case 5: if (Math.abs(cy)<=1) isMasked = false; break; 
                                 case 6: if (Math.abs(cx)<=1) isMasked = false; break; case 7: if (Math.abs(cx)===Math.abs(cy) && z===0) isMasked = false; break; 
                                 case 8: if ((x+y)%4===0 && z===0) isMasked = false; break; case 9: if (Math.abs(cx)>2) isMasked = false; break; 
-                                case 10: if (Math.abs(cy)>2) isMasked = false; break; case 11: if (Math.abs(cx)===4 && Math.abs(cy)===4) isMasked = false; break; 
-                                case 12: if ((Math.abs(cx)===0 || Math.abs(cy)===0) && z<2) isMasked = false; break; case 13: if (Math.abs(cy)===2) isMasked = false; break; 
-                                case 14: if (Math.abs(cx)===2) isMasked = false; break; case 15: if (Math.abs(cx)>2 && Math.abs(cy)<3) isMasked = false; break; 
-                                case 16: if (Math.abs(cy)>2 && Math.abs(cx)<3) isMasked = false; break; case 17: if (Math.abs(cx)!==Math.abs(cy)) isMasked = false; break; 
-                                case 18: if (z>0 && Math.abs(cx)+Math.abs(cy)<3) isMasked = false; break; case 19: if (z===0 && Math.abs(cx)===2 && Math.abs(cy)===2) isMasked = false; break;
-                                case 20: if (x===y) isMasked = false; break; case 21: if (z>1 && Math.abs(cx)<2) isMasked = false; break;
-                                case 22: if (Math.abs(cx)+Math.abs(cy)===4) isMasked = false; break; case 23: if (z===0 && (cx===0 || cy===0)) isMasked = false; break;
-                                case 24: if (z>0 && x%4===0) isMasked = false; break; case 25: if (z>0 && y%4===0) isMasked = false; break;
-                                case 26: if (Math.abs(cx)>0 && Math.abs(cy)>0 && z===1) isMasked = false; break; case 27: if (z===0 && x===4) isMasked = false; break;
-                                case 28: if (z===0 && y===4) isMasked = false; break; case 29: if (Math.abs(cx)===4 || Math.abs(cy)===4) isMasked = false; break;
+                                default: if (Math.abs(cx)+Math.abs(cy) > 6) isMasked = false; break;
                             }
-
                             if (isMasked && rnd() < diff.density) { currentLayerTiles.push({x, y, z}); }
                         }
                     }
-
                     currentLayerTiles.forEach(t => {
                         let mx = 8 - t.x;
                         if (!grid[`${t.x},${t.y},${t.z}`]) { layout.push({...t}); grid[`${t.x},${t.y},${t.z}`] = true; }
                         if (!grid[`${mx},${t.y},${t.z}`]) { layout.push({x: mx, y: t.y, z: t.z}); grid[`${mx},${t.y},${t.z}`] = true; }
                     });
                 }
-
                 if (layout.length % 2 !== 0) { let idx = layout.findIndex(t => t.x === 4); if (idx !== -1) layout.splice(idx, 1); else layout.pop(); }
                 if (layout.length < 8) continue;
 
@@ -844,9 +1129,21 @@
         }
 
         function updateMenuLevelText() { 
-            document.getElementById('menu-level-text').innerText = 'УРОВЕНЬ ' + currentLevel; document.getElementById('hud-level').innerText = 'Ур. ' + currentLevel;
-            let chapterTitle = getChapterName(currentLevel); document.getElementById('menu-chapter-title').innerText = chapterTitle; document.getElementById('hud-chapter-text').innerText = chapterTitle;
-            applyMaterial(currentLevel); renderPreview(currentLevel); 
+            document.getElementById('menu-level-text').innerText = `${t('level')} ${currentLevel}`; 
+            document.getElementById('hud-level').innerText = `${t('levelShort')} ${currentLevel}`;
+            let chapterTitle = getChapterName(currentLevel); 
+            document.getElementById('menu-chapter-title').innerText = chapterTitle; 
+            document.getElementById('hud-chapter-text').innerText = chapterTitle;
+            applyMaterial(currentLevel); 
+            renderPreview(currentLevel); 
+
+            let diff = getDifficultyParams(currentLevel);
+            let diffBadge = document.getElementById('hud-difficulty');
+            if (diffBadge) {
+                diffBadge.innerText = diff.text;
+                diffBadge.style.backgroundColor = diff.color;
+                diffBadge.style.color = (diff.color === "#f1c40f") ? "#000" : "#fff";
+            }
         }
         
         updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI();
@@ -856,7 +1153,7 @@
         document.getElementById('btn-next-level').addEventListener('click', () => { currentLevel++; SafeStorage.set('mahjong_level', currentLevel); updateMenuLevelText(); updateBoostersUI(); });
         
         document.getElementById('btn-reset').addEventListener('click', () => {
-            if (confirm('Начать с 1 уровня? Весь прогресс будет удален.')) { 
+            if (confirm(t('resetConfirm'))) { 
                 currentLevel = 1; totalScore = 0; totalCoins = 0; freeBoosters = {hint:0, undo:0, bomb:0, light:0};
                 SafeStorage.set('mahjong_level', 1); SafeStorage.set('mahjong_score', 0); SafeStorage.set('mahjong_coins', 0);
                 SafeStorage.remove('mahjong_free_boosters'); SafeStorage.remove('mahjong_tutorial_done'); 
@@ -873,7 +1170,8 @@
 
         function updateScoreDisplay() { 
             let elScore = document.getElementById('hud-score'); let elCoins = document.getElementById('hud-coins');
-            if(elScore) elScore.innerText = '🏆 ' + totalScore; if(elCoins) elCoins.innerText = '💰 ' + totalCoins; 
+            if(elScore) elScore.innerText = `${t('yourScore')}${totalScore}`; 
+            if(elCoins) elCoins.innerText = `💰 ${totalCoins}`; 
             updateBoostersUI(); 
         }
         
@@ -884,8 +1182,8 @@
 
         function getSymbolsForLevel(level) {
             let s = level * 12345; function localRnd() { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }
-            let t1 = Math.floor(localRnd() * themeSets.length); let t2 = Math.floor(localRnd() * themeSets.length); let t3 = Math.floor(localRnd() * themeSets.length);
-            return [...themeSets[t1].slice(0, 7), ...themeSets[t2].slice(7, 14), ...themeSets[t3].slice(14, 20)];
+            let t1 = Math.floor(localRnd() * themeSets.length); let t2 = Math.floor(localRnd() * themeSets.length);
+            return [...themeSets[t1].slice(0, 10), ...themeSets[t2].slice(10, 20)];
         }
 
         function forceSolvableAssignment(layout, pairsPool) {
@@ -931,7 +1229,7 @@
             
             const board = document.getElementById('game-board'); board.innerHTML = ''; activeTiles = []; firstTile = null; matchHistory = [];
             document.getElementById('message').innerHTML = ''; document.getElementById('btn-shuffle').classList.remove('btn-pulse'); document.getElementById('progress-bar').style.width = '0%';
-            comboCount = 0; isGameLocked = false; updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI();
+            comboCount = 0; isGameLocked = false; isAnimating = false; updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI();
             
             let diff = getDifficultyParams(currentLevel);
             let diffBadge = document.getElementById('hud-difficulty'); diffBadge.innerText = diff.text; diffBadge.style.backgroundColor = diff.color; diffBadge.style.color = (diff.color === "#f1c40f") ? "#000" : "#fff"; 
@@ -987,7 +1285,9 @@
                     if (other === tile) continue;
                     let overlapX = Math.abs(tile.x - other.x) < 2, overlapY = Math.abs(tile.y - other.y) < 2;
                     if (other.z > tile.z && overlapX && overlapY) blockedTop = true;
-                    if (other.z === tile.z && overlapY) { if (other.x === tile.x - 2) blockedLeft = true; if (other.x === tile.x + 2) blockedRight = true; }
+                    if (other.z === tile.z && overlapY) {
+                        if (other.x === tile.x - 2) blockedLeft = true; if (other.x === tile.x + 2) blockedRight = true;
+                    }
                 }
                 tile.isFree = !blockedTop && (!blockedLeft || !blockedRight);
                 tile.el.classList.toggle('blocked', !tile.isFree);
@@ -998,7 +1298,7 @@
         function checkGameState() {
             if (activeTiles.length === 0 || window.isLevelCompleting) return;
             
-            let freeTiles = activeTiles.filter(t => t.isFree);
+            let freeTiles = activeTiles.filter(t => t.isFree && !t.isMatched);
             let hasMoves = false; let symbolsSet = new Set();
             
             for (let t of freeTiles) {
@@ -1011,7 +1311,7 @@
             if (!hasMoves) { 
                 isGameLocked = true; 
                 if (firstTile) { firstTile.el.classList.remove('selected'); firstTile = null; }
-                document.getElementById('message').innerText = 'НЕТ ХОДОВ! Нажмите Микс ➔'; 
+                document.getElementById('message').innerText = t('noMovesNotice'); 
                 document.getElementById('message').style.color = '#e74c3c'; 
                 btnShuffle.classList.add('btn-pulse'); 
                 document.getElementById('no-moves-modal').style.display = 'flex';
@@ -1030,7 +1330,6 @@
             window.isLevelCompleting = true; 
 
             try { AudioSys.playWin(); } catch(e){}
-            
             try { currentLevel++; SafeStorage.set('mahjong_level', currentLevel); } catch(e){}
 
             shootEpicConfetti(); launchFireworks();
@@ -1047,11 +1346,11 @@
                 const textEl = document.getElementById('level-complete-text');
                 const ratingEl = document.getElementById('level-complete-rating');
                 
-                const praiseWords = ["ВЕЛИКОЛЕПНО!", "БЛЕСТЯЩЕ!", "ГЕНИАЛЬНО!", "ИДЕАЛЬНО!", "ПРЕВОСХОДНО!", "МАСТЕРСКИ!", "ПОТРЯСАЮЩЕ!", "БЕЗУПРЕЧНО!", "НЕВЕРОЯТНО!", "ТАЛАНТЛИВО!", "ВОСХИТИТЕЛЬНО!", "ФЕНОМЕНАЛЬНО!", "ГРАНДИОЗНО!", "БЕСПОДОБНО!", "ШИКАРНО!", "ИСКУСНО!", "ТРИУМФ!", "НЕПРЕВЗОЙДЁННО!", "ЭКСТРАКЛАСС!", "ИЗУМИТЕЛЬНО!"];
-                if (praiseEl) praiseEl.innerText = praiseWords[Math.floor(Math.random() * praiseWords.length)];
+                let praisesList = t('praises');
+                if (praiseEl) praiseEl.innerText = praisesList[Math.floor(Math.random() * praisesList.length)];
                 
                 let rankData = getPlayerRank();
-                if (ratingEl) ratingEl.innerText = `🏆 Ваше место: #${rankData.rank} (Очки: ${totalScore})`;
+                if (ratingEl) ratingEl.innerText = t('yourRank')(rankData.rank, totalScore);
 
                 if (overlay) { overlay.style.display = 'flex'; overlay.style.opacity = '1'; }
                 if (praiseEl) { praiseEl.style.transform = 'scale(1)'; praiseEl.style.opacity = '1'; }
@@ -1119,9 +1418,17 @@
         }
 
         function getSymbolCategory(sym) {
-            const catFood = [0, 1, 6, 28, 36, 47, 48]; const catTech = [2, 16, 53, 54]; const catZodiac = [9, 15, 43]; const catEmotion = [21, 22, 23, 39];
-            const catAnimal = [3, 10, 11, 26, 27, 38, 55, 59]; const catTransport = [4, 34, 37, 57];
-            for (let i = 0; i < themeSets.length; i++) { if (themeSets[i].includes(sym)) { if (catFood.includes(i)) return 'food'; if (catTech.includes(i)) return 'tech'; if (catZodiac.includes(i)) return 'zodiac'; if (catEmotion.includes(i)) return 'emotion'; if (catAnimal.includes(i)) return 'animal'; if (catTransport.includes(i)) return 'transport'; return 'general'; } } return 'general';
+            for (let i = 0; i < themeSets.length; i++) { 
+                if (themeSets[i].includes(sym)) {
+                    if ([0, 1, 6].includes(i)) return 'food';
+                    if ([2].includes(i)) return 'tech';
+                    if ([3].includes(i)) return 'animal';
+                    if ([4].includes(i)) return 'transport';
+                    if ([8].includes(i)) return 'zodiac';
+                    return 'general';
+                }
+            } 
+            return 'general';
         }
 
         function spawnSmartBurst(element, symbol) {
@@ -1133,8 +1440,7 @@
             }
             let pOpts = [symbol, '✅', '🟢'];
             if (category === 'food') pOpts = [symbol, '✅', '🍎', '🍓', '🥐']; else if (category === 'tech') pOpts = [symbol, '✅', '🔋', '⚙️', '💡'];
-            else if (category === 'zodiac') pOpts = [symbol, '✨', '🌙', '🌟', '☄️']; else if (category === 'emotion') pOpts = [symbol, '❤️', '👍', '😊', '🔥'];
-            else if (category === 'animal') pOpts = [symbol, '✅', '🐾', '🌿']; else if (category === 'transport') pOpts = [symbol, '✅', '💨', '🏁'];
+            else if (category === 'zodiac') pOpts = [symbol, '✨', '🌙', '🌟', '☄️']; else if (category === 'animal') pOpts = [symbol, '✅', '🐾', '🌿']; else if (category === 'transport') pOpts = [symbol, '✅', '💨', '🏁'];
             
             let particleCount = 6 + Math.floor(Math.random() * 4); 
             for (let i = 0; i < particleCount; i++) {
@@ -1161,7 +1467,7 @@
         }
 
         function handleTileClick(t, event) { 
-            if (window.isLevelCompleting || isGameLocked) return; 
+            if (window.isLevelCompleting || isGameLocked || isAnimating) return; 
             if (t.isMatched) return; 
             if (tutorialMode) { if (t !== tutorialPair[0] && t !== tutorialPair[1]) return; }
             if (!t.isFree) return;
@@ -1183,7 +1489,8 @@
             } else if (firstTile !== t) { 
                 
                 if (firstTile.symbol === t.symbol) { 
-                    
+                    isAnimating = true;
+
                     t.isMatched = true; firstTile.isMatched = true;
                     t.isTempOpen = false; firstTile.isTempOpen = false;
                     
@@ -1210,7 +1517,11 @@
                     t.el.classList.add('matched'); firstTile.el.classList.add('matched'); 
                     
                     let t1 = firstTile, t2 = t;
-                    setTimeout(() => { if (t1 && t1.el) t1.el.style.display = 'none'; if (t2 && t2.el) t2.el.style.display = 'none'; }, 300);
+                    setTimeout(() => { 
+                        if (t1 && t1.el) t1.el.style.display = 'none'; 
+                        if (t2 && t2.el) t2.el.style.display = 'none'; 
+                        isAnimating = false; 
+                    }, 300);
 
                     activeTiles = activeTiles.filter(x => x !== t1 && x !== t2); firstTile = null; 
                     updateFreeState(); updateProgressBar();
@@ -1278,12 +1589,11 @@
                     });
                     
                     firstTile = null; updateFreeState(); comboCount = 0; matchHistory = [];
-                    let msg = document.getElementById('message'); if(msg) { msg.innerText = 'Фишки перемешаны! ✨'; msg.style.color = '#f1c40f'; }
+                    let msg = document.getElementById('message'); if(msg) { msg.innerText = t('shuffledNotice'); msg.style.color = '#f1c40f'; }
                     let btn = document.getElementById('btn-shuffle'); if(btn) btn.classList.remove('btn-pulse');
                 } catch(e) { console.error("Ошибка микса:", e); }
             };
 
-            // ИНТЕГРАЦИЯ YANDEX ADS ДЛЯ БУСТЕРА (П. 4.7)
             if (ys && ys.adv) {
                 if (AudioSys.ctx && AudioSys.ctx.state === 'running') AudioSys.ctx.suspend();
                 ys.adv.showRewardedVideo({
@@ -1316,7 +1626,10 @@
 
                 if (currentLevel < unlockLvl) {
                     btn.classList.add('locked'); btn.classList.remove('disabled'); 
-                    if(lockTag) lockTag.style.display = 'block';
+                    if(lockTag) {
+                        lockTag.style.display = 'block';
+                        lockTag.innerText = `${t('levelShort')}${unlockLvl}`;
+                    }
                     if(costTag) { costTag.innerText = cost; costTag.style.color = '#f1c40f'; }
                 } else {
                     btn.classList.remove('locked'); 
@@ -1326,7 +1639,7 @@
                     let hasFree = count > 0;
 
                     if (hasFree && costTag) {
-                        costTag.innerText = `${count} шт.`;
+                        costTag.innerText = `${count} ${t('pieces')}`;
                         costTag.style.color = '#2ecc71'; 
                     } else if (costTag) {
                         costTag.innerText = cost;
@@ -1371,7 +1684,7 @@
         }
 
         function getAvailablePairs() {
-            let freeTiles = activeTiles.filter(t => t.isFree && !t.isHidden); let pairs = [];
+            let freeTiles = activeTiles.filter(t => t.isFree && !t.isHidden && !t.isMatched); let pairs = [];
             for (let i = 0; i < freeTiles.length; i++) { for (let j = i + 1; j < freeTiles.length; j++) { if (freeTiles[i].symbol === freeTiles[j].symbol) pairs.push([freeTiles[i], freeTiles[j]]); } } return pairs;
         }
 
@@ -1433,30 +1746,35 @@
         
         const wheelPrizes = [ 
             { type: 'coins', text: "500 💰", val: 500, color: "#3498db" }, 
-            { type: 'booster', id: 'hint', text: "🔍", name: "Поиск", color: "#9b59b6" }, 
+            { type: 'booster', id: 'hint', text: "🔍", name: { ru: "Поиск", en: "Hint", tr: "İpucu", es: "Pista" }, color: "#9b59b6" }, 
             { type: 'coins', text: "1500 💰", val: 1500, color: "#e67e22" }, 
-            { type: 'booster', id: 'undo', text: "↩️", name: "Возврат", color: "#e74c3c" }, 
+            { type: 'booster', id: 'undo', text: "↩️", name: { ru: "Возврат", en: "Undo", tr: "Geri Al", es: "Deshacer" }, color: "#e74c3c" }, 
             { type: 'coins', text: "3000 💰", val: 3000, color: "#f1c40f" }, 
-            { type: 'booster', id: 'bomb', text: "💣", name: "Бомбочка", color: "#2ecc71" },
-            { type: 'booster', id: 'light', text: "⚡", name: "Молния", color: "#1abc9c" } 
+            { type: 'booster', id: 'bomb', text: "💣", name: { ru: "Бомбочка", en: "Bomb", tr: "Bomba", es: "Bomba" }, color: "#2ecc71" }, 
+            { type: 'booster', id: 'light', text: "⚡", name: { ru: "Молния", en: "Lightning", tr: "Yıldırım", es: "Rayo" }, color: "#1abc9c" } 
         ];
         
-        let conicGradient = []; let sliceAngle = 360 / wheelPrizes.length;
+        let sliceAngle = 360 / wheelPrizes.length;
         
-        wheelPrizes.forEach((prize, i) => {
-            let start = i * sliceAngle; let end = (i + 1) * sliceAngle; conicGradient.push(`${prize.color} ${start}deg ${end}deg`);
-            let container = document.createElement('div'); container.className = 'wheel-text-container';
-            container.style.transform = `rotate(${start + sliceAngle/2}deg)`;
-            let textEl = document.createElement('div'); textEl.className = 'wheel-text'; textEl.innerText = prize.text; 
-            
-            if (prize.type === 'booster') {
-                textEl.style.fontSize = '28px';
-                textEl.style.marginTop = '20px';
-            }
-            
-            container.appendChild(textEl); wheelSpinner.appendChild(container);
-        });
-        wheelSpinner.style.background = `conic-gradient(${conicGradient.join(', ')})`;
+        function renderWheel() {
+            wheelSpinner.innerHTML = '';
+            let conicGradient = [];
+            wheelPrizes.forEach((prize, i) => {
+                let start = i * sliceAngle; let end = (i + 1) * sliceAngle; conicGradient.push(`${prize.color} ${start}deg ${end}deg`);
+                let container = document.createElement('div'); container.className = 'wheel-text-container';
+                container.style.transform = `rotate(${start + sliceAngle/2}deg)`;
+                let textEl = document.createElement('div'); textEl.className = 'wheel-text'; textEl.innerText = prize.text; 
+                
+                if (prize.type === 'booster') {
+                    textEl.style.fontSize = '28px';
+                    textEl.style.marginTop = '20px';
+                }
+                
+                container.appendChild(textEl); wheelSpinner.appendChild(container);
+            });
+            wheelSpinner.style.background = `conic-gradient(${conicGradient.join(', ')})`;
+        }
+        renderWheel();
 
         let isSpinning = false;
         btnOpenWheel.addEventListener('click', () => { AudioSys.init(); document.getElementById('shop-modal').style.display = 'none'; wheelModal.style.display = 'flex'; checkWheelTimer(); });
@@ -1466,13 +1784,13 @@
             let lastSpin = SafeStorage.get('mahjong_last_spin');
             if (lastSpin && Date.now() - parseInt(lastSpin) < 86400000) {
                 let timeLeft = 86400000 - (Date.now() - parseInt(lastSpin)); let hours = Math.floor(timeLeft / (1000 * 60 * 60)); let mins = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                btnSpin.innerText = `ОЖИДАНИЕ (${hours}ч ${mins}м)`; btnSpin.style.background = "gray"; btnSpin.style.boxShadow = "none"; btnSpin.disabled = true;
-            } else { btnSpin.innerText = "КРУТИТЬ"; btnSpin.style.background = "linear-gradient(180deg, #ffdf00 0%, #f1c40f 50%, #d4ac0d 100%)"; btnSpin.style.boxShadow = "0 8px 0 #9c7e07, 0 15px 20px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8)"; btnSpin.disabled = false; }
+                btnSpin.innerText = t('waitHours')(hours, mins); btnSpin.style.background = "gray"; btnSpin.style.boxShadow = "none"; btnSpin.disabled = true;
+            } else { btnSpin.innerText = t('spin'); btnSpin.style.background = "linear-gradient(180deg, #ffdf00 0%, #f1c40f 50%, #d4ac0d 100%)"; btnSpin.style.boxShadow = "0 8px 0 #9c7e07, 0 15px 20px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8)"; btnSpin.disabled = false; }
         }
 
         btnSpin.addEventListener('click', () => {
             if(isSpinning || btnSpin.disabled) return;
-            isSpinning = true; btnSpin.innerText = "ВРАЩЕНИЕ..."; AudioSys.playShuffle();
+            isSpinning = true; btnSpin.innerText = t('spinning'); AudioSys.playShuffle();
             let prizeIndex = Math.floor(Math.random() * wheelPrizes.length); let targetSliceAngle = (prizeIndex * sliceAngle) + (sliceAngle / 2); let rotateAngle = 360 * 5 + (360 - targetSliceAngle); 
             wheelSpinner.style.transform = `rotate(${rotateAngle}deg)`;
             let ticks = 0; let tickInterval = setInterval(() => { AudioSys.playWheelTick(); ticks++; if(ticks > 25) clearInterval(tickInterval); }, 150);
@@ -1484,11 +1802,12 @@
                 if (wonPrize.type === 'coins') {
                     totalCoins += wonPrize.val; 
                     SafeStorage.set('mahjong_coins', totalCoins); 
-                    alert(`ПОЗДРАВЛЯЕМ! Вы выиграли ${wonPrize.text}`);
+                    alert(`${t('congrats')} ${t('youWon')(wonPrize.text)}`);
                 } else if (wonPrize.type === 'booster') {
                     freeBoosters[wonPrize.id] = (freeBoosters[wonPrize.id] || 0) + 1;
                     SafeStorage.set('mahjong_free_boosters', JSON.stringify(freeBoosters));
-                    alert(`ПОЗДРАВЛЯЕМ! Вы выиграли бесплатный бустер:\n${wonPrize.text} ${wonPrize.name}`);
+                    let bName = wonPrize.name[currentLang] || wonPrize.name['en'] || wonPrize.name['ru'];
+                    alert(`${t('congrats')}\n${t('boosterWon')(wonPrize.text, bName)}`);
                 }
 
                 SafeStorage.set('mahjong_last_spin', Date.now().toString());
