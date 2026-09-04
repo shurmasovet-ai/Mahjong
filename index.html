@@ -46,7 +46,7 @@
         #menu-level-preview { width: 100px; height: 100px; position: relative; margin-top: 15px; margin-bottom: 5px; transform-style: preserve-3d; }
         .preview-tile { position: absolute; width: 20%; height: 20%; left: calc(var(--x) * 10%); top: calc(var(--y) * 10%); margin-top: calc(var(--z) * -4px); margin-left: calc(var(--z) * -2px); background: var(--tileBg); border: 1px solid rgba(255,255,255,0.4); border-radius: 3px; box-shadow: 1px 1px 3px rgba(0,0,0,0.9); pointer-events: none; }
 
-        .btn-arrow { background: rgba(0, 0, 0, 0.4); border: 2px solid rgba(241, 196, 15, 0.5); color: #f1c40f; font-size: 20px; border-radius: 15px; padding: 10px 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: all 0.1s; }
+        .btn-arrow { background: rgba(0, 0, 0, 0.4); border: 2px solid rgba(241, 196, 15, 0.5); color: #f1c40f; font-size: 20px; border-radius: 15px; padding: 10px 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: all 0.2s ease; }
         .btn-arrow:active { transform: scale(0.9); background: rgba(241, 196, 15, 0.3); }
 
         .btn-massive { background: linear-gradient(180deg, #ffdf00 0%, #f1c40f 50%, #d4ac0d 100%); color: #4b0d18; border: none; padding: 15px 50px; font-family: 'Russo One', sans-serif; font-size: 26px; font-weight: 900; border-radius: 50px; box-shadow: 0 8px 0 #9c7e07, 0 15px 20px rgba(0,0,0,0.7), inset 0 2px 5px rgba(255,255,255,0.8); cursor: pointer; transition: all 0.1s; touch-action: manipulation; user-select: none; margin-top: 20px; margin-bottom: 20px; display: flex; justify-content: center; align-items: center; letter-spacing: 2px; z-index: 2; width: auto; min-width: 220px; }
@@ -65,7 +65,7 @@
         .hud-center { display: flex; flex-direction: column; align-items: center; flex-grow: 1; margin: 0 5px; }
         
         .level-switcher { display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .btn-hud-arrow { background: transparent; border: none; color: #fff; font-size: 22px; cursor: pointer; padding: 0 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); transition: transform 0.1s; }
+        .btn-hud-arrow { background: transparent; border: none; color: #fff; font-size: 22px; cursor: pointer; padding: 0 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); transition: all 0.2s ease; }
         .btn-hud-arrow:active { transform: scale(0.8); color: #f1c40f; }
 
         #hud-level-container { display: flex; flex-direction: column; align-items: center; text-align: center; }
@@ -335,6 +335,12 @@
     </div>
 
     <script>
+        // Глобальные переменные прогресса
+        let currentLevel = 1, unlockedLevel = 1, totalScore = 0, totalCoins = 0, comboCount = 0, lastMatchTime = 0, totalTilesForLevel = 0;
+        let activeTiles = [], firstTile = null; let matchHistory = []; let tutorialMode = false, tutorialPair = [];
+        let isGameLocked = false; window.isLevelCompleting = false; const COMBO_TIME_LIMIT = 4000; 
+        let isAnimating = false;
+
         // --- 🌐 МУЛЬТИЯЗЫЧНОСТЬ (I18N) ---
         const I18N = {
             ru: {
@@ -580,29 +586,36 @@
 
         document.addEventListener('contextmenu', event => event.preventDefault());
 
+        function initGameLanguageAndUI(sdkLang) {
+            let savedLang = SafeStorage.get('mahjong_lang');
+            if (savedLang && SUPPORTED_LANGS.includes(savedLang)) {
+                currentLang = savedLang;
+            } else if (sdkLang) {
+                let userLang = sdkLang.toLowerCase();
+                if (SUPPORTED_LANGS.includes(userLang)) { currentLang = userLang; } 
+                else if (userLang.startsWith('tr')) { currentLang = 'tr'; }
+                else if (userLang.startsWith('es')) { currentLang = 'es'; }
+                else if (userLang.startsWith('ru') || userLang.startsWith('be') || userLang.startsWith('uk') || userLang.startsWith('kk')) { currentLang = 'ru'; }
+                else { currentLang = 'en'; }
+            } else {
+                let navLang = (navigator.language || navigator.userLanguage || 'ru').toLowerCase().slice(0, 2);
+                if (SUPPORTED_LANGS.includes(navLang)) currentLang = navLang;
+                else currentLang = 'ru';
+            }
+            
+            applyLanguageUI();
+            updateMenuLevelText();
+            
+            if (ys && ys.features && ys.features.LoadingAPI) { 
+                ys.features.LoadingAPI.ready(); 
+            }
+        }
+
         try { 
             YaGames.init().then(ysdk => { 
                 ys = ysdk; 
-                
-                if (ys.features && ys.features.LoadingAPI) { 
-                    ys.features.LoadingAPI.ready(); 
-                }
-                
-                // Автоопределение языка через SDK (П. 2.14 требований)
-                if (ys.environment && ys.environment.i18n && ys.environment.i18n.lang) {
-                    let userLang = ys.environment.i18n.lang.toLowerCase();
-                    if (SUPPORTED_LANGS.includes(userLang)) {
-                        setLanguage(userLang, false);
-                    } else if (userLang.startsWith('tr')) {
-                        setLanguage('tr', false);
-                    } else if (userLang.startsWith('es')) {
-                        setLanguage('es', false);
-                    } else if (userLang.startsWith('ru') || userLang.startsWith('be') || userLang.startsWith('uk') || userLang.startsWith('kk')) {
-                        setLanguage('ru', false);
-                    } else {
-                        setLanguage('en', false);
-                    }
-                }
+                let sdkLanguage = (ys.environment && ys.environment.i18n) ? ys.environment.i18n.lang : null;
+                initGameLanguageAndUI(sdkLanguage);
                 
                 ys.getPlayer({ scopes: false }).then(_player => {
                     window.ysPlayer = _player;
@@ -612,8 +625,13 @@
                 }).catch(err => console.log("Yandex Player API init failed", err));
                 
                 console.log("Yandex SDK initialized"); 
-            }).catch(e => console.warn("Yandex SDK not found")); 
-        } catch(e) {}
+            }).catch(e => {
+                console.warn("Yandex SDK not found");
+                initGameLanguageAndUI(null);
+            }); 
+        } catch(e) {
+            initGameLanguageAndUI(null);
+        }
 
         const SafeStorage = {
             data: {},
@@ -634,12 +652,19 @@
                 if(cloudData) this.data = Object.assign(this.data, cloudData);
                 
                 let sLvl = this.get('mahjong_level'); if (sLvl && !isNaN(parseInt(sLvl))) currentLevel = parseInt(sLvl);
+                let sUnLvl = this.get('mahjong_unlocked_level'); 
+                if (sUnLvl && !isNaN(parseInt(sUnLvl))) { unlockedLevel = parseInt(sUnLvl); }
+                else { unlockedLevel = currentLevel; }
+
+                if (currentLevel > unlockedLevel) currentLevel = unlockedLevel;
+
                 let sSco = this.get('mahjong_score'); if (sSco && !isNaN(parseInt(sSco))) totalScore = parseInt(sSco);
                 let sCoi = this.get('mahjong_coins'); if (sCoi && !isNaN(parseInt(sCoi))) totalCoins = parseInt(sCoi);
                 
                 let sLang = this.get('mahjong_lang');
-                if (sLang && SUPPORTED_LANGS.includes(sLang)) {
+                if (sLang && SUPPORTED_LANGS.includes(sLang) && sLang !== currentLang) {
                     currentLang = sLang;
+                    applyLanguageUI();
                 }
 
                 let sBst = this.get('mahjong_free_boosters'); 
@@ -655,7 +680,6 @@
                 let sBg = this.get('mahjong_eq_bg'); if (sBg) eqBg = sBg;
                 let sSnd = this.get('mahjong_eq_snd'); if (sSnd) eqSnd = sSnd;
                 
-                applyLanguageUI();
                 updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI(); applyEquippedBg(); AudioSys.restartAmbient();
             }
         };
@@ -828,7 +852,6 @@
             }
         };
 
-        // --- УПРАВЛЕНИЕ ЯЗЫКОМ И ОБНОВЛЕНИЕ UI ---
         function setLanguage(langKey, save = true) {
             if (!SUPPORTED_LANGS.includes(langKey)) return;
             currentLang = langKey;
@@ -893,17 +916,6 @@
             applyEquippedBg();
             let savedMusic = SafeStorage.get('mahjong_music'); if (savedMusic !== null) AudioSys.musicEnabled = (savedMusic === 'true');
             let savedSound = SafeStorage.get('mahjong_sound'); if (savedSound !== null) AudioSys.enabled = (savedSound === 'true');
-            
-            let savedLang = SafeStorage.get('mahjong_lang');
-            if (savedLang && SUPPORTED_LANGS.includes(savedLang)) {
-                currentLang = savedLang;
-            } else {
-                let navLang = (navigator.language || navigator.userLanguage || 'ru').toLowerCase().slice(0, 2);
-                if (SUPPORTED_LANGS.includes(navLang)) currentLang = navLang;
-                else currentLang = 'ru';
-            }
-
-            applyLanguageUI();
         });
 
         document.addEventListener("visibilitychange", () => { 
@@ -919,12 +931,9 @@
         }
         createParticles();
 
-        let currentLevel = 1, totalScore = 0, totalCoins = 0, comboCount = 0, lastMatchTime = 0, totalTilesForLevel = 0;
-        let activeTiles = [], firstTile = null; let matchHistory = []; let tutorialMode = false, tutorialPair = [];
-        let isGameLocked = false; window.isLevelCompleting = false; const COMBO_TIME_LIMIT = 4000; 
-        let isAnimating = false;
-
         let savedLvl = SafeStorage.get('mahjong_level'); if (savedLvl && !isNaN(parseInt(savedLvl))) currentLevel = parseInt(savedLvl); else currentLevel = 1;
+        let savedUnLvl = SafeStorage.get('mahjong_unlocked_level'); if (savedUnLvl && !isNaN(parseInt(savedUnLvl))) unlockedLevel = parseInt(savedUnLvl); else unlockedLevel = currentLevel;
+        
         let savedScore = SafeStorage.get('mahjong_score'); if (savedScore && !isNaN(parseInt(savedScore))) totalScore = parseInt(savedScore); else totalScore = 0;
         let savedCoins = SafeStorage.get('mahjong_coins'); if (savedCoins && !isNaN(parseInt(savedCoins))) totalCoins = parseInt(savedCoins); else totalCoins = 0;
         
@@ -1144,18 +1153,53 @@
                 diffBadge.style.backgroundColor = diff.color;
                 diffBadge.style.color = (diff.color === "#f1c40f") ? "#000" : "#fff";
             }
+
+            // ВИЗУАЛЬНАЯ БЛОКИРОВКА СТРЕЛОЧЕК
+            const btnNextMenu = document.getElementById('btn-next-level');
+            const btnPrevMenu = document.getElementById('btn-prev-level');
+            const btnNextHud = document.getElementById('btn-hud-next');
+            const btnPrevHud = document.getElementById('btn-hud-prev');
+
+            if (btnPrevMenu) btnPrevMenu.style.opacity = currentLevel > 1 ? '1' : '0.3';
+            if (btnPrevHud) btnPrevHud.style.opacity = currentLevel > 1 ? '1' : '0.3';
+            if (btnNextMenu) btnNextMenu.style.opacity = currentLevel < unlockedLevel ? '1' : '0.3';
+            if (btnNextHud) btnNextHud.style.opacity = currentLevel < unlockedLevel ? '1' : '0.3';
         }
         
         updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI();
         
         document.getElementById('btn-play').addEventListener('click', () => { AudioSys.init(); document.getElementById('main-menu').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; initGame(); });
-        document.getElementById('btn-prev-level').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; SafeStorage.set('mahjong_level', currentLevel); updateMenuLevelText(); updateBoostersUI(); }});
-        document.getElementById('btn-next-level').addEventListener('click', () => { currentLevel++; SafeStorage.set('mahjong_level', currentLevel); updateMenuLevelText(); updateBoostersUI(); });
         
+        // КНОПКИ ПЕРЕКЛЮЧЕНИЯ УРОВНЕЙ С ПРОВЕРКОЙ БЛОКИРОВКИ
+        document.getElementById('btn-prev-level').addEventListener('click', () => { 
+            if(currentLevel > 1) { 
+                currentLevel--; SafeStorage.set('mahjong_level', currentLevel); updateMenuLevelText(); updateBoostersUI(); 
+            }
+        });
+        document.getElementById('btn-next-level').addEventListener('click', () => { 
+            if(currentLevel < unlockedLevel) { // Проверка: пройден ли уровень
+                currentLevel++; SafeStorage.set('mahjong_level', currentLevel); updateMenuLevelText(); updateBoostersUI(); 
+            }
+        });
+        
+        document.getElementById('btn-hud-prev').addEventListener('click', () => { 
+            if(currentLevel > 1) { 
+                currentLevel--; SafeStorage.set('mahjong_level', currentLevel); initGame(); 
+            }
+        });
+        document.getElementById('btn-hud-next').addEventListener('click', () => { 
+            if(currentLevel < unlockedLevel) { // Проверка: пройден ли уровень
+                currentLevel++; SafeStorage.set('mahjong_level', currentLevel); initGame(); 
+            }
+        });
+
         document.getElementById('btn-reset').addEventListener('click', () => {
             if (confirm(t('resetConfirm'))) { 
-                currentLevel = 1; totalScore = 0; totalCoins = 0; freeBoosters = {hint:0, undo:0, bomb:0, light:0};
-                SafeStorage.set('mahjong_level', 1); SafeStorage.set('mahjong_score', 0); SafeStorage.set('mahjong_coins', 0);
+                currentLevel = 1; unlockedLevel = 1; totalScore = 0; totalCoins = 0; freeBoosters = {hint:0, undo:0, bomb:0, light:0};
+                SafeStorage.set('mahjong_level', 1); 
+                SafeStorage.set('mahjong_unlocked_level', 1);
+                SafeStorage.set('mahjong_score', 0); 
+                SafeStorage.set('mahjong_coins', 0);
                 SafeStorage.remove('mahjong_free_boosters'); SafeStorage.remove('mahjong_tutorial_done'); 
                 updateMenuLevelText(); updateScoreDisplay(); updateBoostersUI(); 
             }
@@ -1164,9 +1208,6 @@
         document.getElementById('btn-rules').addEventListener('click', () => { AudioSys.init(); document.getElementById('rules-modal').style.display = 'flex'; });
         document.getElementById('btn-close-rules').addEventListener('click', () => document.getElementById('rules-modal').style.display = 'none');
         document.getElementById('btn-menu').addEventListener('click', () => { document.getElementById('game-screen').style.display = 'none'; document.getElementById('main-menu').style.display = 'flex'; updateMenuLevelText(); });
-        
-        document.getElementById('btn-hud-prev').addEventListener('click', () => { if(currentLevel > 1) { currentLevel--; SafeStorage.set('mahjong_level', currentLevel); initGame(); }});
-        document.getElementById('btn-hud-next').addEventListener('click', () => { currentLevel++; SafeStorage.set('mahjong_level', currentLevel); initGame(); });
 
         function updateScoreDisplay() { 
             let elScore = document.getElementById('hud-score'); let elCoins = document.getElementById('hud-coins');
@@ -1330,7 +1371,16 @@
             window.isLevelCompleting = true; 
 
             try { AudioSys.playWin(); } catch(e){}
-            try { currentLevel++; SafeStorage.set('mahjong_level', currentLevel); } catch(e){}
+            
+            // ОБНОВЛЕНИЕ ПРОГРЕССА
+            try { 
+                if (currentLevel >= unlockedLevel) {
+                    unlockedLevel = currentLevel + 1;
+                    SafeStorage.set('mahjong_unlocked_level', unlockedLevel);
+                }
+                currentLevel++; 
+                SafeStorage.set('mahjong_level', currentLevel); 
+            } catch(e){}
 
             shootEpicConfetti(); launchFireworks();
             
@@ -1521,7 +1571,7 @@
                         if (t1 && t1.el) t1.el.style.display = 'none'; 
                         if (t2 && t2.el) t2.el.style.display = 'none'; 
                         isAnimating = false; 
-                    }, 450); // Увеличено время исчезновения для плавной анимации
+                    }, 450);
 
                     activeTiles = activeTiles.filter(x => x !== t1 && x !== t2); firstTile = null; 
                     updateFreeState(); updateProgressBar();
@@ -1717,7 +1767,7 @@
                         spawnSmartBurst(pair[0].el, pair[0].symbol); spawnSmartBurst(pair[1].el, pair[1].symbol);
                         pair[0].el.classList.add('matched'); pair[1].el.classList.add('matched');
                         let t1 = pair[0], t2 = pair[1];
-                        setTimeout(() => { if(t1.el) t1.el.style.display = 'none'; if(t2.el) t2.el.style.display = 'none'; }, 450); // Увеличено для бустера
+                        setTimeout(() => { if(t1.el) t1.el.style.display = 'none'; if(t2.el) t2.el.style.display = 'none'; }, 450);
                         activeTiles = activeTiles.filter(x => x !== pair[0] && x !== pair[1]); destroyed++;
                     }
                 });
@@ -1735,7 +1785,7 @@
                     t.isMatched = true;
                     spawnSmartBurst(t.el, t.symbol); 
                     t.el.classList.add('matched'); 
-                    setTimeout(() => { if(t.el) t.el.style.display = 'none'; }, 450); // Увеличено для бустера
+                    setTimeout(() => { if(t.el) t.el.style.display = 'none'; }, 450);
                 });
                 activeTiles = activeTiles.filter(t => t.symbol !== randomTile.symbol); matchHistory = []; updateFreeState(); updateProgressBar();
                 if (activeTiles.length === 0) { levelComplete(); }
